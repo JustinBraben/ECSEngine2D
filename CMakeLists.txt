@@ -24,8 +24,11 @@ set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 # Define the SFML components to use.
 set(SFML_COMPONENTS system window graphics network audio)
 
+# Add any library files you want
+add_subdirectory(${PROJECT_SOURCE_DIR}/include/assignment1)
+
 # Add source files to the project's executable and include the src directory.
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp "src/Student.h" "src/Course.h")
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp "src/Student.h" "src/Course.h" "src/DynamicArray.h")
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 # Enforce treating warnings as errors for GNU and Clang compilers.
@@ -57,6 +60,6 @@ foreach(component IN LISTS SFML_COMPONENTS)
 endforeach()
 
 # Link the SFML libraries to the project's executable.
-target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
+target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio assignment1)
 
 # TODO: Add tests and install targets if needed.

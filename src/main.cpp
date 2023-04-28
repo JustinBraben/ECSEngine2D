@@ -3,6 +3,8 @@
 #include <filesystem>
 #include "Student.h"
 #include "Course.h"
+#include "DynamicArray.h"
+#include "../assignment1/main.cpp"
 
 void helloWorld() {
     // Create the main window
@@ -48,12 +50,35 @@ void helloWorld() {
     }
 }
 
-int main() {
-    
+void course() 
+{
     Course c("COMP 4300");
     c.loadFromFile("../../assets/students.txt");
 
     c.print();
+}
 
+void pp(int& i)
+{
+    std::cout << &i << " " << i << " " << sizeof(i) << "\n";
+}
+
+void dynamicArrayExample()
+{
+    DynamicArray<float> myArray(10);
+
+    myArray[4] = 7.14;
+    myArray[2] = 134.420;
+
+    myArray.print();
+}
+
+int main(int argc, char *argv[]) 
+{
+    DynamicArray<float> myArray(10);
+
+    myArray[2] = 17;
+
+    std::cout << myArray[2] << "\n";
     return 0;
 }
