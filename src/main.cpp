@@ -75,10 +75,7 @@ void dynamicArrayExample()
 
 int main(int argc, char *argv[]) 
 {
-    DynamicArray<float> myArray(10);
+    printConfig();
 
-    myArray[2] = 17;
-
-    std::cout << myArray[2] << "\n";
     return 0;
 }
