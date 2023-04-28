@@ -1,0 +1,75 @@
+name: clang
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths-ignore:
+      - .github/workflows/dependency-cache.yaml
+      - .github/workflows/msvc-analysis.yaml
+  workflow_dispatch:
+
+jobs:
+  job:
+    name: ${{ matrix.os }} - ${{ matrix.cmake_preset }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-12 ]
+        cmake_preset: [ debug, release ]
+
+    env:
+      NUGET_SOURCE_NAME: github
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+
+    - name: Fetch Ninja
+      uses: seanmiddleditch/gha-setup-ninja@v3
+
+    - name: Authenticate to GitHub NuGet registry
+      run: >
+        nuget
+        sources add
+        -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        -storepasswordincleartext
+        -name "${{ env.NUGET_SOURCE_NAME }}"
+        -username "${{ github.actor }}"
+        -password "${{ secrets.GITHUB_TOKEN }}"
+
+    - name: Restore vcpkg
+      uses: actions/cache@v3
+      with:
+        path: |
+          /usr/local/share/vcpkg
+          C:\vcpkg
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+
+    - name: Set VCPKG_ROOT
+      run: |
+        echo "Setting VCPKG_ROOT to /usr/local/share/vcpkg"
+        echo "VCPKG_ROOT=/usr/local/share/vcpkg" >> $GITHUB_ENV
+
+    - name: List vcpkg directories (macOS)
+      run: |
+        ls -l /usr/local/share/vcpkg
+        ls -l /usr/local/bin/vcpkg
+        ls -l /usr/local/bin
+        ls -l /usr/local
+      if: runner.os == 'macOS'
+
+    - name: Configure and run CMake
+      uses: lukka/run-cmake@v10
+      env:
+        VCPKG_ROOT: ${{ fromJSON('[ "/usr/local/share/vcpkg", "C:\\vcpkg" ]')[runner.os == 'Windows'] }}
+        CC: ${{ fromJSON('{"Linux":"gcc-10", "macOS":"clang", "Windows":"" }')[runner.os] }}
+        CXX: ${{ fromJSON('{"Linux":"g++-10", "macOS":"clang++", "Windows":"" }')[runner.os] }}
+      with:
+        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+        configurePreset: ${{ matrix.cmake_preset }}
+        buildPreset: ${{ matrix.cmake_preset }}
+        testPreset: ${{ matrix.cmake_preset }}
