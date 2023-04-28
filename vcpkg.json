@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "ecs-engine",
+  "version": "0.1.1",
+  "dependencies": [
+    {
+      "name": "sfml"
+    }
+  ]
+}
