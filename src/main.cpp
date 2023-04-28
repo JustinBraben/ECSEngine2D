@@ -1,8 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <filesystem>
+#include "Student.h"
+#include "Course.h"
 
-int main() {
+void helloWorld() {
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "Hello, World!");
 
@@ -18,7 +20,6 @@ int main() {
     sf::Font font;
     if (!font.loadFromFile(fontPath.string())) {
         // Error handling (e.g., use the default font or exit)
-        return 1;
     }
 
     // Set up the "Hello, World!" text
@@ -45,6 +46,14 @@ int main() {
         // Update the window
         window.display();
     }
+}
+
+int main() {
+    
+    Course c("COMP 4300");
+    c.loadFromFile("../../assets/students.txt");
+
+    c.print();
 
     return 0;
 }
