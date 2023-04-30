@@ -75,7 +75,7 @@ void dynamicArrayExample()
 
 int main(int argc, char *argv[]) 
 {
-    printConfig();
+    runAssignment1();
 
     return 0;
 }

@@ -103,18 +103,26 @@ public:
     auto& getFont() const { return m_font; }
 };
 
-class BouncingRectangle : public Bounce {
+class BouncingShape : public Bounce {
+protected:
     sf::Color m_shapeColor;
 
 public:
-    BouncingRectangle(float startX, float startY, float xSpeed, float ySpeed, float width, float height, sf::Color shapeColor)
+    BouncingShape(float startX, float startY, float xSpeed, float ySpeed, float width, float height, sf::Color shapeColor)
         : Bounce(startX, startY, xSpeed, ySpeed, width, height), m_shapeColor(shapeColor)
-    {
+    {}
 
-    }
+    virtual void draw(sf::RenderWindow& window) const override = 0;
+};
 
-    void update(sf::RenderWindow& window) {
-        Bounce::update(window);
+class BouncingRectangle : public BouncingShape {
+public:
+    BouncingRectangle(float startX, float startY, float xSpeed, float ySpeed, float width, float height, sf::Color shapeColor)
+        : BouncingShape(startX, startY, xSpeed, ySpeed, width, height, shapeColor)
+    {}
+
+    void update(sf::RenderWindow& window) override {
+        BouncingShape::update(window);
     }
 
     void draw(sf::RenderWindow& window) const override {
@@ -125,18 +133,45 @@ public:
     }
 };
 
-class BouncingCircle : public Bounce {
-    sf::Color m_shapeColor;
-
+class BouncingCircle : public BouncingShape {
 public:
     BouncingCircle(float startX, float startY, float xSpeed, float ySpeed, float width, float height, sf::Color shapeColor)
-        : Bounce(startX, startY, xSpeed, ySpeed, width, height), m_shapeColor(shapeColor)
-    {
+        : BouncingShape(startX, startY, xSpeed, ySpeed, width, height, shapeColor)
+    {}
 
-    }
+    void update(sf::RenderWindow& window) override {
+        float leftBound = 0.f;
+        float rightBound = window.getSize().x - 2 * m_width;
+        float topBound = 0.f;
+        float bottomBound = window.getSize().y - 2 * m_width;
 
-    void update(sf::RenderWindow& window) {
-        Bounce::update(window);
+        // Update position
+        float newX = getX() + m_xSpeed;
+        float newY = getY() + m_ySpeed;
+
+        // Check if out of bounds
+        if (newX < leftBound || newX > rightBound) {
+            m_xSpeed *= -1.f;
+        }
+        if (newY < topBound || newY > bottomBound) {
+            m_ySpeed *= -1.f;
+        }
+
+        // Adjust position if out of bounds
+        if (newX < leftBound) {
+            newX = leftBound;
+        }
+        else if (newX > rightBound) {
+            newX = rightBound;
+        }
+        if (newY < topBound) {
+            newY = topBound;
+        }
+        else if (newY > bottomBound) {
+            newY = bottomBound;
+        }
+
+        setPosition(newX, newY);
     }
 
     void draw(sf::RenderWindow& window) const override {
@@ -161,7 +196,7 @@ public:
         Bounce::update(window);
     }
 
-    void draw(sf::RenderWindow& window) const {
+    void draw(sf::RenderWindow& window) const override {
         sf::Text text(m_shapeName, m_font, m_textSize);
         text.setFillColor(m_textColor);
         sf::FloatRect textRect = text.getLocalBounds();
@@ -170,16 +205,14 @@ public:
         // Calculate center of circle
         sf::Vector2f circleCenter(m_xPos + m_width / 2.0f, m_yPos + m_height / 2.0f);
 
-        // Set the text's origin to its center
-        text.setOrigin(textRect.width / 2.0f, textRect.height / 2.0f);
+        // Set the text's position to the center of the circle
         text.setPosition(circleCenter);
 
         window.draw(text);
     }
-
 };
 
-void printConfig(void)
+void runAssignment1(void)
 {
     std::cout << std::filesystem::current_path() << "\n";
 
@@ -220,10 +253,6 @@ void printConfig(void)
             float x, y, dx, dy, radius;
             int r, g, b;
             ss >> name >> x >> y >> dx >> dy >> r >> g >> b >> radius;
-            sf::CircleShape circle(radius);
-            circle.setFillColor(sf::Color(r, g, b));
-            circle.setPosition(x, y);
-            // Use circle object
             myBouncyEntities.push_back(std::make_unique<BouncingCircle>(x, y, dx, dy, radius, radius, sf::Color(r, g, b)));
             myBouncyEntities.push_back(std::make_unique<BouncingText>(x, y, dx, dy, radius, radius, name, shapeFont, fontColor, fontSize));
         }
@@ -232,8 +261,6 @@ void printConfig(void)
             float x, y, dx, dy, width, height;
             int r, g, b;
             ss >> name >> x >> y >> dx >> dy >> r >> g >> b >> width >> height;
-            sf::RectangleShape rect(sf::Vector2f(width, height));
-            TextInShape shapeText(fontPath, name, fontSize, fontColor, shapeFont);
             myBouncyEntities.push_back(std::make_unique<BouncingRectangle>(x, y, dx, dy, width, height, sf::Color(r, g, b)));
             myBouncyEntities.push_back(std::make_unique<BouncingText>(x, y, dx, dy, width, height, name, shapeFont, fontColor, fontSize));
         }
@@ -258,11 +285,10 @@ void printConfig(void)
 
         window.display();
     }
-
-    //window.close();
 }
 
 int assignment1(void)
 {
+    runAssignment1();
     return 0;
 }
