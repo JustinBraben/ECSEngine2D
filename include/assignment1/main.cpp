@@ -104,7 +104,7 @@ protected:
     std::unique_ptr<TextComponent> m_textComponent;
 
 public:
-    Circle(float startX, float startY, float xSpeed, float ySpeed, const std::string& shapeType, sf::Color& shapeColor, float radius, std::unique_ptr<TextComponent> textComponent)
+    Circle(float startX, float startY, float xSpeed, float ySpeed, const std::string& shapeType, const sf::Color& shapeColor, float radius, std::unique_ptr<TextComponent> textComponent)
         : Shape(startX, startY, xSpeed, ySpeed, shapeType, shapeColor), m_radius(radius), m_textComponent(std::move(textComponent)) {}
 
     void update(sf::RenderWindow& window) override {
@@ -176,7 +176,7 @@ protected:
     std::unique_ptr<TextComponent> m_textComponent;
 
 public:
-    Rectangle(float startX, float startY, float xSpeed, float ySpeed, const std::string& shapeType, sf::Color& shapeColor, float width, float height, std::unique_ptr<TextComponent> textComponent)
+    Rectangle(float startX, float startY, float xSpeed, float ySpeed, const std::string& shapeType, const sf::Color& shapeColor, float width, float height, std::unique_ptr<TextComponent> textComponent)
         : Shape(startX, startY, xSpeed, ySpeed, shapeType, shapeColor), m_width(width), m_height(height), m_textComponent(std::move(textComponent)) {}
 
     void update(sf::RenderWindow& window) override {
