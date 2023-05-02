@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <cmath>
 class Vec2
 {
 public:
@@ -34,11 +35,6 @@ public:
 		return Vec2(x / rhs.x, y / rhs.y);
 	}
 
-	Vec2 operator += (const Vec2& rhs) {
-		x += rhs.x;
-		y += rhs.y;
-	}
-
 	Vec2& add(const Vec2& v) {
 		x += v.x;
 		y += v.y;
@@ -56,7 +52,7 @@ public:
 	}
 
 	float dist(const Vec2& v) const {
-		return sqrt((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y));
+		return std::sqrt((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y));
 	}
 private:
 	
