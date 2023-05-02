@@ -28,7 +28,7 @@ set(SFML_COMPONENTS system window graphics network audio)
 add_subdirectory(${PROJECT_SOURCE_DIR}/include/assignment1)
 
 # Add source files to the project's executable and include the src directory.
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp "src/Student.h" "src/Course.h" "src/DynamicArray.h")
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp)
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 # Enforce treating warnings as errors for GNU and Clang compilers.
