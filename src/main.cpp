@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     //Vec2 v2(50, 75);
     //Vec2 v3(1000, 2000);
     //std::cout << v1.x << " " << v1.y << "\n";
-
+    
     runAssignment2();
 
     return 0;

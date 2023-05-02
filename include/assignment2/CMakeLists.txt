@@ -1,11 +1,18 @@
+# Set variables used to build the library
+# important to add include line to library in your other CMakeLists.txt
 set(SFML_COMPONENTS system window graphics network audio)
+set(LIBRARY_NAME assignment2)
 
-find_package(SFML COMPONENTS ${SFML_COMPONENTS})
+# Add all header and source files to the library target
+file(GLOB HEADER_FILES "*.hpp")
+file(GLOB SOURCE_FILES "*.cpp")
+add_library(${LIBRARY_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
-# Create a library target from the source files in this directory
-add_library(assignment2 main.cpp)
+# Find SFML and add it to your project
+find_package(SFML 2.5 REQUIRED COMPONENTS graphics window system)
 
-target_link_libraries(assignment2 sfml-system sfml-window sfml-graphics sfml-network sfml-audio "../../include/assignment2/Vec2.hpp")
+# Link the SFML libraries to your library target
+target_link_libraries(${LIBRARY_NAME} sfml-graphics sfml-window sfml-system)
 
-# Include the directory containing this CMake file.
-target_include_directories(assignment2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# Add SFML include directories to your library target
+target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
