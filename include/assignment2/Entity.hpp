@@ -3,14 +3,13 @@
 #include "Components.hpp"
 #include <memory>
 #include <string>
+
 class Entity {
-
-	friend class EnitityManager;
-
+	friend class EntityManager;
+private:
 	bool m_active = true;
 	size_t m_id = 0;
 	std::string m_tag = "default";
-
 	Entity(const size_t id, const std::string& tag);
 
 public:
@@ -27,4 +26,5 @@ public:
 	const std::string& tag() const;
 	const size_t id() const;
 	void destroy();
+
 };

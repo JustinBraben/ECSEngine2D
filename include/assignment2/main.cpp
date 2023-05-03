@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <filesystem>
 #include "Game.hpp"
 
 int runAssignment2() {
@@ -9,6 +10,8 @@ int runAssignment2() {
 	Vec2 v3 = v1 + v2;
 
 	std::cout << v3.x << " " << v3.y << "\n";
+
+	std::cout << std::filesystem::current_path() << "\n";
 
 	Game g("../../include/assignment2/configs/config.txt");
 	g.run();

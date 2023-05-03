@@ -5,7 +5,7 @@
 //#include "Engine/Vec2.hpp"
 //#include "Engine/Entity.hpp"
 //#include "../assignment1/main.cpp"
-#include "../assignment2/main.cpp"
+#include "../assignment2/Game.hpp"
 
 int main(int argc, char *argv[]) 
 {
@@ -16,7 +16,8 @@ int main(int argc, char *argv[])
     //Vec2 v3(1000, 2000);
     //std::cout << v1.x << " " << v1.y << "\n";
     
-    runAssignment2();
+    Game g("../../include/assignment2/configs/config.txt");
+    g.run();
 
     return 0;
 }

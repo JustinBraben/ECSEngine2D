@@ -1,14 +1,15 @@
 #pragma once
 
+#include "Entity.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
-#include "Entity.hpp"
 
-using EntityVec = std::vector<std::shared_ptr<Entity>>;
-using EntityMap = std::map<std::string, EntityVec>;
+typedef std::vector<std::shared_ptr<Entity>> EntityVec;
+typedef std::map<std::string, EntityVec> EntityMap;
 
 class EntityManager {
+
 	EntityVec m_entities;
 	EntityVec m_toAdd;
 	EntityMap m_entityMap;

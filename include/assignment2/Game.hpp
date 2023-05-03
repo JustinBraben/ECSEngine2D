@@ -1,9 +1,11 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
 #include "Entity.hpp"
 #include "EntityManager.hpp"
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include <SFML/Graphics.hpp>
 
@@ -21,7 +23,7 @@ class Game
 	EnemyConfig m_enemyConfig;
 	BulletConfig m_bulletConfig;
 	int m_score = 0;
-	int currentFrame = 0;
+	int m_currentFrame = 0;
 	int m_lastEnemySpawnTime = 0;
 	bool m_paused = false;
 	bool m_running = true;
