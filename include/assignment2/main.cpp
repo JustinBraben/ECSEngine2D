@@ -4,7 +4,7 @@
 
 int runAssignment2() {
 
-	Vec2 v1(100, 100);
+	/*Vec2 v1(100, 100);
 	Vec2 v2(300, 500);
 
 	Vec2 v3 = v1 + v2;
@@ -14,7 +14,7 @@ int runAssignment2() {
 	std::cout << std::filesystem::current_path() << "\n";
 
 	Game g("../../include/assignment2/configs/config.txt");
-	g.run();
+	g.run();*/
 
 	return 1;
 }
