@@ -109,6 +109,11 @@ void Game::sMovement()
 			entity->cTransform->pos.y += entity->cTransform->velocity.y;
 			entity->cTransform->pos.x += entity->cTransform->velocity.x;
 		}
+		
+		if (entity->tag() == "smallEnemy") {
+			entity->cTransform->pos.y += entity->cTransform->velocity.y;
+			entity->cTransform->pos.x += entity->cTransform->velocity.x;
+		}
 	}
 }
 
@@ -288,6 +293,17 @@ void Game::sCollision()
 			enemy->destroy();
 		}
 	}
+
+	// TODO: write collisions with small Enemies
+	for (auto enemy : m_entities.getEntities("smallEnemy")) {
+		auto distance = m_player->cTransform->pos.dist(enemy->cTransform->pos);
+		if (distance < m_player->cCollision->radius + enemy->cCollision->radius) {
+			std::cout << "Player collided with enemy id : " << enemy->id() << "\n";
+			m_player->cTransform->pos.x = m_window.getSize().x / 2;
+			m_player->cTransform->pos.y = m_window.getSize().y / 2;
+			enemy->destroy();
+		}
+	}
 }
 
 // respawn the player in the middle of the screen
@@ -393,19 +409,19 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
 	for (int i = 0; i < entity->cShape->circle.getPointCount(); i++) {
 		float pi = 3.141593;
 		auto smallerEntity = m_entities.addEntity("smallEnemy");
-		auto angleToRadians = (180.0 / 3.141593);
+		auto angleToRadians = (180.0 / pi);
 
 		auto angle = i * (2.0f * pi) / static_cast<float>(entity->cShape->circle.getPointCount()) * angleToRadians;
 
-		//std::cout << "angle would have been " << angle << "\n";
+		std::cout << "angle would have been " << angle << "\n";
 
-		float evx = speed * std::cos(angle) * 3;
-		float evy = speed * std::sin(angle) * 3;
+		float evx = speed * std::cos(angle);
+		float evy = speed * std::sin(angle);
 
 		smallerEntity->cCollision = std::make_shared<CCollision>(m_enemyConfig.CR - m_enemyConfig.CR / 2);
 
 		smallerEntity->cTransform = std::make_shared<CTransform>(Vec2(entity->cTransform->pos.x, entity->cTransform->pos.y),
-			Vec2(evx, evy), angle);
+			Vec2(evx, evy), 0);
 
 		smallerEntity->cShape = std::make_shared<CShape>(static_cast<float>(m_enemyConfig.SR) / 2.0f,
 			entity->cShape->circle.getPointCount(),
