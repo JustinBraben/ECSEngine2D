@@ -40,7 +40,7 @@ void Game::init(const std::string& config)
 
 	// set up default window parameters
 	m_window.create(sf::VideoMode(1280, 720), "Assignment 2");
-	m_window.setFramerateLimit(60);
+	m_window.setFramerateLimit(144);
 
 	spawnPlayer();
 }
@@ -204,8 +204,9 @@ void Game::sLifespan()
 	for (auto& entity : m_entities.getEntities()) {
 		if (entity->cLifeSpan == nullptr)
 			continue;
-		if (entity->cLifeSpan->remaining > 0)
+		if (entity->cLifeSpan->remaining > 0) {
 			entity->cLifeSpan->remaining--;
+		}
 		if (entity->cLifeSpan != nullptr && entity->cLifeSpan->remaining < 1)
 			entity->destroy();
 	}
@@ -254,6 +255,7 @@ void Game::sCollision()
 			auto distance = bullet->cTransform->pos.dist(enemy->cTransform->pos);
 			if (distance < bullet->cCollision->radius + enemy->cCollision->radius) {
 				std::cout << "Bullet collided! with enemy : " << enemy->id() << " \n";
+				spawnSmallEnemies(enemy);
 				enemy->destroy();
 				bullet->destroy();
 			}
@@ -262,9 +264,28 @@ void Game::sCollision()
 
 	// TODO: write the collisions where enemy runs into the player
 	for (auto enemy : m_entities.getEntities("enemy")) {
+
+		// TODO: make enemies reverse velocity when they collide with a bound
+
+		if (enemy->cTransform->pos.x < enemy->cCollision->radius ||
+			enemy->cTransform->pos.x > m_window.getSize().x - enemy->cCollision->radius) {
+			enemy->cTransform->velocity.x *= -1.0f;
+		}
+		if (enemy->cTransform->pos.y < enemy->cCollision->radius ||
+			enemy->cTransform->pos.y > m_window.getSize().y - enemy->cCollision->radius) {
+			enemy->cTransform->velocity.y *= -1.0f;
+		}
+
+		// Check if out of bounds
+
+		// TODO: respawn player when colliding with an enemy
 		auto distance = m_player->cTransform->pos.dist(enemy->cTransform->pos);
 		if (distance < m_player->cCollision->radius + enemy->cCollision->radius) {
-			std::cout << "Player colliding with enemy id : " << enemy->id() << "\n";
+			std::cout << "Player collided with enemy id : " << enemy->id() << "\n";
+			m_player->cTransform->pos.x = m_window.getSize().x / 2;
+			m_player->cTransform->pos.y = m_window.getSize().y / 2;
+			spawnSmallEnemies(enemy);
+			enemy->destroy();
 		}
 	}
 }
@@ -297,6 +318,8 @@ void Game::spawnPlayer()
 	// Add collision to the player 
 	entity->cCollision = std::make_shared<CCollision>(m_playerConfig.CR);
 
+	entity->cScore = std::make_shared<CScore>(0);
+
 	// Since we want this Entity to be our player, set our Game's player variable to be this Entity
 	// This goes slightly against the EntityManager paradigm, but we use the player so much it's worth it
 	m_player = entity;
@@ -316,28 +339,40 @@ void Game::spawnEnemy()
 	// TODO: Ensure these are not spawned offscreen
 	// - also don't let them spawn on the player
 	std::uniform_int_distribution<> distribVertices(m_enemyConfig.VMIN, m_enemyConfig.VMAX);
-	std::uniform_int_distribution<> distribX(20, 1250);
-	std::uniform_int_distribution<> distribY(20, 699);
-	std::uniform_real_distribution<> distribVX(-1, 1);
-	std::uniform_real_distribution<> distribVY(-1, 1);
+	std::uniform_int_distribution<> distribX(m_enemyConfig.SR, m_window.getSize().x - m_enemyConfig.SR);
+	std::uniform_int_distribution<> distribY(m_enemyConfig.SR, m_window.getSize().y - m_enemyConfig.SR);
+	std::uniform_int_distribution<> distribRGB(0, 255);
+
+	std::uniform_real_distribution<> distribVX(-m_enemyConfig.SMIN, m_enemyConfig.SMAX);
+	std::uniform_real_distribution<> distribVY(-m_enemyConfig.SMIN, m_enemyConfig.SMAX);
+
 	
 	int vertices = distribVertices(gen);
 	float ex = static_cast<float>(distribX(gen));
 	float ey = static_cast<float>(distribY(gen));
-	float evx = static_cast<float>(distribVX(gen));
-	float evy = static_cast<float>(distribVY(gen));
+	float evx = distribVX(gen);
+	float evy = distribVY(gen);
 
+	entity->cCollision = std::make_shared<CCollision>(m_playerConfig.CR);
 
 	// TODO: set enemies based on config file
 	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(evx, evy), 0.0f);
 
+	while (entity->cTransform->pos.dist(m_player->cTransform->pos) <= entity->cCollision->radius + m_player->cCollision->radius) {
+
+		float ex = static_cast<float>(distribX(gen));
+		float ey = static_cast<float>(distribY(gen));
+		entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(evx, evy), 0.0f);
+
+	}
+
 	// Entity's shape will have radius 32, 8 sides, dark grey fill, and red outline of thickness 4
 	entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR, vertices, 
-		sf::Color(0, 0, 0),
+		sf::Color(distribRGB(gen), distribRGB(gen), distribRGB(gen)),
 		sf::Color(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB),
 		m_enemyConfig.OT);
 
-	entity->cCollision = std::make_shared<CCollision>(m_playerConfig.CR);
+	entity->cScore = std::make_shared<CScore>(vertices * 10);
 
 	// record when the most recent enemy was spawned
 	m_lastEnemySpawnTime = m_currentFrame;
@@ -346,6 +381,41 @@ void Game::spawnEnemy()
 void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
 {
 	// TODO: spawn small enemies at the location of the input enemy e
+	std::cout << "This would have made " << entity->cShape->circle.getPointCount() << " many small enemies\n";
+
+	std::random_device rd;
+	std::mt19937 gen(rd());
+
+	std::uniform_real_distribution<> distribV(m_enemyConfig.SMIN, m_enemyConfig.SMAX);
+
+	float speed = distribV(gen);
+
+	for (int i = 0; i < entity->cShape->circle.getPointCount(); i++) {
+		float pi = 3.141593;
+		auto smallerEntity = m_entities.addEntity("smallEnemy");
+		auto angleToRadians = (180.0 / 3.141593);
+
+		auto angle = i * (2.0f * pi) / static_cast<float>(entity->cShape->circle.getPointCount()) * angleToRadians;
+
+		//std::cout << "angle would have been " << angle << "\n";
+
+		float evx = speed * std::cos(angle) * 3;
+		float evy = speed * std::sin(angle) * 3;
+
+		smallerEntity->cCollision = std::make_shared<CCollision>(m_enemyConfig.CR - m_enemyConfig.CR / 2);
+
+		smallerEntity->cTransform = std::make_shared<CTransform>(Vec2(entity->cTransform->pos.x, entity->cTransform->pos.y),
+			Vec2(evx, evy), angle);
+
+		smallerEntity->cShape = std::make_shared<CShape>(static_cast<float>(m_enemyConfig.SR) / 2.0f,
+			entity->cShape->circle.getPointCount(),
+			entity->cShape->circle.getFillColor(), entity->cShape->circle.getOutlineColor(),
+			m_enemyConfig.OT);
+
+		smallerEntity->cLifeSpan = std::make_shared<CLifeSpan>(m_enemyConfig.L);
+
+		smallerEntity->cScore = std::make_shared<CScore>(entity->cScore->score * 10);
+	}
 
 	// when we create the smaller enemy, we have to read the values of the original enemy
 	// - spawn a number of small enemies equal to the vertices. of the orignal enemy

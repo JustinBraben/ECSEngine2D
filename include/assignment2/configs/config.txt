@@ -1,8 +1,8 @@
 Window 1280 720 60 0
 Font fonts/tech.ttf 24 255 255 255
-Player 32 32 5 5 5 5 255 0 0 4 8
-Enemy 32 32 3 3 255 255 255 2 3 8 90 144
-Bullet 10 10 20 255 255 255 255 255 255 2 20 90
+Player 32 32 2 5 5 5 255 0 0 4 8
+Enemy 32 32 2 2 255 255 255 2 3 8 90 144
+Bullet 10 10 3 255 255 255 255 255 255 2 20 90
 
 'Player' SR CR S FR FG FB OR OG OB OT V
 	Shape Radius		SR		int
