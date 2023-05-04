@@ -31,16 +31,16 @@ void Game::init(const std::string& config)
 				>> m_enemyConfig.VMAX >> m_enemyConfig.L >> m_enemyConfig.SI;
 		}
 		if (type == "Bullet") {
-			ss >> m_bulletConfig.SR >> m_bulletConfig.CR >> m_bulletConfig.FR
-				>> m_bulletConfig.FG >> m_bulletConfig.FB >> m_bulletConfig.OR
-				>> m_bulletConfig.OG >> m_bulletConfig.OB >> m_bulletConfig.OT
-				>> m_bulletConfig.V >> m_bulletConfig.L >> m_bulletConfig.S;
+			ss >> m_bulletConfig.SR >> m_bulletConfig.CR >> m_bulletConfig.S
+				>> m_bulletConfig.FR >> m_bulletConfig.FG >> m_bulletConfig.FB
+				>> m_bulletConfig.OR >> m_bulletConfig.OG >> m_bulletConfig.OB
+				>> m_bulletConfig.OT >> m_bulletConfig.V >> m_bulletConfig.L;
 		}
 	}
 
 	// set up default window parameters
 	m_window.create(sf::VideoMode(1280, 720), "Assignment 2");
-	m_window.setFramerateLimit(144);
+	m_window.setFramerateLimit(60);
 
 	spawnPlayer();
 }
@@ -252,11 +252,19 @@ void Game::sCollision()
 			// if it is, destroy the enemy and the 
 			// then spawn the small enemies from that enemy
 			auto distance = bullet->cTransform->pos.dist(enemy->cTransform->pos);
-			if (distance < bullet->cShape->circle.getRadius() + enemy->cShape->circle.getRadius()) {
+			if (distance < bullet->cCollision->radius + enemy->cCollision->radius) {
 				std::cout << "Bullet collided! with enemy : " << enemy->id() << " \n";
 				enemy->destroy();
 				bullet->destroy();
 			}
+		}
+	}
+
+	// TODO: write the collisions where enemy runs into the player
+	for (auto enemy : m_entities.getEntities("enemy")) {
+		auto distance = m_player->cTransform->pos.dist(enemy->cTransform->pos);
+		if (distance < m_player->cCollision->radius + enemy->cCollision->radius) {
+			std::cout << "Player colliding with enemy id : " << enemy->id() << "\n";
 		}
 	}
 }
@@ -275,13 +283,19 @@ void Game::spawnPlayer()
 	float mx = m_window.getSize().x / 2.0f;
 	float my = m_window.getSize().y / 2.0f;
 	
-	entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), Vec2(1.0f, 1.0f), 0.0f);
+	entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), 
+		Vec2(m_playerConfig.S, m_playerConfig.S), 0.0f);
 	
 	// Entity's shape will have radius 32, 8 sides, dark grey fill, and red outline of thickness 4
-	entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
+	entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.V,
+		sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB),
+		sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB), m_playerConfig.OT);
 
 	// Add an input component to the player so that we can use inputs
 	entity->cInput = std::make_shared<CInput>();
+
+	// Add collision to the player 
+	entity->cCollision = std::make_shared<CCollision>(m_playerConfig.CR);
 
 	// Since we want this Entity to be our player, set our Game's player variable to be this Entity
 	// This goes slightly against the EntityManager paradigm, but we use the player so much it's worth it
@@ -295,7 +309,6 @@ void Game::spawnEnemy()
 	// This returns a std::shared_ptr<Entity>, so we use 'auto' to save typing
 	auto entity = m_entities.addEntity("enemy");
 
-	// Give this entity a Transform so it spawns at (200,200) with velocity (1,1) and angle of 0
 	std::random_device rd;
 	std::mt19937 gen(rd());
 
@@ -324,7 +337,7 @@ void Game::spawnEnemy()
 		sf::Color(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB),
 		m_enemyConfig.OT);
 
-	entity->cCollision = std::make_shared<CCollision>(32.0);
+	entity->cCollision = std::make_shared<CCollision>(m_playerConfig.CR);
 
 	// record when the most recent enemy was spawned
 	m_lastEnemySpawnTime = m_currentFrame;
@@ -355,15 +368,17 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& mousePos)
 	if (length != 0)
 		direction /= length;
 
-	float speed = 1.0f;
-
-	auto bulletVelocity = direction * speed;
+	auto bulletVelocity = direction * m_bulletConfig.S;
 
 	std::cout << "Velocity x of bullet : " << bulletVelocity.x << " Velocity y of bullet : " << bulletVelocity.y << "\n";
 
 	bullet->cTransform = std::make_shared<CTransform>(entity->cTransform->pos, Vec2(bulletVelocity.x, bulletVelocity.y), 0);
-	bullet->cShape = std::make_shared<CShape>(10, 8, sf::Color(255,255, 255), sf::Color(255,0,0), 2);
-	bullet->cLifeSpan = std::make_shared<CLifeSpan>(144);
+	bullet->cShape = std::make_shared<CShape>(m_bulletConfig.SR, m_bulletConfig.V, 
+		sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB),
+		sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB),
+		m_bulletConfig.OT);
+	bullet->cLifeSpan = std::make_shared<CLifeSpan>(m_bulletConfig.L);
+	bullet->cCollision = std::make_shared<CCollision>(m_bulletConfig.CR);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
