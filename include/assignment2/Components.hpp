@@ -24,6 +24,8 @@ public:
 		circle.setOutlineThickness(thickness);
 		circle.setOrigin(radius, radius);
 	}
+
+	auto getFillColor() const { return circle.getFillColor(); }
 };
 
 class CCollision {

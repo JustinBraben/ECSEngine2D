@@ -72,6 +72,8 @@ void Game::run() {
 		// may need to be moved when paused implemented
 		m_currentFrame++;
 	}
+
+	m_window.close();
 }
 
 void Game::setPaused(bool paused)
@@ -86,16 +88,16 @@ void Game::sMovement()
 	for (auto& entity : m_entities.getEntities()) {
 		if (entity->tag() == "player") {
 			// Sample movement speed update
-			if (entity->cInput->up) {
+			if (entity->cInput->up && entity->cTransform->pos.y > entity->cCollision->radius) {
 				entity->cTransform->pos.y -= entity->cTransform->velocity.y;
 			}
-			if (entity->cInput->down) {
+			if (entity->cInput->down && entity->cTransform->pos.y < m_window.getSize().y - entity->cCollision->radius) {
 				entity->cTransform->pos.y += entity->cTransform->velocity.y;
 			}
-			if (entity->cInput->left) {
+			if (entity->cInput->left && entity->cTransform->pos.x > entity->cCollision->radius) {
 				entity->cTransform->pos.x -= entity->cTransform->velocity.x;
 			}
-			if (entity->cInput->right) {
+			if (entity->cInput->right && entity->cTransform->pos.x < m_window.getSize().x - entity->cCollision->radius) {
 				entity->cTransform->pos.x += entity->cTransform->velocity.x;
 			}
 		}
@@ -145,6 +147,10 @@ void Game::sUserInput()
 			case sf::Keyboard::D:
 				std::cout << "D Key Pressed\n";
 				m_player->cInput->right = true;
+				break;
+			case sf::Keyboard::Escape:
+				std::cout << "Escape Key Pressed\n";
+				m_running = false;
 				break;
 			default: break;
 			}
@@ -223,17 +229,23 @@ void Game::sRender()
 	// - sample drawing of the player Entity we have created
 	m_window.clear();
 
-	for (auto e : m_entities.getEntities()) {
+	for (auto entity : m_entities.getEntities()) {
 
 		// set the position of the shape based on the entity's transform->pos
-		e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
+		entity->cShape->circle.setPosition(entity->cTransform->pos.x, entity->cTransform->pos.y);
 
 		// set the rotation of the shape based on the entity's transform->angle
-		e->cTransform->angle += 1.0f;
-		e->cShape->circle.setRotation(e->cTransform->angle);
+		entity->cTransform->angle += 1.0f;
+		entity->cShape->circle.setRotation(entity->cTransform->angle);
+
+		// TODO: adjust alpha of entities that have a lifespan
+		// decrease alpha as life span gets closer to 0 from total
+		if (entity->cLifeSpan != nullptr) {
+			//entity->cShape->circle.setFillColor();
+		}
 
 		// draw the entity's sf::CircleShape
-		m_window.draw(e->cShape->circle);
+		m_window.draw(entity->cShape->circle);
 	}
 
 	m_window.display();
