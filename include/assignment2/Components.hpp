@@ -26,6 +26,10 @@ public:
 	}
 
 	auto getFillColor() const { return circle.getFillColor(); }
+
+	void setFillColor(const sf::Color& fill) { circle.setFillColor(fill); }
+
+	void setOutlineColor(const sf::Color& outline) { circle.setOutlineColor(outline); }
 };
 
 class CCollision {

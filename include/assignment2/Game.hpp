@@ -39,6 +39,7 @@ class Game
 	void sRender();
 	void sEnemySpawner();
 	void sCollision();
+	void sScore();
 
 	void spawnPlayer();
 	void spawnEnemy();

@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "Game.hpp"
 #include <random>
 #include <cmath>
 
@@ -217,6 +218,12 @@ void Game::sLifespan()
 			continue;
 		if (entity->cLifeSpan->remaining > 0) {
 			entity->cLifeSpan->remaining--;
+			auto entColor = entity->cShape->getFillColor();
+			auto alphaDelta = static_cast<float>(255) / static_cast<float>(entity->cLifeSpan->total);
+			auto newAlpha = alphaDelta * static_cast<float>(entity->cLifeSpan->remaining);
+			auto newColor = sf::Color(entColor.r, entColor.g, entColor.b, newAlpha);
+			entity->cShape->setFillColor(newColor);
+			entity->cShape->setOutlineColor(newColor);
 		}
 		if (entity->cLifeSpan != nullptr && entity->cLifeSpan->remaining < 1)
 			entity->destroy();
@@ -316,6 +323,11 @@ void Game::sCollision()
 			enemy->destroy();
 		}
 	}
+}
+
+void Game::sScore()
+{
+
 }
 
 // respawn the player in the middle of the screen
@@ -421,9 +433,11 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
 	for (int i = 0; i < entity->cShape->circle.getPointCount(); i++) {
 		float pi = 3.141593;
 		auto smallerEntity = m_entities.addEntity("smallEnemy");
-		auto angleToRadians = (180.0 / pi);
+		auto angleToRadians = (pi / 180.0f);
+		auto baseAngle = 360.0f / static_cast<float>(entity->cShape->circle.getPointCount());
 
-		auto angle = i * (2.0f * pi) / static_cast<float>(entity->cShape->circle.getPointCount()) * angleToRadians;
+		//auto angle = i * (2.0f * pi) / static_cast<float>(entity->cShape->circle.getPointCount()) * angleToRadians;
+		auto angle = i * (baseAngle) * angleToRadians;
 
 		std::cout << "angle would have been " << angle << "\n";
 
