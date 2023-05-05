@@ -2,6 +2,8 @@
 #include "Game.hpp"
 #include <random>
 #include <cmath>
+#include <iostream>
+#include <string>
 
 Game::Game(const std::string& configPath) {
 	init(configPath);
@@ -19,6 +21,16 @@ void Game::init(const std::string& config)
 		std::stringstream ss(line);
 		std::string type;
 		ss >> type;
+		if (type == "Font") {
+			int r, g, b;
+			std::string fontPath;
+			float fontSize;
+			ss >> fontPath >> fontSize >> r >> g >> b;
+			m_font.loadFromFile(fontPath);
+			m_text.setFont(m_font);
+			m_text.setColor(sf::Color(r, g, b));
+			m_text.setCharacterSize(fontSize);
+		}
 		if (type == "Player") {
 			ss >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.S
 				>> m_playerConfig.FR >> m_playerConfig.FG >> m_playerConfig.FB
@@ -60,6 +72,7 @@ void Game::run() {
 			sEnemySpawner();
 			sMovement();
 			sCollision();
+			sScore();
 		}
 
 		// TODO: user input outside pause for now
@@ -255,6 +268,8 @@ void Game::sRender()
 		m_window.draw(entity->cShape->circle);
 	}
 
+	m_window.draw(m_text);
+
 	m_window.display();
 }
 
@@ -272,6 +287,17 @@ void Game::sCollision()
 {
 	// TODO: implement collision
 	for (auto bullet : m_entities.getEntities("bullet")) {
+
+		for (auto smallEnemy : m_entities.getEntities("smallEnemy")) {
+			auto distance = bullet->cTransform->pos.dist(smallEnemy->cTransform->pos);
+			if (distance < bullet->cCollision->radius + smallEnemy->cCollision->radius) {
+				std::cout << "Bullet collided! with enemy : " << smallEnemy->id() << " \n";
+				m_player->cScore->score += smallEnemy->cScore->score;
+				smallEnemy->destroy();
+				bullet->destroy();
+			}
+		}
+
 		for (auto enemy : m_entities.getEntities("enemy")) {
 			// determine if a bullet is within the distance of an enemy 
 			// if it is, destroy the enemy and the 
@@ -279,6 +305,7 @@ void Game::sCollision()
 			auto distance = bullet->cTransform->pos.dist(enemy->cTransform->pos);
 			if (distance < bullet->cCollision->radius + enemy->cCollision->radius) {
 				std::cout << "Bullet collided! with enemy : " << enemy->id() << " \n";
+				m_player->cScore->score += enemy->cScore->score;
 				spawnSmallEnemies(enemy);
 				enemy->destroy();
 				bullet->destroy();
@@ -327,7 +354,8 @@ void Game::sCollision()
 
 void Game::sScore()
 {
-
+	m_text.setString("Score : " + std::to_string(m_player->cScore->score));
+	m_text.setPosition(50.0f, 50.0f);
 }
 
 // respawn the player in the middle of the screen
@@ -412,7 +440,7 @@ void Game::spawnEnemy()
 		sf::Color(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB),
 		m_enemyConfig.OT);
 
-	entity->cScore = std::make_shared<CScore>(vertices * 10);
+	entity->cScore = std::make_shared<CScore>(vertices * 2);
 
 	// record when the most recent enemy was spawned
 	m_lastEnemySpawnTime = m_currentFrame;
