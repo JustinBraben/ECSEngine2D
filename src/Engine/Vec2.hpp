@@ -1,59 +1,24 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include <cmath>
-class Vec2
-{
+
+class Vec2 {
 public:
-	float x = 0;
-	float y = 0;
+	float x = 0, y = 0;
 
-	Vec2() {}
-	Vec2(float xIn, float yIn) :
-		x(xIn), y(yIn) {}
+	Vec2();
+	Vec2(float xin, float yin);
 
-	bool operator == (const Vec2& rhs) {
-		return (rhs.x == this->x && rhs.y == this->y);
-	}
+	bool operator == (const Vec2& rhs) const;
+	bool operator != (const Vec2& rhs) const;
 
-	bool operator != (const Vec2& rhs) {
-		return (rhs.x != this->x || rhs.y != this->y);
-	}
+	Vec2 operator + (const Vec2& rhs) const;
+	Vec2 operator - (const Vec2& rhs) const;
+	Vec2 operator / (const float val) const;
+	Vec2 operator * (const float val) const;
 
-	Vec2 operator + (const Vec2& rhs) const {
-		return Vec2(x + rhs.x, y + rhs.y);
-	}
+	void operator += (const Vec2& rhs);
+	void operator -= (const Vec2& rhs);
+	void operator /= (const float val);
+	void operator *= (const float val);
 
-	Vec2 operator - (const Vec2& rhs) const {
-		return Vec2(x - rhs.x, y - rhs.y);
-	}
-
-	Vec2 operator * (const Vec2& rhs) const {
-		return Vec2(x * rhs.x, y * rhs.y);
-	}
-
-	Vec2 operator / (const Vec2& rhs) const {
-		return Vec2(x / rhs.x, y / rhs.y);
-	}
-
-	Vec2& add(const Vec2& v) {
-		x += v.x;
-		y += v.y;
-		return *this;
-	}
-
-	Vec2& scale(float s) {
-		x *= s;
-		y *= s;
-		return *this;
-	}
-
-	Vec2& rotate(float deg) {
-		return *this;
-	}
-
-	float dist(const Vec2& v) const {
-		return std::sqrt((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y));
-	}
-private:
-	
+	float dist(const Vec2& rhs) const;
 };
