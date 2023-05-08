@@ -76,3 +76,8 @@ public:
 	CLifeSpan(int total)
 		: remaining(total), total(total) {}
 };
+
+class CAnimation : public Component {
+public:
+	//Animation animation;
+};

@@ -34,19 +34,22 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 # Enforce treating warnings as errors for GNU and Clang compilers.
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  add_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -O3 -g -fPIC -fsanitize=address -fsanitize=undefined --coverage)
+  add_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -O3 -g -fPIC -fsanitize=address -fsanitize=undefined --coverage)
 endif()
 
 # Enforce treating warnings as errors for MSVC compiler.
 if(MSVC)
   # Treat warnings as errors
-  target_compile_options(${PROJECT_NAME} PRIVATE /WX)
+  target_compile_options(${PROJECT_NAME} PRIVATE /WX /W4 /w14640 /permissive)
   
   # Enable debugging information and code coverage.
-  target_compile_options(${PROJECT_NAME} PRIVATE /Zi /DEBUG /coverage)
+  target_compile_options(${PROJECT_NAME} PRIVATE /Zi /DEBUG)
   
   # Enable code analysis
   target_compile_options(${PROJECT_NAME} PRIVATE /analyze)
+
+  # Enable runtime security checks
+  target_compile_options(${PROJECT_NAME} PRIVATE /guard:cf)
 endif()
 
 # Find and require the SFML library, ensuring it is at least version 2.5.
