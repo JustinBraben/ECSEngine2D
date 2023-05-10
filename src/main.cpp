@@ -2,12 +2,12 @@
 #include <iostream>
 #include <filesystem>
 #include <map>
-#include "../assignment2/Game.hpp"
+#include "../assignment3/GameEngine.hpp"
 
 int main(void) 
 {
-    Game g("../../include/assignment2/configs/config.txt");
-    g.run();
+    // Game g("../../include/assignment2/configs/config.txt");
+    // g.run();
 
     return 0;
 }

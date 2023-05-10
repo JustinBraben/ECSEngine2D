@@ -1,5 +1,4 @@
 #include "Game.hpp"
-#include "Game.hpp"
 #include <random>
 #include <cmath>
 #include <iostream>

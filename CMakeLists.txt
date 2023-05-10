@@ -26,7 +26,8 @@ set(SFML_COMPONENTS system window graphics network audio)
 
 # Add any library files you want
 #add_subdirectory(${PROJECT_SOURCE_DIR}/include/assignment1)
-add_subdirectory(${PROJECT_SOURCE_DIR}/include/assignment2)
+#add_subdirectory(${PROJECT_SOURCE_DIR}/include/assignment2)
+add_subdirectory(${PROJECT_SOURCE_DIR}/include/assignment3)
 
 # Add source files to the project's executable and include the src directory.
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/src/main.cpp)
@@ -64,6 +65,6 @@ foreach(component IN LISTS SFML_COMPONENTS)
 endforeach()
 
 # Link the SFML libraries to the project's executable.
-target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio assignment2)
+target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio assignment3)
 
 # TODO: Add tests and install targets if needed.
