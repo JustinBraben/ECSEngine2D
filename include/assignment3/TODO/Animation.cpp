@@ -20,4 +20,30 @@ Animation::Animation(const std::string& name, const sf::Texture& t, size_t frame
 // animation loops when it reaches the end
 void Animation::update()
 {
+	// add the speed variable to the current frame
+	m_currentFrame++;
+
+	// TODO:	1) calculate the correct frame of animation to play based on currentFrame and speed
+	//			2) set the texture rectange properly (see constructor sample)
+}
+
+bool Animation::hasEnded() const
+{
+	// TODO: detect when animation has ended (last frame was played) and return true
+	return false;
+}
+
+const std::string& Animation::getName() const
+{
+	return m_name;
+}
+
+const Vec2& Animation::getSize() const
+{
+	return m_size;
+}
+
+sf::Sprite& Animation::getSprite()
+{
+	return m_sprite;
 }

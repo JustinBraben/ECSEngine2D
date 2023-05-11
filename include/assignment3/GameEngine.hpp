@@ -14,11 +14,12 @@ class GameEngine {
 protected:
 	sf::RenderWindow m_window;
 	Assets m_assets;
-	SceneMap m_currentScene;
+	std::string m_currentScene;
+	SceneMap m_sceneMap;
 	size_t m_simulationSpeed = 1;
 	bool m_running = true;
 
-	void init();
+	void init(const std::string& path);
 	void update();
 
 	void sUserInput();

@@ -13,6 +13,8 @@ public:
 	Vec2 velocity{ 0.0, 0.0 };
 	float angle = 0;
 
+	CTransform() {}
+
 	CTransform(const Vec2& p, const Vec2& v, float a)
 		: pos(p), velocity(v), angle(a) {}
 };
@@ -38,8 +40,9 @@ public:
 
 class CBoundingBox : public Component {
 public:
-	Vec2 size;
-	Vec2 halfSize;
+	Vec2 size = { 64.0, 64.0};
+	Vec2 halfSize = { 32.0, 32.0 };
+	CBoundingBox() {}
 	CBoundingBox(const Vec2& s)
 		: size(s), halfSize(s.x / 2, s.y / 2) {}
 };
@@ -73,6 +76,8 @@ class CLifeSpan : public Component {
 public:
 	int remaining = 0;	// amount of lifespan remaining on the entity
 	int total = 0;		// the toal initial amount of lifespan
+
+	CLifeSpan() {}
 	CLifeSpan(int total)
 		: remaining(total), total(total) {}
 };
@@ -80,4 +85,14 @@ public:
 class CAnimation : public Component {
 public:
 	//Animation animation;
+};
+
+class CGravity : public Component {
+public:
+	
+};
+
+class CState : public Component {
+public:
+
 };

@@ -164,3 +164,36 @@ Payer	GX	GY	CW	CH	SX	SY	SM	GY	B
 ---------------------------------------------------------------------------------------------------------------
 Assignment Hints
 ---------------------------------------------------------------------------------------------------------------
+
+-	Rendering system has already been set up for you, to help debug:
+	You can press the T key to toggle drawing textures
+	You can press the C key to toggle drawing bounding boxes
+	You can press the G key to toggle drawing grid
+
+-	You can implement Animation::update() and Animation::hasEnded() at any
+	time, it will not affect the gameplay mechanics whatsover, just animation
+
+-	Implement Scene_Play::loadLevel()
+	Since rendering is already completed, once you correctly read in the
+	different types of entities, add them to the EntityManager and they should
+	automatically be drawn to the screen. Add the correct bounding boxes
+	to Tile entities, and no bounding boxes to the Dec entities. Remember
+	you can toggle debug viewing of bounding boxes with the T and C keys
+
+	As part of this step, implement the Scene_Play::gridToMidPixel()
+	function, which takes in as parameters a grid x,y position and an Entity,
+	and returns the Vec2 position of the CENTER of that Entity. You must
+	use the Animation size of the Entity to determine where its center point
+	should be. Keep in mind that this means your Entity MUST have its
+	CAnimation component added first, so that it can be used to calculate the
+	midpoint of this function.
+
+-	Implement Scene_Play::spawnPlayer()
+	Read the player configuration from the level file and spawn the player
+	This is where the player should restart when they die.
+
+-	Implement some basic WASD u/l/d/r movement for the player entity so that
+	you can use this to help test collisions in the future. Remember that 
+	you must use registerAction to register a new action for the scene. See
+	the actions already registered for you, and the sDoAction() function for
+	syntax on how to perform actions

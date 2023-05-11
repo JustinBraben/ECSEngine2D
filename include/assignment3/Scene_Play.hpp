@@ -29,14 +29,22 @@ protected:
 	void loadLevel(const std::string& filename);
 
 public:
+
+	Scene_Play(GameEngine* gameEngine, const std::string& levelPath);
+
+	Vec2 gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity> entity);
+
+	void spawnPlayer();
+	void spawnBullet(std::shared_ptr<Entity> entity);
 	void update();
 
 	// Systems
 	void sAnimation();
 	void sMovement();
 	void sEnemySpawner();
+	void sLifespan();
 	void sCollision();
 	void sRender();
-	//void sDoAction(action);
+	void sDoAction(const Action& action);
 	void sDebug();
 };
