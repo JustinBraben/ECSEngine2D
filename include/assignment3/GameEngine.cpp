@@ -1,5 +1,6 @@
 #include "GameEngine.hpp"
 #include "GameEngine.hpp"
+#include "GameEngine.hpp"
 #include "Assets.hpp"
 #include "Scene_Play.hpp"
 #include "Scene_Menu.hpp"
@@ -34,6 +35,11 @@ bool GameEngine::isRunning()
 sf::RenderWindow& GameEngine::window()
 {
 	return m_window;
+}
+
+const Assets& GameEngine::getAssets() const
+{
+	return m_assets;
 }
 
 void GameEngine::run()
@@ -82,5 +88,10 @@ void GameEngine::sUserInput()
 
 void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene, bool endCurrentScene)
 {
-
+	if (m_sceneMap[sceneName])
+		m_currentScene = sceneName;
+	else {
+		m_sceneMap[sceneName] = scene;
+		m_currentScene = sceneName;
+	}
 }

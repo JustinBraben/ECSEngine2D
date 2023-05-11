@@ -168,3 +168,89 @@ void Scene_Play::sDoAction(const Action& action)
 
 	}
 }
+
+void Scene_Play::sAnimation()
+{
+	// TODO: Complete the Animation class code first 
+
+	// TODO: set the animation of the player based on its CState component
+	// TODO: for each entity with an animation, call entity->getComponent<CAnimation>().animation.update()
+	//	if the animation is not repeated, and it has ended, destroy the entity
+}
+
+void Scene_Play::onEnd()
+{
+	// TODO: When the scene ends, change back to the MENU scene
+	//	use m_game->changeScene(correct params);
+}
+
+void Scene_Play::sRender()
+{
+	// color the background darker so you know that the game is paused
+	if (!m_paused) { m_game->window().clear(sf::Color(100, 100, 255)); }
+	else { m_game->window().clear(sf::Color(50, 50, 150)); }
+
+	// set the viewport of the window to be centered on the player if it's far enough right
+	auto& pPos = m_player->getComponent<CTransform>().pos;
+	float windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
+	sf::View view = m_game->window().getView();
+	view.setCenter(windowCenterX, m_game->window().getSize().y - view.getCenter().y);
+	m_game->window().setView(view);
+
+	// draw all Entity textures / animations
+	if (m_drawTextures) {
+		for (auto entity : m_entityManager.getEntities()) {
+
+			auto& transform = entity->getComponent<CTransform>();
+
+			if (entity->hasComponent<CAnimation>()) {
+				auto& animation = entity->getComponent<CAnimation>().animation;
+				animation.getSprite().setRotation(transform.angle);
+				animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
+				animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+				m_game->window().draw(animation.getSprite());
+			}
+		}
+	}
+
+	// draw all Entity collision bounding boxes with a rectangleshape
+	if (m_drawCollision) {
+		for (auto entity : m_entityManager.getEntities()) {
+			if (entity->hasComponent<CBoundingBox>()) {
+				auto& box = entity->getComponent<CBoundingBox>();
+				auto& transform = entity->getComponent<CTransform>();
+				sf::RectangleShape rect;
+				rect.setSize(sf::Vector2f(box.size.x - 1, box.size.y - 1));
+				rect.setOrigin(sf::Vector2f(box.halfSize.x, box.halfSize.y));
+				rect.setPosition(transform.pos.x, transform.pos.y);
+				rect.setFillColor(sf::Color(0, 0, 0, 0));
+				rect.setOutlineColor(sf::Color(255, 255, 255, 255));
+				rect.setOutlineThickness(1);
+				m_game->window().draw(rect);
+			}
+		}
+	}
+
+	// draw the grid so you can easily debug
+	if (m_drawGrid) {
+		float leftX = m_game->window().getView().getCenter().x - width() / 2;
+		float rightX = leftX + width() + m_gridSize.x;
+		float nextGridX = leftX - static_cast<float>((static_cast<int>(leftX) % static_cast<int>(m_gridSize.x)));
+
+		for (float x = nextGridX; x < rightX; x += m_gridSize.x) {
+			drawLine(Vec2(x, 0), Vec2(x, height()));
+		}
+
+		for (float y = 0; y < height(); y += m_gridSize.y) {
+			drawLine(Vec2(leftX, height() - y), Vec2(rightX, height() - y));
+
+			for (float x = nextGridX; x < rightX; x += m_gridSize.x) {
+				std::string xCell = std::to_string(static_cast<int>(x) / static_cast<int>(m_gridSize.x));
+				std::string yCell = std::to_string(static_cast<int>(y) / static_cast<int>(m_gridSize.y));
+				m_gridText.setString("(" + xCell + "," + yCell + ")");
+				m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
+				m_game->window().draw(m_gridText);
+			}
+		}
+	}
+}

@@ -1,9 +1,13 @@
 #pragma once
 
 #include "Vec2.hpp"
+#include "Animation.hpp"
 #include <SFML/Graphics.hpp>
 
-class Component{};
+class Component{
+public:
+	bool has = false;
+};
 
 class CTransform : public Component {
 public:
@@ -15,8 +19,11 @@ public:
 
 	CTransform() {}
 
-	CTransform(const Vec2& p, const Vec2& v, float a)
-		: pos(p), velocity(v), angle(a) {}
+	CTransform(const Vec2& p)
+		: pos(p) {}
+
+	CTransform(const Vec2& p, const Vec2& sp, const Vec2& sc, float a)
+		: pos(p), prevPos(p), velocity(sp), scale(sc), angle(a) {}
 };
 
 class CShape : public Component {
@@ -40,8 +47,8 @@ public:
 
 class CBoundingBox : public Component {
 public:
-	Vec2 size = { 64.0, 64.0};
-	Vec2 halfSize = { 32.0, 32.0 };
+	Vec2 size = { 64.0f, 64.0f};
+	Vec2 halfSize = { 32.0f, 32.0f };
 	CBoundingBox() {}
 	CBoundingBox(const Vec2& s)
 		: size(s), halfSize(s.x / 2, s.y / 2) {}
@@ -50,6 +57,7 @@ public:
 class CCollision : public Component {
 public:
 	float radius = 0;
+
 	CCollision(float r)
 		: radius(r) {}
 };
@@ -61,6 +69,8 @@ public:
 	bool right = false;
 	bool down = false;
 	bool shoot = false;
+	bool canShoot = true;
+	bool canJump = true;
 
 	CInput() {}
 };
@@ -74,25 +84,36 @@ public:
 
 class CLifeSpan : public Component {
 public:
-	int remaining = 0;	// amount of lifespan remaining on the entity
-	int total = 0;		// the toal initial amount of lifespan
+	int lifespan = 0;
+	int frameCreated = 0;
 
 	CLifeSpan() {}
-	CLifeSpan(int total)
-		: remaining(total), total(total) {}
+
+	CLifeSpan(int duration, int frame)
+		: lifespan(duration), frameCreated(frame) {}
 };
 
 class CAnimation : public Component {
 public:
-	//Animation animation;
+	Animation animation;
+	bool repeat = false;
+	CAnimation() {}
+	CAnimation(const Animation& animation, bool r)
+		: animation(animation), repeat(r) {}
 };
 
 class CGravity : public Component {
 public:
-	
+	float gravity = 0;
+	CGravity() {}
+	CGravity(float g) 
+		: gravity(g) {}
 };
 
 class CState : public Component {
 public:
-
+	std::string state = "jumping";
+	CState() {}
+	CState(const std::string& s)
+		: state(s) {}
 };

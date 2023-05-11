@@ -36,6 +36,7 @@ public:
 
 	void spawnPlayer();
 	void spawnBullet(std::shared_ptr<Entity> entity);
+	void onEnd();
 	void update();
 
 	// Systems
