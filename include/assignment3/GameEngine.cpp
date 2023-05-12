@@ -61,9 +61,18 @@ void GameEngine::run()
 	// some systems should while pausing (rendering)
 	// some systems shouldn't (movement / input)
 
-	while (isRunning()) {
-		update();
-	}
+	std::cout << "Game is now running\n";
+
+	//do {
+	//	// update();
+	//} while (isRunning());
+
+	std::cout << "Game is now done running, Press Enter to continue...\n";
+
+	std::cin.ignore();  // Ignore any characters in the input buffer
+	std::cin.get();     // Wait for the user to press Enter
+
+	m_window.close();
 }
 
 void GameEngine::sUserInput()
@@ -76,7 +85,7 @@ void GameEngine::sUserInput()
 		}
 
 		if (evnt.type == sf::Event::KeyPressed) {
-			if (evnt.type == sf::Keyboard::X) {
+			if (evnt.key.code == sf::Keyboard::X) {
 				std::cout << "screenshot saved to " << "test.png" << "\n";
 				sf::Texture texture;
 				texture.create(m_window.getSize().x, m_window.getSize().y);
