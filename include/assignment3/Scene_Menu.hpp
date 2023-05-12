@@ -23,16 +23,18 @@ protected:
 	size_t m_selectedMenuIndex = 0;
 
 	void init();
-	void update();
-	void onEnd();
-	void sDoAction(const Action& action);
+
 
 public:
+
+	void update() override;
+	void onEnd() override;
+	void sDoAction(const Action& action) override;
+	void sRender() override;
 
 	Scene_Menu(GameEngine* gameEngine = nullptr);
 
 	// Systems
-	void sRender();
 	void sAnimation();
 	void sMovement();
 	void sEnemySpawner();

@@ -1,5 +1,22 @@
 #include "Scene_Menu.hpp"
 
+Scene_Menu::Scene_Menu(GameEngine* gameEngine)
+	: Scene(gameEngine) 
+{
+	// Constructor implementation
+	// You may initialize any member variables or perform other necessary actions here
+}
+
+void Scene_Menu::update()
+{
+	// TODO: implement update for Scene_Menu
+}
+
+void Scene_Menu::onEnd()
+{
+	// TODO: implement onEnd for Scene_Menu
+}
+
 void Scene_Menu::sDoAction(const Action& action)
 {
 	if (action.type() == "START") {
@@ -19,4 +36,9 @@ void Scene_Menu::sDoAction(const Action& action)
 			onEnd();
 		}
 	}
+}
+
+void Scene_Menu::sRender()
+{
+	// TODO: implement sRender for Scene_Menu
 }

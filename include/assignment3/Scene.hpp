@@ -20,19 +20,19 @@ protected:
 	bool m_hasEnded = false;
 	size_t m_currentFrame = 0;
 
-	virtual void onEnd() = 0;
 	void setPaused(bool paused);
+
 
 public:
 
-	Scene();
-	Scene(GameEngine* gameEngine);
-
+	virtual void onEnd() = 0;
 	virtual void update() = 0;
 	virtual void sDoAction(const Action& action) = 0;
 	virtual void sRender() = 0;
 
-	virtual void doAction(const Action& action);
+	Scene();
+	Scene(GameEngine* gameEngine);
+
 	void simulate(const size_t frames);
 	void registerAction(int inputKey, const std::string& actionName);
 

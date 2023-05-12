@@ -1,6 +1,5 @@
 #include "GameEngine.hpp"
 #include "GameEngine.hpp"
-#include "GameEngine.hpp"
 #include "Assets.hpp"
 #include "Scene_Play.hpp"
 #include "Scene_Menu.hpp"
@@ -14,7 +13,10 @@ GameEngine::GameEngine(const std::string& path)
 
 void GameEngine::init(const std::string& path)
 {
-	m_assets.addFont("arial", "../../assets/sarial.ttf");
+	// TODO: read the assets and add them to the m_assets class
+	//	from assets.txt
+	// NOTE: for now you are just manually adding them here
+	m_assets.addFont("arial", "../../assets/arial.ttf");
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
 	m_window.setFramerateLimit(60);
@@ -24,7 +26,8 @@ void GameEngine::init(const std::string& path)
 
 void GameEngine::update()
 {
-	// TODO: Make update() function
+	// TODO: update enitites and run systems
+	//	that are meant to be run while the 
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()
@@ -54,6 +57,10 @@ void GameEngine::quit()
 
 void GameEngine::run()
 {
+	// TODO: add pause functionality in here
+	// some systems should while pausing (rendering)
+	// some systems shouldn't (movement / input)
+
 	while (isRunning()) {
 		update();
 	}
@@ -91,17 +98,43 @@ void GameEngine::sUserInput()
 			const std::string actionType = (evnt.type == sf::Event::KeyPressed) ? "START" : "END";
 
 			// look up the action and send the action to the scene
-			currentScene()->doAction(Action(currentScene()->getActionMap().at(evnt.key.code), actionType));
+			currentScene()->sDoAction(Action(currentScene()->getActionMap().at(evnt.key.code), actionType));
 		}
 	}
 }
 
 void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene, bool endCurrentScene)
 {
-	if (m_sceneMap[sceneName])
+	// TODO: implement changeScene for the gameEngine
+	//	this should check to see if the sceneName is contained in the m_sceneMap
+	//	if the sceneName is contained in the m_sceneMap, set the m_currentScene string to the sceneName
+	//	otherwise, it should create a new entry in the m_sceneMap with sceneName as key and scene as 
+	//	std::shared_ptr<Scene> value
+	//	FIND OUT WHAT endCurrentScene IS FOR
+
+	// Check if the scene already exists in the map
+	auto it = m_sceneMap.find(sceneName);
+
+	if (it != m_sceneMap.end()) {
+		// Scene already exists, set it as the current scene
+		m_currentScene = sceneName;
+
+		// Optionally end the current scene if requested
+		if (endCurrentScene)
+		{
+			// Call any necessary cleanup or end functions on the current scene
+			// it->second->end();
+		}
+	}
+	else {
+		// Add the new scene to the map
+		m_sceneMap[sceneName] = scene;
+		m_currentScene = sceneName;
+	}
+	/*if (m_sceneMap[sceneName])
 		m_currentScene = sceneName;
 	else {
 		m_sceneMap[sceneName] = scene;
 		m_currentScene = sceneName;
-	}
+	}*/
 }
