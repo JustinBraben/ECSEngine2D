@@ -16,7 +16,7 @@ void GameEngine::init(const std::string& path)
 	// TODO: read the assets and add them to the m_assets class
 	//	from assets.txt
 	// NOTE: for now you are just manually adding them here
-	m_assets.addFont("arial", "../../assets/arial.ttf");
+	m_assets.addFont("Arial", "../../assets/arial.ttf");
 	m_assets.addFont("AboveDemoRegular", "../../include/assignment3/configs/fonts/AboveDemoRegular-lJMd.ttf");
 	m_assets.addFont("Neoteric", "../../include/assignment3/configs/fonts/Neoteric-32A8.ttf");
 

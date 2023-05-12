@@ -49,12 +49,12 @@ const Animation& Assets::getAnimation(const std::string& name) const
 	return m_animations.at(name);
 }
 
-const sf::Sound Assets::getSound(const std::string& name) const
+const sf::Sound& Assets::getSound(const std::string& name) const
 {
 	return m_sounds.at(name);
 }
 
-const sf::Font Assets::getFont(const std::string& name) const
+const sf::Font& Assets::getFont(const std::string& name) const
 {
 	return m_fonts.at(name);
 }
