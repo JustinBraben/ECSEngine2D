@@ -9,5 +9,8 @@ int main(void)
     // Game g("../../include/assignment2/configs/config.txt");
     // g.run();
 
+    //GameEngine g("../../include/assignment2/configs/config.txt");
+    //g.run();
+
     return 0;
 }

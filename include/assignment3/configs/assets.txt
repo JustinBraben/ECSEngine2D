@@ -1,0 +1,3 @@
+Texture		TexStand		images/megaman/stand64.png
+Animation	Stand			TexStand		1		0
+Font		Tech			fonts.tech.ttf

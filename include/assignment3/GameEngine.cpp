@@ -14,12 +14,17 @@ GameEngine::GameEngine(const std::string& path)
 
 void GameEngine::init(const std::string& path)
 {
-	//m_assets.loadFromFile(path);
+	m_assets.addFont("arial", "../../assets/sarial.ttf");
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
 	m_window.setFramerateLimit(60);
 
 	changeScene("MENU", std::make_shared<Scene_Menu>(this));
+}
+
+void GameEngine::update()
+{
+	// TODO: Make update() function
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()
@@ -40,6 +45,11 @@ sf::RenderWindow& GameEngine::window()
 const Assets& GameEngine::getAssets() const
 {
 	return m_assets;
+}
+
+void GameEngine::quit()
+{
+	// TODO: Make quit() function
 }
 
 void GameEngine::run()
