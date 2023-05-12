@@ -1,5 +1,13 @@
 #include "Scene_Menu.hpp"
 
+#include "Physics.hpp"
+#include "Assets.hpp"
+#include "GameEngine.hpp"
+#include "Components.hpp"
+#include "Action.hpp"
+
+#include <iostream>
+
 Scene_Menu::Scene_Menu(GameEngine* gameEngine)
 	: Scene(gameEngine) 
 {
@@ -41,4 +49,27 @@ void Scene_Menu::sDoAction(const Action& action)
 void Scene_Menu::sRender()
 {
 	// TODO: implement sRender for Scene_Menu
+	//	This should display MEGA MARIO in the top left (Black text)
+	//	and the level.txt names (Currently selected level will be white text,
+	//	otherwise level names will be Black)
+	//	Should display controls to navigate menu at the bottom of the screen
+	//	eg UP: W	DOWN: S		PLAY: D		BACK: ESC	
+	//
+
+	m_game->window().clear(sf::Color(173, 216, 230));
+
+	//auto assets = m_game->getAssets();
+	//auto font = assets.getFont("arial");
+	auto fontMenu = m_game->getAssets().getFont("arial");
+
+	sf::Text text;
+	text.setFont(fontMenu);
+	text.setString("MEGA MARIO");
+	text.setCharacterSize(32);
+	text.setFillColor(sf::Color::Black);
+	text.setPosition(10, 10);  // Adjust the position as needed
+
+	m_game->window().draw(text);
+
+	m_game->window().display();
 }

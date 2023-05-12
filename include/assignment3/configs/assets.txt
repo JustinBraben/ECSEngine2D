@@ -1,3 +1,6 @@
-Texture		TexStand		images/megaman/stand64.png
-Animation	Stand			TexStand		1		0
-Font		Tech			fonts.tech.ttf
+Texture		TexStand			images/megaman/stand64.png
+Animation	Stand				TexStand		1		0
+Font		Tech				fonts.tech.ttf
+Font		Arial				../../assets/arial.ttf
+Font		AboveDemoRegular	../../include/assignment3/configs/fonts/AboveDemoRegular-lJMd.ttf
+Font		Neoteric			../../include/assignment3/configs/fonts/Neoteric-32A8.ttf

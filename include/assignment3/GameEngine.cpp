@@ -17,6 +17,8 @@ void GameEngine::init(const std::string& path)
 	//	from assets.txt
 	// NOTE: for now you are just manually adding them here
 	m_assets.addFont("arial", "../../assets/arial.ttf");
+	m_assets.addFont("AboveDemoRegular", "../../include/assignment3/configs/fonts/AboveDemoRegular-lJMd.ttf");
+	m_assets.addFont("Neoteric", "../../include/assignment3/configs/fonts/Neoteric-32A8.ttf");
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
 	m_window.setFramerateLimit(60);
@@ -27,7 +29,12 @@ void GameEngine::init(const std::string& path)
 void GameEngine::update()
 {
 	// TODO: update enitites and run systems
-	//	that are meant to be run while the 
+	//	that are meant to be run while the
+
+	//auto scene = currentScene();
+
+	sUserInput();
+	currentScene()->sRender();
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()
@@ -53,6 +60,12 @@ const Assets& GameEngine::getAssets() const
 void GameEngine::quit()
 {
 	// TODO: Make quit() function
+	// This should close the window if ESC action is sent to Scene_Menu
+	// If it is called in a Scene_Play it should change scene back to the Scene_Menu
+	// NOTE: for now it is just closing the window
+	if (m_currentScene == "MENU") {
+		m_running = false;
+	}
 }
 
 void GameEngine::run()
@@ -63,16 +76,16 @@ void GameEngine::run()
 
 	std::cout << "Game is now running\n";
 
-	//do {
-	//	// update();
-	//} while (isRunning());
+	while (isRunning()) {
+		update();
+	}
+
+	m_window.close();
 
 	std::cout << "Game is now done running, Press Enter to continue...\n";
 
-	std::cin.ignore();  // Ignore any characters in the input buffer
+	//std::cin.ignore();  // Ignore any characters in the input buffer
 	std::cin.get();     // Wait for the user to press Enter
-
-	m_window.close();
 }
 
 void GameEngine::sUserInput()
@@ -110,6 +123,11 @@ void GameEngine::sUserInput()
 			currentScene()->sDoAction(Action(currentScene()->getActionMap().at(evnt.key.code), actionType));
 		}
 	}
+	
+	// Check if the window is closed after processing events
+	/*if (!isRunning()) {
+		m_window.close();
+	}*/
 }
 
 void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene, bool endCurrentScene)
@@ -140,10 +158,4 @@ void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene
 		m_sceneMap[sceneName] = scene;
 		m_currentScene = sceneName;
 	}
-	/*if (m_sceneMap[sceneName])
-		m_currentScene = sceneName;
-	else {
-		m_sceneMap[sceneName] = scene;
-		m_currentScene = sceneName;
-	}*/
 }

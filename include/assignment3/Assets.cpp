@@ -39,22 +39,22 @@ void Assets::addFont(const std::string& name, const std::string& path)
 	m_fonts[name] = font;
 }
 
-sf::Texture& Assets::getTexture(const std::string& name)
+const sf::Texture& Assets::getTexture(const std::string& name) const
 {
-	return m_textures[name];
+	return m_textures.at(name);
 }
 
-Animation& Assets::getAnimation(const std::string& name)
+const Animation& Assets::getAnimation(const std::string& name) const
 {
-	return m_animations[name];
+	return m_animations.at(name);
 }
 
-sf::Sound Assets::getSound(const std::string& name)
+const sf::Sound Assets::getSound(const std::string& name) const
 {
-	return m_sounds[name];
+	return m_sounds.at(name);
 }
 
-sf::Font Assets::getFont(const std::string& name)
+const sf::Font Assets::getFont(const std::string& name) const
 {
-	return m_fonts[name];
+	return m_fonts.at(name);
 }
