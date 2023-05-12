@@ -22,3 +22,11 @@ target_link_libraries(${LIBRARY_NAME} ${SFML_LIBRARIES})
 
 # Add SFML include directories to your library target
 target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Find and link the CoreAudio framework
+if(APPLE)
+    find_library(AUDIO_TOOLBOX_FRAMEWORK AudioToolbox)
+    find_library(AUDIO_UNIT_FRAMEWORK AudioUnit)
+    find_library(CORE_AUDIO_FRAMEWORK CoreAudio)
+    target_link_libraries(${LIBRARY_NAME} ${AUDIO_TOOLBOX_FRAMEWORK} ${AUDIO_UNIT_FRAMEWORK} ${CORE_AUDIO_FRAMEWORK})
+endif()
