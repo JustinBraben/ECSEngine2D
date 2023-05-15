@@ -18,19 +18,20 @@ Scene_Menu::Scene_Menu(GameEngine* gameEngine)
 	// TODO: add paths to level files for std::vec<string> levelPaths
 	m_levelPaths.push_back("../../include/assignment3/configs/level1.txt");
 
+	m_title = "MEGA MARIO";
+
 	// TODO: add strings to std::vec<string> menuStrings
 	// These will be strings displayed in your main menu
 	
-	m_menuStrings.push_back("MEGA MARIO");
 	m_menuStrings.push_back("LEVEL 1");
 	m_menuStrings.push_back("UP : W    DOWN : S	    PLAY : D    BACK : ESC");
 
 	// TODO: Set m_menuText
 	//auto it = std::find(m_menuStrings.begin(), m_menuStrings.end(), "MEGA MARIO");
 	// Set m_menuText
-	auto menuFont = m_game->getAssets().getFont("Arial");
+	auto& menuFont = m_game->getAssets().getFont("Arial");
 	m_menuText.setFont(menuFont);
-	m_menuText.setString("MEGA MARIO");
+	m_menuText.setString(m_title);
 	m_menuText.setFillColor(sf::Color::Black);
 	m_menuText.setCharacterSize(32);
 	m_menuText.setPosition(10, 10);  // Adjust the position as needed
@@ -79,14 +80,7 @@ void Scene_Menu::sRender()
 
 	m_game->window().clear(sf::Color(173, 216, 230));
 
-	// TODO: remove this code and just set the font in the constructor
-	// Currently not working in the constructor so setting it here
-	auto menuFont = m_game->getAssets().getFont("Arial");
-	m_menuText.setFont(menuFont);
-	m_menuText.setString("MEGA MARIO");
-	m_menuText.setFillColor(sf::Color::Black);
-	m_menuText.setCharacterSize(32);
-	m_menuText.setPosition(10, 10);  // Adjust the position as needed
+	// TODO: Render level text and currently selected level text will be white
 
 	m_game->window().draw(m_menuText);
 
