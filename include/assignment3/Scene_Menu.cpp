@@ -22,6 +22,12 @@ Scene_Menu::Scene_Menu(GameEngine* gameEngine)
 
 void Scene_Menu::init()
 {
+	// TODO: Register actions for Scene_Menu
+	registerAction(sf::Keyboard::Escape, "QUIT");	// QUIT out of the game
+	registerAction(sf::Keyboard::W, "UP");			// Go UP in menu
+	registerAction(sf::Keyboard::S, "DOWN");		// Go DOWN in menu
+	registerAction(sf::Keyboard::D, "PLAY");		// Toggle drawing (G)rid
+
 	// TODO: add paths to level files for std::vec<string> levelPaths
 	// Load level paths from files
 	// Suppose you have level#.txt files in a "levels" directory
@@ -44,6 +50,7 @@ void Scene_Menu::init()
 void Scene_Menu::update()
 {
 	// TODO: implement update for Scene_Menu
+	
 }
 
 void Scene_Menu::onEnd()
@@ -53,22 +60,23 @@ void Scene_Menu::onEnd()
 
 void Scene_Menu::sDoAction(const Action& action)
 {
-	if (action.type() == "START") {
-		if (action.name() == "UP") {
-			if (m_selectedMenuIndex > 0)
-				m_selectedMenuIndex--;
-			else
-				m_selectedMenuIndex = m_menuStrings.size() - 1;
-		}
-		else if (action.name() == "DOWN") {
-			m_selectedMenuIndex = (m_selectedMenuIndex + 1) % m_menuStrings.size();
-		}
-		else if (action.name() == "PLAY") {
-			//m_game->changeScene("PLAY", std::make_shared<Scene_Play>(m_game, m_levelPaths[m_selectedMenuIndex]));
-		}
-		else if (action.type() == "QUIT") {
-			onEnd();
-		}
+	if (action.name() == "UP") {
+		// Only decrease the index if it's not already at the top
+		if (m_selectedMenuIndex > 0)
+			m_selectedMenuIndex--;
+		/*else
+			m_selectedMenuIndex = m_menuStrings.size() - 1;*/
+	}
+	else if (action.name() == "DOWN") {
+		// Only increase the index if it's not already at the bottom
+		if (m_selectedMenuIndex < m_menuStrings.size() - 1)
+			m_selectedMenuIndex++;
+	}
+	else if (action.name() == "PLAY") {
+		//m_game->changeScene("PLAY", std::make_shared<Scene_Play>(m_game, m_levelPaths[m_selectedMenuIndex]));
+	}
+	else if (action.type() == "QUIT") {
+		onEnd();
 	}
 }
 

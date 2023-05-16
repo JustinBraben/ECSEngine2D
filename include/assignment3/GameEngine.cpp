@@ -112,6 +112,8 @@ void GameEngine::sUserInput()
 
 		if (evnt.type == sf::Event::KeyPressed || evnt.type == sf::Event::KeyReleased) {
 
+			auto scene = currentScene();
+
 			// if the current scene does not have an action associated with this key, skip the event
 			if (currentScene()->getActionMap().find(evnt.key.code) == currentScene()->getActionMap().end())
 				continue;

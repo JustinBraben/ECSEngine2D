@@ -10,6 +10,7 @@ Scene::Scene(GameEngine* gameEngine)
 
 void Scene::registerAction(int inputKey, const std::string& actionName)
 {
+    m_actionMap[inputKey] = actionName;
 }
 
 const ActionMap& Scene::getActionMap() const {
