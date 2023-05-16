@@ -15,16 +15,20 @@ Scene_Menu::Scene_Menu(GameEngine* gameEngine)
 	// Constructor implementation
 	// You may initialize any member variables or perform other necessary actions here
 	
-	// TODO: add paths to level files for std::vec<string> levelPaths
-	m_levelPaths.push_back("../../include/assignment3/configs/level1.txt");
-
 	m_title = "MEGA MARIO";
+	m_menuStrings = { "Level 1", "Level 2" };
+	init();
+}
 
-	// TODO: add strings to std::vec<string> menuStrings
-	// These will be strings displayed in your main menu
-	
-	m_menuStrings.push_back("LEVEL 1");
-	m_menuStrings.push_back("UP : W    DOWN : S	    PLAY : D    BACK : ESC");
+void Scene_Menu::init()
+{
+	// TODO: add paths to level files for std::vec<string> levelPaths
+	// Load level paths from files
+	// Suppose you have level#.txt files in a "levels" directory
+	for (size_t i = 0; i < m_menuStrings.size(); ++i)
+	{
+		m_levelPaths.push_back("../../include/assignment3/configs/level" + std::to_string(i + 1) + ".txt");
+	}
 
 	// TODO: Set m_menuText
 	//auto it = std::find(m_menuStrings.begin(), m_menuStrings.end(), "MEGA MARIO");
@@ -80,9 +84,32 @@ void Scene_Menu::sRender()
 
 	m_game->window().clear(sf::Color(173, 216, 230));
 
-	// TODO: Render level text and currently selected level text will be white
-
+	// Render title
 	m_game->window().draw(m_menuText);
+
+	// Render level names
+	sf::Text levelText;
+	auto& menuFont = m_game->getAssets().getFont("Arial");
+	levelText.setFont(menuFont);
+	levelText.setCharacterSize(24);
+	for (size_t i = 0; i < m_menuStrings.size(); ++i)
+	{
+		levelText.setString(m_menuStrings[i]);
+		// The currently selected level text will be white, the others will be black
+		levelText.setFillColor(i == m_selectedMenuIndex ? sf::Color::White : sf::Color::Black);
+		// Position the level names below the title, adjust the position as needed
+		levelText.setPosition(10, 50 + i * 30);
+		m_game->window().draw(levelText);
+	}
+
+	// Render navigation instructions
+	sf::Text instructions;
+	instructions.setFont(menuFont);
+	instructions.setCharacterSize(20);
+	instructions.setFillColor(sf::Color::Black);
+	instructions.setString("UP : W    DOWN : S    PLAY : D    BACK : ESC");
+	instructions.setPosition(0, m_game->window().getSize().y - 50); // Bottom of the window
+	m_game->window().draw(instructions);
 
 	m_game->window().display();
 }
