@@ -36,8 +36,11 @@ public:
 
 	void spawnPlayer();
 	void spawnBullet(std::shared_ptr<Entity> entity);
-	void onEnd();
-	void update();
+
+	void update() override;
+	void onEnd() override;
+	void sDoAction(const Action& action) override;
+	void sRender() override;
 
 	// Systems
 	void sAnimation();
@@ -45,7 +48,5 @@ public:
 	void sEnemySpawner();
 	void sLifespan();
 	void sCollision();
-	void sRender();
-	void sDoAction(const Action& action);
 	void sDebug();
 };

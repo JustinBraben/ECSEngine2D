@@ -34,7 +34,10 @@ void GameEngine::update()
 	//auto scene = currentScene();
 
 	sUserInput();
-	currentScene()->sRender();
+	
+	// TODO: Should be calling update on the current scene
+	// Then letting the scene dictate what systems need to be run
+	currentScene()->update();
 }
 
 std::shared_ptr<Scene> GameEngine::currentScene()

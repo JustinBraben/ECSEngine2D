@@ -50,7 +50,7 @@ void Scene_Menu::init()
 void Scene_Menu::update()
 {
 	// TODO: implement update for Scene_Menu
-	
+	sRender();
 }
 
 void Scene_Menu::onEnd()
@@ -73,7 +73,8 @@ void Scene_Menu::sDoAction(const Action& action)
 			m_selectedMenuIndex++;
 	}
 	else if (action.name() == "PLAY") {
-		//m_game->changeScene("PLAY", std::make_shared<Scene_Play>(m_game, m_levelPaths[m_selectedMenuIndex]));
+		auto newScenePlay = std::make_shared<Scene_Play>(m_game, m_levelPaths[m_selectedMenuIndex]);
+		m_game->changeScene("PLAY", newScenePlay);
 	}
 	else if (action.type() == "QUIT") {
 		onEnd();

@@ -70,7 +70,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 
 	auto block = m_entityManager.addEntity("tile");
 	auto assets = m_game->getAssets();
-	auto animation = assets.getAnimation("Block");
+	//auto animation = assets.getAnimation("Block");
 	//block->addComponent<CAnimation>(m_game->getAssets().getAnimation("Block"), true);
 	//block->addComponent<CTransform>(Vec2(224, 480));
 	// add a bounding box, this will now show up if we press the 'C' key
@@ -183,7 +183,9 @@ void Scene_Play::sAnimation()
 void Scene_Play::onEnd()
 {
 	// TODO: When the scene ends, change back to the MENU scene
-	//	use m_game->changeScene(correct params);
+	// use m_game->changeScene(correct params);
+	// auto newSceneMenu = std::make_shared<Scene_Menu>(m_game, m_levelPaths[m_selectedMenuIndex]);
+	// changeScene("MENU", std::make_shared<Scene_Menu>(this));
 }
 
 void Scene_Play::sRender()
@@ -255,4 +257,6 @@ void Scene_Play::sRender()
 			}
 		}
 	}
+
+	m_game->window().display();
 }
