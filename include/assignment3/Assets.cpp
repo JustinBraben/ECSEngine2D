@@ -1,5 +1,4 @@
 #include "Assets.hpp"
-#include "Assets.hpp"
 #include <iostream>
 
 void Assets::addTexture(const std::string& name, const std::string& path) {

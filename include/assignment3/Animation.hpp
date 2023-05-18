@@ -20,6 +20,9 @@ public:
 	Animation(const std::string& name, const sf::Texture& t);
 	Animation(const std::string& name, const sf::Texture& t, size_t frameCount, size_t speed);
 
+	// TODO: add Move constuctor
+	// Animation(Animation&& other) noexcept;
+
 	void update();
 	bool hasEnded() const;
 	const std::string& getName() const;

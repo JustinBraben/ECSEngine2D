@@ -6,6 +6,8 @@
 #include "Action.hpp"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 Scene_Play::Scene_Play(GameEngine* gameEngine, const std::string& levelPath)
 	: Scene(gameEngine), m_levelPath(levelPath)
@@ -40,7 +42,10 @@ Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity
 	//	The bottom-left corner of the Animation should align with the bottom left of the grid cell
 
 	auto& entityAnimation = entity->getComponent<CAnimation>();
-	auto entitySize = entityAnimation.animation.getSize();
+
+	// Setting this to transform size x at the moment
+	// TODO: Should change this if you want to adjust the x and y scale
+	auto entitySize = entityAnimation.animation.getSize() * entity->getComponent<CTransform>().scale.x;
 	auto posX = gridX * entitySize.x;
 	auto posY = m_game->window().getSize().y - (gridY * entitySize.y);
 	auto midX = posX + (entitySize.x / 2.0f);
@@ -57,7 +62,24 @@ void Scene_Play::loadLevel(const std::string& filename)
 	// TODO: read in the level file and add the appropriate entities
 	//	use the PlayerConfig struct m_playerConfig to store player properties
 	//	this struct is defined at the top of Scene_Play.hpp
+	std::ifstream fin(filename);
+	std::string line;
 
+	while (std::getline(fin, line)) {
+		std::stringstream ss(line);
+		std::string type;
+		ss >> type;
+		if (type == "Tile") {
+			std::string tileType;
+			float gridX, gridY;
+			ss >> tileType >> gridX >> gridY;
+			auto& brick = m_entityManager.addEntity("tile");
+			auto& assets = m_game->getAssets();
+			auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxBrick");
+			brick->addComponent<CAnimation>(animationOryxBrick, true);
+			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
+		}
+	}
 
 	// NOTE: all of the code below is sample code which shows you hot to
 	//	set up and use entities with the new syntax, it should be removed
