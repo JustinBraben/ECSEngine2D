@@ -39,7 +39,14 @@ Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity
 	//	The size of the grid width aand height is stored in m_gridSize.x and m_gridSize.y
 	//	The bottom-left corner of the Animation should align with the bottom left of the grid cell
 
-	return Vec2(0, 0);
+	auto& entityAnimation = entity->getComponent<CAnimation>();
+	auto entitySize = entityAnimation.animation.getSize();
+	auto posX = gridX * entitySize.x;
+	auto posY = m_game->window().getSize().y - (gridY * entitySize.y);
+	auto midX = posX + (entitySize.x / 2.0f);
+	auto midY = posY - (entitySize.y / 2.0f);
+
+	return Vec2(midX, midY);
 }
 
 void Scene_Play::loadLevel(const std::string& filename)
@@ -60,7 +67,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 	auto brick = m_entityManager.addEntity("tile");
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
 	//brick->addComponent<CAnimation>(m_game->assets().getAnimation("Brick"), true);
-	//brick->addComponent<CTransform>(Vec2(96, 480));
+	// brick->addComponent<CTransform>(Vec2(96, 480));
 	// NOTE: your final code should position the entity with the grid x,y position read from the file:
 	//	brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
 
