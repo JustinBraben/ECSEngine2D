@@ -16,7 +16,6 @@ private:
 public:
 
 	void addTexture(const std::string& name, const std::string& path);
-	void addAnimation(const std::string& name, const Animation& animation);
 	void addAnimation(const std::string& name, Animation&& animation);
 	void addSound(const std::string& name, const std::string& path);
 	void addFont(const std::string& name, const std::string& path);

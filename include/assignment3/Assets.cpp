@@ -12,11 +12,6 @@ void Assets::addTexture(const std::string& name, const std::string& path) {
 	m_textures[name] = texture;
 }
 
-void Assets::addAnimation(const std::string& name, const Animation& animation)
-{
-	m_animations[name] = animation;
-}
-
 void Assets::addAnimation(const std::string& name, Animation&& animation)
 {
 	m_animations[name] = std::move(animation);
