@@ -27,8 +27,12 @@ void GameEngine::init(const std::string& path)
 	//const auto& brickAnimation = Animation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
 	//m_assets.addAnimation("OryxBrick", brickAnimation);
 	//Animation brickAnimation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
-	const auto& tileRect = sf::IntRect(24, 24, 24, 24);
-	m_assets.addAnimation("OryxBrick", Animation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect));
+	const auto& blockRect = sf::IntRect(24, 24, 24, 24);
+	m_assets.addAnimation("OryxBrick", Animation("OryxBrick", m_assets.getTexture("OryxWorld"), blockRect));
+
+	// TODO: Come up with a better way to get intRects from our large texture
+	const auto& questionRect = sf::IntRect(24 * 7, 24 * 27, 24, 24);
+	m_assets.addAnimation("OryxQuestion", Animation("OryxQuestion", m_assets.getTexture("OryxWorld"), questionRect));
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
 	m_window.setFramerateLimit(60);

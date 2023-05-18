@@ -1,5 +1,6 @@
 Texture		Brick				
 Texture		TexStand			images/megaman/stand64.png
+Texture		Question
 Animation	Stand				TexStand		1		0
 Font		Tech				fonts.tech.ttf
 Font		Arial				../../assets/arial.ttf

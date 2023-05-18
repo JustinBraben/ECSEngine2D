@@ -73,11 +73,22 @@ void Scene_Play::loadLevel(const std::string& filename)
 			std::string tileType;
 			float gridX, gridY;
 			ss >> tileType >> gridX >> gridY;
+
+			if (tileType == "Ground") {
 			auto brick = m_entityManager.addEntity("tile");
 			auto& assets = m_game->getAssets();
 			auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxBrick");
 			brick->addComponent<CAnimation>(animationOryxBrick, true);
 			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
+			}
+
+			if (tileType == "Question") {
+				auto question = m_entityManager.addEntity("tile");
+				auto& assets = m_game->getAssets();
+				auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxQuestion");
+				question->addComponent<CAnimation>(animationOryxBrick, true);
+				question->addComponent<CTransform>(gridToMidPixel(gridX, gridY, question));
+			}
 		}
 	}
 
@@ -89,11 +100,6 @@ void Scene_Play::loadLevel(const std::string& filename)
 	// some sample entities
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
 	//brick->addComponent<CAnimation>(m_game->assets().getAnimation("Brick"), true);
-	auto brick = m_entityManager.addEntity("tile");
-	auto& assets = m_game->getAssets();
-	auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxBrick");
-	brick->addComponent<CTransform>(Vec2(96, 480));
-	brick->addComponent<CAnimation>(animationOryxBrick, true);
 	
 	//brick->addComponent<CAnimation>(m_game->getAssets().getAnimation("OryxBrick"));
 	// NOTE: your final code should position the entity with the grid x,y position read from the file:
