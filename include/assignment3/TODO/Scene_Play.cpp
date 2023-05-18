@@ -58,6 +58,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 	//	use the PlayerConfig struct m_playerConfig to store player properties
 	//	this struct is defined at the top of Scene_Play.hpp
 
+
 	// NOTE: all of the code below is sample code which shows you hot to
 	//	set up and use entities with the new syntax, it should be removed
 
@@ -67,7 +68,9 @@ void Scene_Play::loadLevel(const std::string& filename)
 	auto brick = m_entityManager.addEntity("tile");
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
 	//brick->addComponent<CAnimation>(m_game->assets().getAnimation("Brick"), true);
-	// brick->addComponent<CTransform>(Vec2(96, 480));
+	brick->addComponent<CTransform>(Vec2(96, 480));
+	
+	//brick->addComponent<CAnimation>(m_game->getAssets().getAnimation("OryxBrick"));
 	// NOTE: your final code should position the entity with the grid x,y position read from the file:
 	//	brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
 

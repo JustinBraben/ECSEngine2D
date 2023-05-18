@@ -1,4 +1,5 @@
 #include "Assets.hpp"
+#include "Assets.hpp"
 #include <iostream>
 
 void Assets::addTexture(const std::string& name, const std::string& path) {
@@ -44,7 +45,7 @@ const sf::Texture& Assets::getTexture(const std::string& name) const
 	return m_textures.at(name);
 }
 
-const Animation& Assets::getAnimation(const std::string& name) const
+Animation Assets::getAnimation(const std::string& name) const
 {
 	return m_animations.at(name);
 }

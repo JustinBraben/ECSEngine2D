@@ -1,8 +1,17 @@
+#include "Animation.hpp"
 #include "../Animation.hpp"
 #include <cmath>
 
 Animation::Animation()
 {
+}
+
+Animation::Animation(const std::string& name, const sf::Texture& t, const sf::IntRect& tRect)
+	: m_name(name)
+{
+	m_size = Vec2(static_cast<float>(tRect.width), static_cast<float>(tRect.height));
+	m_sprite.setOrigin(m_size.x / 2.0f, m_size.y / 2.0f);
+	m_sprite.setTextureRect(tRect);
 }
 
 Animation::Animation(const std::string& name, const sf::Texture& t)
