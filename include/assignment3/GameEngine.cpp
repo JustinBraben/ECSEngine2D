@@ -25,7 +25,7 @@ void GameEngine::init(const std::string& path)
 
 	// TODO: Add animations
 	const auto& tileRect = sf::IntRect(24, 24, 24, 24);
-	auto& brickAnimation = Animation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
+	const auto& brickAnimation = Animation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
 	m_assets.addAnimation("OryxBrick", brickAnimation);
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
