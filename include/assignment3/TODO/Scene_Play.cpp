@@ -41,7 +41,7 @@ Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity
 	//	The size of the grid width aand height is stored in m_gridSize.x and m_gridSize.y
 	//	The bottom-left corner of the Animation should align with the bottom left of the grid cell
 
-	auto& entityAnimation = entity->getComponent<CAnimation>();
+	auto entityAnimation = entity->getComponent<CAnimation>();
 
 	// Setting this to transform size x at the moment
 	// TODO: Should change this if you want to adjust the x and y scale
@@ -73,7 +73,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 			std::string tileType;
 			float gridX, gridY;
 			ss >> tileType >> gridX >> gridY;
-			auto& brick = m_entityManager.addEntity("tile");
+			auto brick = m_entityManager.addEntity("tile");
 			auto& assets = m_game->getAssets();
 			auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxBrick");
 			brick->addComponent<CAnimation>(animationOryxBrick, true);
@@ -89,7 +89,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 	// some sample entities
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
 	//brick->addComponent<CAnimation>(m_game->assets().getAnimation("Brick"), true);
-	auto& brick = m_entityManager.addEntity("tile");
+	auto brick = m_entityManager.addEntity("tile");
 	auto& assets = m_game->getAssets();
 	auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxBrick");
 	brick->addComponent<CTransform>(Vec2(96, 480));
