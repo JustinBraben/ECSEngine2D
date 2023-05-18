@@ -11,6 +11,7 @@ Animation::Animation(const std::string& name, const sf::Texture& t, const sf::In
 {
 	m_size = Vec2(static_cast<float>(tRect.width), static_cast<float>(tRect.height));
 	m_sprite.setOrigin(m_size.x / 2.0f, m_size.y / 2.0f);
+	m_sprite.setTexture(t);
 	m_sprite.setTextureRect(tRect);
 }
 

@@ -13,7 +13,7 @@ class CTransform : public Component {
 public:
 	Vec2 pos = { 0.0, 0.0 };
 	Vec2 prevPos = { 0.0, 0.0 };
-	Vec2 scale = { 1.0, 1.0 };
+	Vec2 scale = { 64.0f / 24.0f, 64.0f / 24.0f};		// converting tile textures from 24x24 to 64x64
 	Vec2 velocity{ 0.0, 0.0 };
 	float angle = 0;
 

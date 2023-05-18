@@ -24,7 +24,8 @@ void GameEngine::init(const std::string& path)
 	m_assets.addTexture("OryxWorld", "../../assets/textures/oryx_16bit_fantasy_world_trans.png");
 
 	// TODO: Add animations
-	auto& brickAnimation = Animation("OryxBrick", m_assets.getTexture("OryxWorld"), sf::IntRect(24, 24, 24, 24));
+	const auto& tileRect = sf::IntRect(24, 24, 24, 24);
+	auto& brickAnimation = Animation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
 	m_assets.addAnimation("OryxBrick", brickAnimation);
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");

@@ -45,7 +45,7 @@ const sf::Texture& Assets::getTexture(const std::string& name) const
 	return m_textures.at(name);
 }
 
-Animation Assets::getAnimation(const std::string& name) const
+const Animation& Assets::getAnimation(const std::string& name) const
 {
 	return m_animations.at(name);
 }

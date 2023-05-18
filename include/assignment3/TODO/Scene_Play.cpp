@@ -65,10 +65,13 @@ void Scene_Play::loadLevel(const std::string& filename)
 	spawnPlayer();
 
 	// some sample entities
-	auto brick = m_entityManager.addEntity("tile");
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
 	//brick->addComponent<CAnimation>(m_game->assets().getAnimation("Brick"), true);
+	auto& brick = m_entityManager.addEntity("tile");
+	auto& assets = m_game->getAssets();
+	auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxBrick");
 	brick->addComponent<CTransform>(Vec2(96, 480));
+	brick->addComponent<CAnimation>(animationOryxBrick, true);
 	
 	//brick->addComponent<CAnimation>(m_game->getAssets().getAnimation("OryxBrick"));
 	// NOTE: your final code should position the entity with the grid x,y position read from the file:
@@ -78,15 +81,14 @@ void Scene_Play::loadLevel(const std::string& filename)
 		std::cout << "This could be a good way of identifying if a tile is a brick!\n";
 	}*/
 
-	auto block = m_entityManager.addEntity("tile");
-	auto assets = m_game->getAssets();
+	//auto block = m_entityManager.addEntity("tile");
 	//auto animation = assets.getAnimation("Block");
 	//block->addComponent<CAnimation>(m_game->getAssets().getAnimation("Block"), true);
 	//block->addComponent<CTransform>(Vec2(224, 480));
 	// add a bounding box, this will now show up if we press the 'C' key
 	//block->addComponent<CBoundingBox>(m_game->assets().getAnimation("Block").getSize());
 
-	auto question = m_entityManager.addEntity("tile");
+	//auto question = m_entityManager.addEntity("tile");
 	//question->addComponent<CAnimation>(m_game->assets().getAnimation("Question"), true);
 	//question->addComponent<CTransform>(Vec2(352, 480));
 
@@ -206,6 +208,7 @@ void Scene_Play::sRender()
 
 	// set the viewport of the window to be centered on the player if it's far enough right
 	auto& pPos = m_player->getComponent<CTransform>().pos;
+	auto windowSize = m_game->window().getSize().x;
 	float windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
 	sf::View view = m_game->window().getView();
 	view.setCenter(windowCenterX, m_game->window().getSize().y - view.getCenter().y);
