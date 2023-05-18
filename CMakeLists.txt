@@ -41,7 +41,7 @@ endif()
 # Enforce treating warnings as errors for MSVC compiler.
 if(MSVC)
   # Treat warnings as errors
-  target_compile_options(${PROJECT_NAME} PRIVATE /WX /W4 /w14640 /permissive)
+  target_compile_options(${PROJECT_NAME} PRIVATE /WX /W4 /w14640 /permissive /we4239)
   
   # Enable debugging information and code coverage.
   target_compile_options(${PROJECT_NAME} PRIVATE /Zi /DEBUG)
