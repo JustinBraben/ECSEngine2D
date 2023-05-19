@@ -74,7 +74,7 @@ void Scene_Menu::sDoAction(const Action& action)
 	}
 	else if (action.name() == "PLAY") {
 		auto newScenePlay = std::make_shared<Scene_Play>(m_game, m_levelPaths[m_selectedMenuIndex]);
-		m_game->changeScene("PLAY", newScenePlay);
+		m_game->changeScene("PLAY_" + m_levelPaths[m_selectedMenuIndex], newScenePlay);
 	}
 	else if (action.type() == "QUIT") {
 		onEnd();

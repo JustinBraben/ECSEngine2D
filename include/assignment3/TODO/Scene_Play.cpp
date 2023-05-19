@@ -1,4 +1,5 @@
 #include "../Scene_Play.hpp"
+#include "../Scene_Menu.hpp"
 #include "Physics.hpp"
 #include "Assets.hpp"
 #include "GameEngine.hpp"
@@ -225,7 +226,8 @@ void Scene_Play::onEnd()
 	// TODO: When the scene ends, change back to the MENU scene
 	// use m_game->changeScene(correct params);
 	// auto newSceneMenu = std::make_shared<Scene_Menu>(m_game, m_levelPaths[m_selectedMenuIndex]);
-	// changeScene("MENU", std::make_shared<Scene_Menu>(this));
+	//changeScene("MENU", std::make_shared<Scene_Menu>(this));
+	m_game->changeScene("MENU", std::make_shared<Scene_Menu>(m_game));
 }
 
 void Scene_Play::sRender()
