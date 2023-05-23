@@ -9,7 +9,7 @@ int main(void)
     // Game g("../../include/assignment2/configs/config.txt");
     // g.run();
 
-    GameEngine g("../../include/assignment3/configs/level1.txt");
+    GameEngine g("../../include/assignment3/configs/assets.txt");
     g.run();
 
     return 0;

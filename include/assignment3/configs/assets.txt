@@ -1,7 +1,11 @@
-Texture		Brick				
+Texture		OryxBrick			../../assets/textures/oryx_16bit_fantasy_world_trans.png
 Texture		TexStand			images/megaman/stand64.png
-Texture		Question
+Texture		Question			../../assets/textures/oryx_16bit_fantasy_world_trans.png
 Animation	Stand				TexStand		1		0
+Animation	Idle				../../assets/textures/Ninja_Frog/Idle_(32x32).png
+Animation	Jump				../../assets/textures/Ninja_Frog/Jump_(32x32).png
+Animation	Fall				../../assets/textures/Ninja_Frog/Fall_(32x32).png
+Animation	Run					../../assets/textures/Ninja_Frog/Run_(32x32).png
 Font		Tech				fonts.tech.ttf
 Font		Arial				../../assets/arial.ttf
 Font		AboveDemoRegular	../../include/assignment3/configs/fonts/AboveDemoRegular-lJMd.ttf

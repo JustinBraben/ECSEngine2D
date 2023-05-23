@@ -1,10 +1,11 @@
 #include "GameEngine.hpp"
-#include "GameEngine.hpp"
 #include "Assets.hpp"
 #include "Scene_Play.hpp"
 #include "Scene_Menu.hpp"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 GameEngine::GameEngine(const std::string& path)
 {
@@ -13,8 +14,35 @@ GameEngine::GameEngine(const std::string& path)
 
 void GameEngine::init(const std::string& path)
 {
+	std::ifstream fin(path);
+	std::string line;
+
 	// TODO: read the assets and add them to the m_assets class
 	//	from assets.txt
+	while (std::getline(fin, line)) {
+		std::stringstream ss(line);
+		std::string type;
+		ss >> type;
+		if (type == "Texture") {
+			std::string textureName, texturePath;
+			ss >> textureName >> texturePath;
+			m_assets.addTexture(textureName, texturePath);
+		}
+		else if (type == "Animation") {
+			std::string animationName, animationPath;
+			ss >> animationName >> animationPath;
+			sf::Texture texture;
+			texture.loadFromFile(animationPath);
+			auto animation = Animation(animationName, texture);
+			m_assets.addAnimation(animationName, std::move(animation));
+		}
+		else if (type == "Font") {
+			std::string fontName, fontPath;
+			ss >> fontName >> fontPath;
+			m_assets.addFont(fontName, fontPath);
+		}
+	}
+
 	// NOTE: for now you are just manually adding them here
 	m_assets.addFont("Arial", "../../assets/arial.ttf");
 	m_assets.addFont("AboveDemoRegular", "../../include/assignment3/configs/fonts/AboveDemoRegular-lJMd.ttf");
