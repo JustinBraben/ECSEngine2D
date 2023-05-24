@@ -1,6 +1,6 @@
 #include "../Scene_Play.hpp"
 #include "../Scene_Menu.hpp"
-#include "Physics.hpp"
+#include "../Physics.hpp"
 #include "Assets.hpp"
 #include "GameEngine.hpp"
 #include "Components.hpp"
@@ -34,6 +34,11 @@ void Scene_Play::init(const std::string& levelPath)
 
 	m_gridText.setCharacterSize(12);
 	//m_gridText.setFont(m_game->getAssets().getFont("Tech"));
+
+	auto& gridFont = m_game->getAssets().getFont("Arial");
+	m_gridText.setFont(gridFont);
+	m_gridText.setFillColor(sf::Color::Black);
+	m_gridText.setCharacterSize(12);
 
 	loadLevel(levelPath);
 }
@@ -85,6 +90,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 			auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxBrick");
 			brick->addComponent<CAnimation>(animationOryxBrick, true);
 			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
+			brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 			}
 
 			if (tileType == "Question") {
@@ -93,6 +99,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 				auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxQuestion");
 				question->addComponent<CAnimation>(animationOryxBrick, true);
 				question->addComponent<CTransform>(gridToMidPixel(gridX, gridY, question));
+				question->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 			}
 		}
 	}
@@ -105,25 +112,6 @@ void Scene_Play::loadLevel(const std::string& filename)
 	// some sample entities
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
 	//brick->addComponent<CAnimation>(m_game->assets().getAnimation("Brick"), true);
-	
-	//brick->addComponent<CAnimation>(m_game->getAssets().getAnimation("OryxBrick"));
-	// NOTE: your final code should position the entity with the grid x,y position read from the file:
-	//	brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
-
-	/*if (brick->getComponent<CAnimation>().animation.getName() == "Brick") {
-		std::cout << "This could be a good way of identifying if a tile is a brick!\n";
-	}*/
-
-	//auto block = m_entityManager.addEntity("tile");
-	//auto animation = assets.getAnimation("Block");
-	//block->addComponent<CAnimation>(m_game->getAssets().getAnimation("Block"), true);
-	//block->addComponent<CTransform>(Vec2(224, 480));
-	// add a bounding box, this will now show up if we press the 'C' key
-	//block->addComponent<CBoundingBox>(m_game->assets().getAnimation("Block").getSize());
-
-	//auto question = m_entityManager.addEntity("tile");
-	//question->addComponent<CAnimation>(m_game->assets().getAnimation("Question"), true);
-	//question->addComponent<CTransform>(Vec2(352, 480));
 
 	// NOTE: THIS IS INCREDIBLY IMPORTANT PLEASE READ THIS EXAMPLE
 	//	Components are now returned as references rather than pointers
@@ -145,7 +133,8 @@ void Scene_Play::spawnPlayer()
 	m_player = m_entityManager.addEntity("player");
 	m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
 	m_player->addComponent<CTransform>(Vec2(224, 352));
-	//m_player->addComponent<CBoundingBox>(Vec2(48, 48));
+	m_player->addComponent<CGravity>(0.1f);
+	m_player->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 
 	// TODO: be sure to add the remaining components to the player
 }
@@ -175,7 +164,7 @@ void Scene_Play::sMovement()
 	// TODO: Implement the maximum player speed in both X and Y directions
 	// NOTE: Setting aan entity's scale.x to -1/1 will make it face to the left/right
 
-	Vec2 playerVelocity(0, 0);
+	Vec2 playerVelocity(0, m_player->getComponent<CTransform>().velocity.y);
 
 	if (m_player->getComponent<CInput>().up) 
 	{
@@ -198,6 +187,10 @@ void Scene_Play::sMovement()
 
 	for (auto entity : m_entityManager.getEntities()) 
 	{
+		if (entity->hasComponent<CGravity>()) 
+		{
+			entity->getComponent<CTransform>().velocity.y += entity->getComponent<CGravity>().gravity;
+		}
 		entity->getComponent<CTransform>().pos += entity->getComponent<CTransform>().velocity;
 	}
 }
@@ -215,7 +208,27 @@ void Scene_Play::sCollision()
 	//	Also, something BELOW something else will have a y value GREATER than it
 	//	Also, something ABOVE something else will have a y value LESS than it
 
+	Physics physics;
+
 	// TODO: Implement Physics::GetOverlap() function, use it inside this function
+
+
+
+	for (auto entity : m_entityManager.getEntities())
+	{
+		if (entity->tag() == "player")
+			continue;
+
+		Vec2 collision = physics.GetOverlap(entity, m_player);
+
+		if (collision.x > 0.f) {
+			//std::cout << "Colliding in the x !\n";
+		}
+
+		if (collision.y > 0.f) {
+			//std::cout << "Colliding in the y !\n";
+		}
+	}
 
 	// TODO: Implement bullet / tile collisions
 	//	Destory the tile if it has a Brick animation
@@ -371,4 +384,19 @@ void Scene_Play::sRender()
 	}
 
 	m_game->window().display();
+}
+
+void Scene_Play::drawLine(const Vec2& p1, const Vec2& p2)
+{
+	// TODO: drawLine from p1 to p2
+	sf::VertexArray line(sf::Lines, 2);
+
+	line[0].position = sf::Vector2f(p1.x, p1.y); // Set the position of the first vertex
+	line[0].color = sf::Color::White; // Set the color of the first vertex
+
+	line[1].position = sf::Vector2f(p2.x, p2.y); // Set the position of the second vertex
+	line[1].color = sf::Color::White; // Set the color of the second vertex
+
+	// Assuming you have an sf::RenderWindow object called 'window'
+	m_game->window().draw(line);
 }

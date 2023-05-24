@@ -42,6 +42,8 @@ public:
 	void sDoAction(const Action& action) override;
 	void sRender() override;
 
+	void drawLine(const Vec2& p1, const Vec2& p2);
+
 	// Systems
 	void sAnimation();
 	void sMovement();
