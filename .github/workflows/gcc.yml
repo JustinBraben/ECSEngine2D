@@ -42,7 +42,9 @@ jobs:
         -password "${{ secrets.GITHUB_TOKEN }}"
 
     - name: Install dependencies (Ubuntu)
-      run: sudo apt-get install -y libx11-dev libxrandr-dev libxi-dev libudev-dev libgl1-mesa-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libx11-dev libxrandr-dev libxi-dev libudev-dev libgl1-mesa-dev
 
     - name: Modify vcpkg directory permissions
       run: |
