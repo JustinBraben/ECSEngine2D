@@ -139,8 +139,8 @@ void Scene_Play::spawnPlayer()
 {
 	// here is a sample player entity which you can use to construct other entities
 	m_player = m_entityManager.addEntity("player");
-	//m_player->addComponent<CAnimation>(m_game->assets().getAnimation("Stand"), true);
-	//m_player->addComponent<CTransform>(Vec2(224, 352));
+	m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
+	m_player->addComponent<CTransform>(Vec2(224, 352));
 	//m_player->addComponent<CBoundingBox>(Vec2(48, 48));
 
 	// TODO: be sure to add the remaining components to the player

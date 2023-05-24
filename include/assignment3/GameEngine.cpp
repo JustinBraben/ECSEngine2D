@@ -29,12 +29,12 @@ void GameEngine::init(const std::string& path)
 			m_assets.addTexture(textureName, texturePath);
 		}
 		else if (type == "Animation") {
-			std::string animationName, animationPath;
+			/*std::string animationName, animationPath;
 			ss >> animationName >> animationPath;
 			sf::Texture texture;
 			texture.loadFromFile(animationPath);
 			auto animation = Animation(animationName, texture);
-			m_assets.addAnimation(animationName, std::move(animation));
+			m_assets.addAnimation(animationName, std::move(animation));*/
 		}
 		else if (type == "Font") {
 			std::string fontName, fontPath;
@@ -42,11 +42,6 @@ void GameEngine::init(const std::string& path)
 			m_assets.addFont(fontName, fontPath);
 		}
 	}
-
-	// NOTE: for now you are just manually adding them here
-	m_assets.addFont("Arial", "../../assets/arial.ttf");
-	m_assets.addFont("AboveDemoRegular", "../../include/assignment3/configs/fonts/AboveDemoRegular-lJMd.ttf");
-	m_assets.addFont("Neoteric", "../../include/assignment3/configs/fonts/Neoteric-32A8.ttf");
 
 	// TODO: Load Textures
 	m_assets.addTexture("OryxWorld", "../../assets/textures/oryx_16bit_fantasy_world_trans.png");
@@ -61,6 +56,9 @@ void GameEngine::init(const std::string& path)
 	// TODO: Come up with a better way to get intRects from our large texture
 	const auto& questionRect = sf::IntRect(24 * 7, 24 * 27, 24, 24);
 	m_assets.addAnimation("OryxQuestion", Animation("OryxQuestion", m_assets.getTexture("OryxWorld"), questionRect));
+
+	const auto& idleRect = sf::IntRect(4, 8, 24, 24);
+	m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleRect));
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
 	m_window.setFramerateLimit(60);

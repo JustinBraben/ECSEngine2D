@@ -110,11 +110,14 @@ Texture N P
 	Texture FilePath	P		std::string (it will have no spaces)
 
 Animation Asset Asset Specification:
-Animation N T F S
+Animation N T F S L P Z
 	Animation Name		N		std::string (it will have no spaces)
 	Texture Name		T		std::string (refers to an existing texture)
 	FrameCount			F		int (number of frames in the animation)
 	Anim Speed			S		int (number of game frames between anim frames)
+	Texture Rect Left	L		int (left position of texture Rect)
+	Texture Rect Top	P		int (top position of texture Rect)
+	Texture Size		Z		int (size of the texture)
 
 Font Asset Specification:
 Font N P

@@ -4,7 +4,7 @@
 #include <map>
 #include "../assignment3/GameEngine.hpp"
 
-int main(void) 
+int main() 
 {
     // Game g("../../include/assignment2/configs/config.txt");
     // g.run();
