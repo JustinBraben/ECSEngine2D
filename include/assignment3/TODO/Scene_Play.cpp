@@ -24,9 +24,13 @@ void Scene_Play::init(const std::string& levelPath)
 	registerAction(sf::Keyboard::C, "TOGGLE_COLLISION");	// Toggle drawing (C)ollision Boxes
 	registerAction(sf::Keyboard::G, "TOGGLE_GRID");			// Toggle drawing (G)rid
 
-	registerAction(sf::Keyboard::W, "JUMP");
+	//registerAction(sf::Keyboard::W, "JUMP");
 
 	// TODO: Register all other gameplay Actions
+	registerAction(sf::Keyboard::W, "MOVE_UP");
+	registerAction(sf::Keyboard::S, "MOVE_DOWN");
+	registerAction(sf::Keyboard::A, "MOVE_LEFT");
+	registerAction(sf::Keyboard::D, "MOVE_RIGHT");
 
 	m_gridText.setCharacterSize(12);
 	//m_gridText.setFont(m_game->getAssets().getFont("Tech"));
@@ -170,6 +174,32 @@ void Scene_Play::sMovement()
 	// TODO: Implement gravity's effect on the player
 	// TODO: Implement the maximum player speed in both X and Y directions
 	// NOTE: Setting aan entity's scale.x to -1/1 will make it face to the left/right
+
+	Vec2 playerVelocity(0, 0);
+
+	if (m_player->getComponent<CInput>().up) 
+	{
+		playerVelocity.y = -3;
+	}
+	if (m_player->getComponent<CInput>().down)
+	{
+		playerVelocity.y = 3;
+	}
+	if (m_player->getComponent<CInput>().left)
+	{
+		playerVelocity.x = -3;
+	}
+	if (m_player->getComponent<CInput>().right)
+	{
+		playerVelocity.x = 3;
+	}
+
+	m_player->getComponent<CTransform>().velocity = playerVelocity;
+
+	for (auto entity : m_entityManager.getEntities()) 
+	{
+		entity->getComponent<CTransform>().pos += entity->getComponent<CTransform>().velocity;
+	}
 }
 
 void Scene_Play::sLifespan()
@@ -206,9 +236,48 @@ void Scene_Play::sDoAction(const Action& action)
 		else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid;  }
 		else if (action.name() == "PAUSE") { setPaused(!m_paused);  }
 		else if (action.name() == "QUIT") { onEnd();  }
+
+		if (action.name() == "MOVE_LEFT") 
+		{ 
+			m_player->getComponent<CInput>().left = true;
+		}
+
+		if (action.name() == "MOVE_RIGHT")
+		{
+			m_player->getComponent<CInput>().right = true;
+		}
+
+		if (action.name() == "MOVE_UP")
+		{
+			m_player->getComponent<CInput>().up = true;
+		}
+
+		if (action.name() == "MOVE_DOWN")
+		{
+			m_player->getComponent<CInput>().down = true;
+		}
 	}
 	else if (action.type() == "END") {
 
+		if (action.name() == "MOVE_LEFT")
+		{
+			m_player->getComponent<CInput>().left = false;
+		}
+
+		if (action.name() == "MOVE_RIGHT")
+		{
+			m_player->getComponent<CInput>().right = false;
+		}
+
+		if (action.name() == "MOVE_UP")
+		{
+			m_player->getComponent<CInput>().up = false;
+		}
+
+		if (action.name() == "MOVE_DOWN")
+		{
+			m_player->getComponent<CInput>().down = false;
+		}
 	}
 }
 
