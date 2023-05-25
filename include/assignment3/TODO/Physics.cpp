@@ -29,14 +29,6 @@ Vec2 Physics::GetOverlap(std::shared_ptr<Entity> a, std::shared_ptr<Entity> b) {
 	auto& bBox = b->getComponent<CBoundingBox>();
 	auto& bTransform = b->getComponent<CTransform>();
 
-	/*rect.setSize(sf::Vector2f(box.size.x - 1, box.size.y - 1));
-	rect.setOrigin(sf::Vector2f(box.halfSize.x, box.halfSize.y));
-	rect.setPosition(transform.pos.x, transform.pos.y);
-	rect.setFillColor(sf::Color(0, 0, 0, 0));
-	rect.setOutlineColor(sf::Color(255, 255, 255, 255));
-	rect.setOutlineThickness(1);
-	m_game->window().draw(rect);*/
-
 	Vec2 delta = { std::abs(aTransform.pos.x - bTransform.pos.x) ,
 						std::abs(aTransform.pos.y - bTransform.pos.y) };
 
@@ -73,11 +65,16 @@ Vec2 Physics::GetPreviousOverlap(std::shared_ptr<Entity> a, std::shared_ptr<Enti
 		return Vec2(0, 0);
 	}
 
-	Vec2 delta = { std::abs(a->getComponent<CTransform>().prevPos.x - b->getComponent<CTransform>().prevPos.x) ,
-						std::abs(a->getComponent<CTransform>().prevPos.y - b->getComponent<CTransform>().prevPos.y) };
+	auto& aBox = a->getComponent<CBoundingBox>();
+	auto& aTransform = a->getComponent<CTransform>();
+	auto& bBox = b->getComponent<CBoundingBox>();
+	auto& bTransform = b->getComponent<CTransform>();
 
-	auto overLapX = a->getComponent<CBoundingBox>().halfSize.x + b->getComponent<CBoundingBox>().halfSize.x - delta.x;
-	auto overLapY = a->getComponent<CBoundingBox>().halfSize.y + b->getComponent<CBoundingBox>().halfSize.y - delta.y;
+	Vec2 delta = { std::abs(aTransform.prevPos.x - bTransform.prevPos.x) ,
+						std::abs(aTransform.prevPos.y - bTransform.prevPos.y) };
+
+	auto overLapX = aBox.halfSize.x + bBox.halfSize.x - delta.x;
+	auto overLapY = aBox.halfSize.y + bBox.halfSize.y - delta.y;
 
 	return Vec2(overLapX, overLapY);
 }

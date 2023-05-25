@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 
 Scene_Play::Scene_Play(GameEngine* gameEngine, const std::string& levelPath)
 	: Scene(gameEngine), m_levelPath(levelPath)
@@ -223,32 +224,50 @@ void Scene_Play::sCollision()
 		Vec2 collision = physics.GetOverlap(entity, m_player);
 
 		if (collision.x > 0.f && collision.y > 0.f) {
-			std::cout << "Collision detected !\n";
 
-			// if prev player position was above a block
-			if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().pos.y) 
+			Vec2 prevCollision = physics.GetPreviousOverlap(entity, m_player);
+
+			if (prevCollision.x <= 0.f &&
+				std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x)
 			{
-				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
-				m_player->getComponent<CTransform>().velocity.y = 0;
-			}
-			
-			if (m_player->getComponent<CTransform>().prevPos.y > entity->getComponent<CTransform>().pos.y) 
-			{
-				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
-				m_player->getComponent<CTransform>().velocity.y = 0;
-			}
-			
-			/*if (m_player->getComponent<CTransform>().prevPos.x < entity->getComponent<CTransform>().pos.x && 
-				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) < m_player->getComponent<CBoundingBox>().halfSize.y)
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
-			else if (m_player->getComponent<CTransform>().prevPos.x > entity->getComponent<CTransform>().pos.x &&
-				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) < m_player->getComponent<CBoundingBox>().halfSize.y)
-				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;*/
+
+				m_player->getComponent<CTransform>().velocity.x = 0;
+			}
+
+			if (prevCollision.y <= 0.f &&
+				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y)
+			{
+				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+
+				m_player->getComponent<CTransform>().velocity.y = 0;
+			}
+
+			/*if (std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y)
+			{
+				if (m_player->getComponent<CTransform>().pos.y < m_player->getComponent<CTransform>().prevPos.y)
+					m_player->getComponent<CTransform>().pos.y += collision.y;
+				else
+					m_player->getComponent<CTransform>().pos.y -= collision.y;
+
+				m_player->getComponent<CTransform>().velocity.y = 0;
+			}*/
+			
+			/*if (std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x) 
+			{
+				if (m_player->getComponent<CTransform>().pos.x < m_player->getComponent<CTransform>().prevPos.x)
+					m_player->getComponent<CTransform>().pos.x += collision.x;
+				else
+					m_player->getComponent<CTransform>().pos.x -= collision.x;
+
+				m_player->getComponent<CTransform>().velocity.x = 0;
+			}*/
+
 		}
 	}
 
 	// TODO: Implement bullet / tile collisions
-	//	Destory the tile if it has a Brick animation
+	//	Destroy the tile if it has a Brick animation
 	// TODO: Implement player / tile collisions and resolutions
 	//	Update the CState component of the player to store whether
 	//	it is currently on the ground or in the air. This will be
