@@ -136,6 +136,7 @@ void Scene_Play::spawnPlayer()
 	m_player->addComponent<CTransform>(Vec2(224, 352));
 	m_player->addComponent<CGravity>(0.1f);
 	m_player->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+	m_player->addComponent<CState>("AIR");
 
 	// TODO: be sure to add the remaining components to the player
 }
@@ -227,42 +228,25 @@ void Scene_Play::sCollision()
 
 			Vec2 prevCollision = physics.GetPreviousOverlap(entity, m_player);
 
-			if (prevCollision.x <= 0.f &&
+			if (prevCollision.y <= 0.f &&
+				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y)
+			{
+				m_player->getComponent<CState>().state = "GROUND";
+
+				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+
+				m_player->getComponent<CTransform>().velocity.y = 0;
+			}
+			else if (prevCollision.x <= 0.f &&
 				std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x)
 			{
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
 				m_player->getComponent<CTransform>().velocity.x = 0;
 			}
-
-			if (prevCollision.y <= 0.f &&
-				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y)
-			{
-				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
-
-				m_player->getComponent<CTransform>().velocity.y = 0;
-			}
-
-			/*if (std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y)
-			{
-				if (m_player->getComponent<CTransform>().pos.y < m_player->getComponent<CTransform>().prevPos.y)
-					m_player->getComponent<CTransform>().pos.y += collision.y;
-				else
-					m_player->getComponent<CTransform>().pos.y -= collision.y;
-
-				m_player->getComponent<CTransform>().velocity.y = 0;
-			}*/
-			
-			/*if (std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x) 
-			{
-				if (m_player->getComponent<CTransform>().pos.x < m_player->getComponent<CTransform>().prevPos.x)
-					m_player->getComponent<CTransform>().pos.x += collision.x;
-				else
-					m_player->getComponent<CTransform>().pos.x -= collision.x;
-
-				m_player->getComponent<CTransform>().velocity.x = 0;
-			}*/
-
+		}
+		else {
+			m_player->getComponent<CState>().state = "AIR";
 		}
 	}
 
