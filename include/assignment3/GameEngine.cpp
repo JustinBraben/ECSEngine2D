@@ -61,7 +61,7 @@ void GameEngine::init(const std::string& path)
 	m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleRect));
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
-	m_window.setFramerateLimit(60);
+	m_window.setFramerateLimit(144);
 
 	changeScene("MENU", std::make_shared<Scene_Menu>(this));
 }

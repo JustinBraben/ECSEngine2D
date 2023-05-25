@@ -176,11 +176,11 @@ void Scene_Play::sMovement()
 	}
 	if (m_player->getComponent<CInput>().left)
 	{
-		playerVelocity.x = -3;
+		playerVelocity.x = -2;
 	}
 	if (m_player->getComponent<CInput>().right)
 	{
-		playerVelocity.x = 3;
+		playerVelocity.x = 2;
 	}
 
 	m_player->getComponent<CTransform>().velocity = playerVelocity;
@@ -191,6 +191,7 @@ void Scene_Play::sMovement()
 		{
 			entity->getComponent<CTransform>().velocity.y += entity->getComponent<CGravity>().gravity;
 		}
+		entity->getComponent<CTransform>().prevPos = entity->getComponent<CTransform>().pos;
 		entity->getComponent<CTransform>().pos += entity->getComponent<CTransform>().velocity;
 	}
 }
@@ -221,12 +222,28 @@ void Scene_Play::sCollision()
 
 		Vec2 collision = physics.GetOverlap(entity, m_player);
 
-		if (collision.x > 0.f) {
-			//std::cout << "Colliding in the x !\n";
-		}
+		if (collision.x > 0.f && collision.y > 0.f) {
+			std::cout << "Collision detected !\n";
 
-		if (collision.y > 0.f) {
-			//std::cout << "Colliding in the y !\n";
+			// if prev player position was above a block
+			if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().pos.y) 
+			{
+				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+				m_player->getComponent<CTransform>().velocity.y = 0;
+			}
+			
+			if (m_player->getComponent<CTransform>().prevPos.y > entity->getComponent<CTransform>().pos.y) 
+			{
+				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+				m_player->getComponent<CTransform>().velocity.y = 0;
+			}
+			
+			/*if (m_player->getComponent<CTransform>().prevPos.x < entity->getComponent<CTransform>().pos.x && 
+				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) < m_player->getComponent<CBoundingBox>().halfSize.y)
+				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
+			else if (m_player->getComponent<CTransform>().prevPos.x > entity->getComponent<CTransform>().pos.x &&
+				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) < m_player->getComponent<CBoundingBox>().halfSize.y)
+				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;*/
 		}
 	}
 

@@ -24,11 +24,24 @@ Vec2 Physics::GetOverlap(std::shared_ptr<Entity> a, std::shared_ptr<Entity> b) {
 		return Vec2(0, 0);
 	}
 
-	Vec2 delta = { std::abs(a->getComponent<CTransform>().pos.x - b->getComponent<CTransform>().pos.x) ,
-						std::abs(a->getComponent<CTransform>().pos.y - b->getComponent<CTransform>().pos.y) };
+	auto& aBox = a->getComponent<CBoundingBox>();
+	auto& aTransform = a->getComponent<CTransform>();
+	auto& bBox = b->getComponent<CBoundingBox>();
+	auto& bTransform = b->getComponent<CTransform>();
 
-	auto overlapX = a->getComponent<CBoundingBox>().halfSize.x + b->getComponent<CBoundingBox>().halfSize.x - delta.x;
-	auto overlapY = a->getComponent<CBoundingBox>().halfSize.y + b->getComponent<CBoundingBox>().halfSize.y - delta.y;
+	/*rect.setSize(sf::Vector2f(box.size.x - 1, box.size.y - 1));
+	rect.setOrigin(sf::Vector2f(box.halfSize.x, box.halfSize.y));
+	rect.setPosition(transform.pos.x, transform.pos.y);
+	rect.setFillColor(sf::Color(0, 0, 0, 0));
+	rect.setOutlineColor(sf::Color(255, 255, 255, 255));
+	rect.setOutlineThickness(1);
+	m_game->window().draw(rect);*/
+
+	Vec2 delta = { std::abs(aTransform.pos.x - bTransform.pos.x) ,
+						std::abs(aTransform.pos.y - bTransform.pos.y) };
+
+	auto overlapX = aBox.halfSize.x + bBox.halfSize.x - delta.x;
+	auto overlapY = aBox.halfSize.y + bBox.halfSize.y - delta.y;
 
 	auto overlap = Vec2(overlapX, overlapY);
 
