@@ -44,6 +44,10 @@ public:
 
 	void drawLine(const Vec2& p1, const Vec2& p2);
 
+	size_t width() const;
+
+	size_t height() const;
+
 	// Systems
 	void sAnimation();
 	void sMovement();

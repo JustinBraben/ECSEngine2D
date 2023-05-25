@@ -378,6 +378,7 @@ void Scene_Play::sRender()
 				std::string yCell = std::to_string(static_cast<int>(y) / static_cast<int>(m_gridSize.y));
 				m_gridText.setString("(" + xCell + "," + yCell + ")");
 				m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
+				m_gridText.setFillColor(sf::Color::White);
 				m_game->window().draw(m_gridText);
 			}
 		}
@@ -399,4 +400,16 @@ void Scene_Play::drawLine(const Vec2& p1, const Vec2& p2)
 
 	// Assuming you have an sf::RenderWindow object called 'window'
 	m_game->window().draw(line);
+}
+
+size_t Scene_Play::width() const
+{
+	// TODO: get width of window
+	return size_t(m_game->window().getSize().x);
+}
+
+size_t Scene_Play::height() const
+{
+	// TODO: get height of window
+	return size_t(m_game->window().getSize().y);
 }
