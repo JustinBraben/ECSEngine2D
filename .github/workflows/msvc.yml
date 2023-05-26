@@ -40,8 +40,6 @@ jobs:
       run: |
         choco install nuget.commandline --yes
       shell: powershell
-      options:
-        run: elevated
 
     - name: Authenticate to GitHub NuGet registry
       run: |
