@@ -344,8 +344,10 @@ void Scene_Play::sRender()
 	auto& pPos = m_player->getComponent<CTransform>().pos;
 	auto windowSize = m_game->window().getSize().x;
 	float windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
+	float windowCenterY = std::min(m_game->window().getSize().y / 2.0f, pPos.y);
 	sf::View view = m_game->window().getView();
-	view.setCenter(windowCenterX, m_game->window().getSize().y - view.getCenter().y);
+	view.setCenter(windowCenterX, windowCenterY);
+
 	m_game->window().setView(view);
 
 	// draw all Entity textures / animations

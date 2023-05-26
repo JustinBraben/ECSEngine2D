@@ -16,7 +16,8 @@ Scene_Menu::Scene_Menu(GameEngine* gameEngine)
 	// You may initialize any member variables or perform other necessary actions here
 	
 	m_title = "MEGA MARIO";
-	m_menuStrings = { "Level 1", "Level 2" };
+	std::string levelsPath = "C:/Users/Justin/source/repos/ECSEngine2D/include/assignment3/configs";
+	m_menuStrings = { "Level 1", "Level 2", "Level 3"};
 	init();
 }
 

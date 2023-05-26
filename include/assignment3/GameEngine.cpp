@@ -191,6 +191,13 @@ void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene
 		// Scene already exists, set it as the current scene
 		m_currentScene = sceneName;
 
+		float windowCenterX = (this)->window().getSize().x / 2.0f;
+		float windowCenterY = (this)->window().getSize().y / 2.0f;
+		sf::View view = (this)->window().getView();
+		view.setCenter(windowCenterX, windowCenterY);
+
+		(this)->window().setView(view);
+
 		// Optionally end the current scene if requested
 		if (endCurrentScene)
 		{
