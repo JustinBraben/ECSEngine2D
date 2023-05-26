@@ -38,8 +38,8 @@ jobs:
       
     - name: Configure Chocolatey Package Source on Windows
       run: |
-        choco source add -n=chocolatey -s=https://chocolatey.org/api/v2/ --yes
-        choco source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/ --yes
+        powershell -Command "Start-Process choco -ArgumentList 'source add -n=chocolatey -s=https://chocolatey.org/api/v2/ -v' -Verb RunAs -Wait"
+        powershell -Command "Start-Process choco -ArgumentList 'source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/ -v' -Verb RunAs -Wait"
       shell: powershell
         
     - name: Install NuGet on self-hosted Windows agent
