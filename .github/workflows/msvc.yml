@@ -31,14 +31,16 @@ jobs:
     - name: Fetch Ninja
       uses: seanmiddleditch/gha-setup-ninja@v3
       
-    - name: Configure Chocolatey Package Source on windows
+    - name: Configure Chocolatey Package Source on Windows
       run: |
-        choco source add -n=chocolatey -s=https://chocolatey.org/api/v2/
-        choco source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/
+        powershell -Command "Start-Process choco -ArgumentList 'source add -n=chocolatey -s=https://chocolatey.org/api/v2/' -Verb RunAs -Wait"
+        powershell -Command "Start-Process choco -ArgumentList 'source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/' -Verb RunAs -Wait"
+      shell: pwsh
         
     - name: Install NuGet on self-hosted Windows agent
       run: |
-        choco install nuget.commandline -y
+        powershell -Command "Start-Process choco -ArgumentList 'install nuget.commandline -y' -Verb RunAs -Wait"
+      shell: pwsh
 
     - name: Authenticate to GitHub NuGet registry
       run: >
