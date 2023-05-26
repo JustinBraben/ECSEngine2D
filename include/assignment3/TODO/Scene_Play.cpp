@@ -56,7 +56,7 @@ Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity
 
 	// Setting this to transform size x at the moment
 	// TODO: Should change this if you want to adjust the x and y scale
-	auto entitySize = entityAnimation.animation.getSize() * entity->getComponent<CTransform>().scale.x;
+	auto entitySize = entityAnimation.animation.getSize() * std::abs(entity->getComponent<CTransform>().scale.x);
 	auto posX = gridX * entitySize.x;
 	auto posY = m_game->window().getSize().y - (gridY * entitySize.y);
 	auto midX = posX + (entitySize.x / 2.0f);
@@ -164,13 +164,13 @@ void Scene_Play::sMovement()
 	// TODO: Implement player movement / jumping based on its CInput component
 	// TODO: Implement gravity's effect on the player
 	// TODO: Implement the maximum player speed in both X and Y directions
-	// NOTE: Setting aan entity's scale.x to -1/1 will make it face to the left/right
+	// NOTE: Setting an entity's scale.x to -1/1 will make it face to the left/right
 
 	Vec2 playerVelocity(0, m_player->getComponent<CTransform>().velocity.y);
 
 	if (m_player->getComponent<CInput>().up) 
 	{
-		playerVelocity.y = -3;
+		playerVelocity.y = -6;
 	}
 	if (m_player->getComponent<CInput>().down)
 	{
@@ -179,10 +179,12 @@ void Scene_Play::sMovement()
 	if (m_player->getComponent<CInput>().left)
 	{
 		playerVelocity.x = -2;
+		m_player->getComponent<CTransform>().scale.x = -1 * std::abs(m_player->getComponent<CTransform>().scale.x);
 	}
 	if (m_player->getComponent<CInput>().right)
 	{
 		playerVelocity.x = 2;
+		m_player->getComponent<CTransform>().scale.x = std::abs(m_player->getComponent<CTransform>().scale.x);
 	}
 
 	m_player->getComponent<CTransform>().velocity = playerVelocity;
