@@ -30,6 +30,15 @@ jobs:
 
     - name: Fetch Ninja
       uses: seanmiddleditch/gha-setup-ninja@v3
+      
+    - name: Configure Chocolatey Package Source on windows
+      run: |
+        choco source add -n=chocolatey -s=https://chocolatey.org/api/v2/
+        choco source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/
+        
+    - name: Install NuGet on self-hosted Windows agent
+      run: |
+        choco install nuget.commandline -y
 
     - name: Authenticate to GitHub NuGet registry
       run: >
@@ -40,11 +49,6 @@ jobs:
         -name "${{ env.NUGET_SOURCE_NAME }}"
         -username "${{ github.actor }}"
         -password "${{ secrets.GITHUB_TOKEN }}"
-
-    - name: Configure Chocolatey Package Source on windows
-      run: |
-        choco source add -n=chocolatey -s=https://chocolatey.org/api/v2/
-        choco source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/
 
     - name: Install GNU Tar and Zstd on Windows
       run: |
