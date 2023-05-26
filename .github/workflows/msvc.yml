@@ -13,7 +13,7 @@ on:
 jobs:
   job:
     name: ${{ matrix.os }} - ${{ matrix.cmake_preset }}
-    runs-on: self-hosted
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
@@ -31,7 +31,7 @@ jobs:
     - name: Fetch Ninja
       uses: seanmiddleditch/gha-setup-ninja@v3
       
-    - name: Install Chocolatey on self-hosted Windows agent
+    - name: Install Chocolatey on Windows agent
       run: |
         powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
       shell: powershell
