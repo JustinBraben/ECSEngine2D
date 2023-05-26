@@ -13,7 +13,7 @@ on:
 jobs:
   job:
     name: ${{ matrix.os }} - ${{ matrix.cmake_preset }}
-    runs-on: self-hosted
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
@@ -37,9 +37,9 @@ jobs:
         args: -h
         
     - name: Install NuGet on Windows agent
-    - uses: nuget/setup-nuget@v1
-      with:
-        nuget-version: 'latest'
+      run: |
+        choco install nuget.commandline --yes
+      shell: powershell
 
     - name: Authenticate to GitHub NuGet registry
       run: |
