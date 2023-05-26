@@ -13,7 +13,7 @@ on:
 jobs:
   job:
     name: ${{ matrix.os }} - ${{ matrix.cmake_preset }}
-    runs-on: ${{ matrix.os }}
+    runs-on: self-hosted
 
     strategy:
       fail-fast: false
@@ -38,13 +38,13 @@ jobs:
       
     - name: Configure Chocolatey Package Source on Windows
       run: |
-        powershell -Command "Start-Process choco -ArgumentList 'source add -n=chocolatey -s=https://chocolatey.org/api/v2/' -Verb RunAs -Wait"
-        powershell -Command "Start-Process choco -ArgumentList 'source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/' -Verb RunAs -Wait"
+        choco source add -n=chocolatey -s=https://chocolatey.org/api/v2/ --yes
+        choco source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/ --yes
       shell: powershell
         
     - name: Install NuGet on self-hosted Windows agent
       run: |
-        powershell -Command "Start-Process choco -ArgumentList 'install nuget.commandline -y' -Verb RunAs -Wait"
+        choco install nuget.commandline --yes
       shell: powershell
 
     - name: Authenticate to GitHub NuGet registry
