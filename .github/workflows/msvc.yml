@@ -31,16 +31,10 @@ jobs:
     - name: Fetch Ninja
       uses: seanmiddleditch/gha-setup-ninja@v3
       
-    - name: Install Chocolatey on Windows agent
-      run: |
-        powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-      shell: powershell
-      
-    - name: Configure Chocolatey Package Source on Windows
-      run: |
-        powershell -Command "Start-Process choco -ArgumentList 'source add -n=chocolatey -s=https://chocolatey.org/api/v2/ -v' -Verb RunAs -Wait"
-        powershell -Command "Start-Process choco -ArgumentList 'source add -n=chocolatey-licensed -s=https://licensedpackages.chocolatey.org/api/v2/ -v' -Verb RunAs -Wait"
-      shell: powershell
+    - name: Choco help
+      uses: crazy-max/ghaction-chocolatey@v2
+      with:
+        args: -h
         
     - name: Install NuGet on self-hosted Windows agent
       run: |
