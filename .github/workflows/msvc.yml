@@ -36,10 +36,10 @@ jobs:
       with:
         args: -h
         
-    - name: Install NuGet on self-hosted Windows agent
-      run: |
-        choco install nuget.commandline --yes
-      shell: powershell
+    - name: Install NuGet on Windows agent
+    - uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: 'latest'
 
     - name: Authenticate to GitHub NuGet registry
       run: |
