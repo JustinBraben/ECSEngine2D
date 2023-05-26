@@ -10,7 +10,7 @@
 #include <iostream>
 
 Scene_Menu::Scene_Menu(GameEngine* gameEngine)
-	: Scene(gameEngine) 
+	: Scene(gameEngine), m_delayedMove(false), m_delayTime(sf::seconds(0.08f))
 {
 	// Constructor implementation
 	// You may initialize any member variables or perform other necessary actions here
@@ -51,7 +51,21 @@ void Scene_Menu::init()
 void Scene_Menu::update()
 {
 	// TODO: implement update for Scene_Menu
-	sRender();
+	if (m_delayedMove) 
+	{
+		// Check if the delay time has passed
+		if (m_delayClock.getElapsedTime() >= m_delayTime) 
+		{
+			m_delayedMove = false;  // Reset the flag
+
+			// Update the menu display after the delay
+			sRender();
+		}
+	}
+	else 
+	{
+		sRender();  // Render the menu initially and when no delayed move is in progress
+	}
 }
 
 void Scene_Menu::onEnd()
@@ -61,12 +75,13 @@ void Scene_Menu::onEnd()
 
 void Scene_Menu::sDoAction(const Action& action)
 {
+	if (m_delayedMove)
+		return;
+
 	if (action.name() == "UP") {
 		// Only decrease the index if it's not already at the top
 		if (m_selectedMenuIndex > 0)
 			m_selectedMenuIndex--;
-		/*else
-			m_selectedMenuIndex = m_menuStrings.size() - 1;*/
 	}
 	else if (action.name() == "DOWN") {
 		// Only increase the index if it's not already at the bottom
@@ -80,6 +95,10 @@ void Scene_Menu::sDoAction(const Action& action)
 	else if (action.type() == "QUIT") {
 		onEnd();
 	}
+
+	// Start the delay timer after a move
+	m_delayedMove = true;
+	m_delayClock.restart();
 }
 
 void Scene_Menu::sRender()

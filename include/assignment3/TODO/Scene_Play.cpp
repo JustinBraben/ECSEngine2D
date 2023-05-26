@@ -329,8 +329,10 @@ void Scene_Play::onEnd()
 {
 	// TODO: When the scene ends, change back to the MENU scene
 	// use m_game->changeScene(correct params);
-	// auto newSceneMenu = std::make_shared<Scene_Menu>(m_game, m_levelPaths[m_selectedMenuIndex]);
-	//changeScene("MENU", std::make_shared<Scene_Menu>(this));
+	sDoAction(Action("MOVE_LEFT", "END"));
+	sDoAction(Action("MOVE_RIGHT", "END"));
+	sDoAction(Action("MOVE_DOWN", "END"));
+	sDoAction(Action("MOVE_UP", "END"));
 	m_game->changeScene("MENU", std::make_shared<Scene_Menu>(m_game));
 }
 
@@ -343,12 +345,53 @@ void Scene_Play::sRender()
 	// set the viewport of the window to be centered on the player if it's far enough right
 	auto& pPos = m_player->getComponent<CTransform>().pos;
 	auto windowSize = m_game->window().getSize().x;
-	float windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
-	float windowCenterY = std::min(m_game->window().getSize().y / 2.0f, pPos.y);
-	sf::View view = m_game->window().getView();
-	view.setCenter(windowCenterX, windowCenterY);
 
-	m_game->window().setView(view);
+	//float windowToPlayerMidpoint = ((m_game->window().getSize().y / 2.0f) + pPos.y) / 2.0f;
+	//float windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
+	//float windowCenterY = std::min(m_game->window().getSize().y / 2.0f, pPos.y);
+
+	sf::View view = m_game->window().getView();
+
+	auto& cameraCenterX = view.getCenter().x;
+	auto& cameraCenterY = view.getCenter().y;
+
+	// Player on right side of the screen
+	if (pPos.x > view.getCenter().x) 
+	{
+		while (pPos.x - cameraCenterX > m_game->window().getSize().x / 4.0f) 
+		{
+			view.setCenter(cameraCenterX + 1.0f, cameraCenterY);
+			m_game->window().setView(view);
+		}
+	}
+	// Player on the left side of the screen
+	else 
+	{
+		while (cameraCenterX - pPos.x > m_game->window().getSize().x / 4.0f)
+		{
+			view.setCenter(cameraCenterX - 1.0f, cameraCenterY);
+			m_game->window().setView(view);
+		}
+	}
+
+	// Player is below screen
+	if (pPos.y > view.getCenter().y)
+	{
+		while (pPos.y - cameraCenterY > m_game->window().getSize().y / 4.0f)
+		{
+			view.setCenter(cameraCenterX, cameraCenterY + 1.0f);
+			m_game->window().setView(view);
+		}
+	}
+	// Player is above screen
+	else
+	{
+		while (cameraCenterY - pPos.y > m_game->window().getSize().y / 4.0f)
+		{
+			view.setCenter(cameraCenterX, cameraCenterY - 1.0f);
+			m_game->window().setView(view);
+		}
+	}
 
 	// draw all Entity textures / animations
 	if (m_drawTextures) {

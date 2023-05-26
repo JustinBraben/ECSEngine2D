@@ -45,4 +45,9 @@ private:
 	std::string m_levelPath;
 	std::shared_ptr<Entity> m_player;
 	PlayerConfig m_playerConfig;
+
+	// Delay variables
+	bool m_delayedMove;     // Flag to indicate if delayed move is in progress
+	sf::Time m_delayTime;   // Delay time between moves
+	sf::Clock m_delayClock; // Clock to track the delay time
 };
