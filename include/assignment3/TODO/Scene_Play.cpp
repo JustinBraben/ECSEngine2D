@@ -346,10 +346,6 @@ void Scene_Play::sRender()
 	auto& pPos = m_player->getComponent<CTransform>().pos;
 	auto windowSize = m_game->window().getSize().x;
 
-	//float windowToPlayerMidpoint = ((m_game->window().getSize().y / 2.0f) + pPos.y) / 2.0f;
-	//float windowCenterX = std::max(m_game->window().getSize().x / 2.0f, pPos.x);
-	//float windowCenterY = std::min(m_game->window().getSize().y / 2.0f, pPos.y);
-
 	sf::View view = m_game->window().getView();
 
 	auto& cameraCenterX = view.getCenter().x;

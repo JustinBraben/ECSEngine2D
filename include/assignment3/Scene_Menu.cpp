@@ -71,6 +71,7 @@ void Scene_Menu::update()
 void Scene_Menu::onEnd()
 {
 	// TODO: implement onEnd for Scene_Menu
+	m_game->quit();
 }
 
 void Scene_Menu::sDoAction(const Action& action)
