@@ -42,7 +42,7 @@ jobs:
       shell: powershell
 
     - name: Authenticate to GitHub NuGet registry
-      run: |
+      run: >
         nuget
         sources add
         -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
