@@ -53,6 +53,9 @@ jobs:
 
     - name: Install GNU Tar and Zstd on Windows
       run: |
+        echo "ChocolateyInstall: $env:ChocolateyInstall"
+        Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+        echo "After importing Chocolatey module"
         choco install tartool --source=chocolatey
         refreshenv
         choco install 7zip-zstd --source=chocolatey
