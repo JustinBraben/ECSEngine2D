@@ -233,8 +233,8 @@ void Scene_Play::sMovement()
 	m_player->getComponent<CTransform>().velocity = playerVelocity;
 
 	// Clamp player velocity in either direction
-	if (m_player->getComponent<CTransform>().velocity.y > 3.0f)
-		m_player->getComponent<CTransform>().velocity.y = 3.0f;
+	if (m_player->getComponent<CTransform>().velocity.y > 6.0f)
+		m_player->getComponent<CTransform>().velocity.y = 6.0f;
 
 	if (m_player->getComponent<CTransform>().velocity.x > 4.0f)
 		m_player->getComponent<CTransform>().velocity.x = 4.0f;
@@ -246,6 +246,10 @@ void Scene_Play::sMovement()
 
 	if (m_player->getComponent<CTransform>().velocity.x < -4.0f)
 		m_player->getComponent<CTransform>().velocity.x = -4.0f;
+
+	// If player is moving downwards they can no longer jump
+	if (m_player->getComponent<CTransform>().velocity.y > 0.0f)
+		m_player->getComponent<CInput>().canJump = false;
 
 
 	for (auto entity : m_entityManager.getEntities()) 
