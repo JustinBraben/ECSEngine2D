@@ -166,28 +166,85 @@ void Scene_Play::sMovement()
 	// TODO: Implement the maximum player speed in both X and Y directions
 	// NOTE: Setting an entity's scale.x to -1/1 will make it face to the left/right
 
-	Vec2 playerVelocity(0, m_player->getComponent<CTransform>().velocity.y);
+	Vec2 playerVelocity(m_player->getComponent<CTransform>().velocity.x, m_player->getComponent<CTransform>().velocity.y);
 
-	if (m_player->getComponent<CInput>().up) 
+	//if (m_player->getComponent<CInput>().up) 
+	//{
+	//	playerVelocity.y = -6.0f;
+	//	//playerVelocity.y = m_player->getComponent<CInput>().canJump ? -20 : 0;
+	//}
+	//if (m_player->getComponent<CInput>().down)
+	//{
+	//	playerVelocity.y = 3.0f;
+	//}
+	//if (m_player->getComponent<CInput>().left)
+	//{
+	//	playerVelocity.x = -2.0f;
+	//	m_player->getComponent<CTransform>().scale.x = -1 * std::abs(m_player->getComponent<CTransform>().scale.x);
+	//}
+	//if (m_player->getComponent<CInput>().right)
+	//{
+	//	playerVelocity.x = 2.0f;
+	//	m_player->getComponent<CTransform>().scale.x = std::abs(m_player->getComponent<CTransform>().scale.x);
+	//}
+
+	//m_player->getComponent<CTransform>().velocity = playerVelocity;
+
+	if (m_player->getComponent<CInput>().up)
 	{
-		playerVelocity.y = -6;
+		playerVelocity.y += -0.6f;
+		//playerVelocity.y = m_player->getComponent<CInput>().canJump ? -20 : 0;
 	}
 	if (m_player->getComponent<CInput>().down)
 	{
-		playerVelocity.y = 3;
+		playerVelocity.y += 0.3f;
 	}
+
 	if (m_player->getComponent<CInput>().left)
 	{
-		playerVelocity.x = -2;
+		playerVelocity.x += -0.2f;
 		m_player->getComponent<CTransform>().scale.x = -1 * std::abs(m_player->getComponent<CTransform>().scale.x);
 	}
+
 	if (m_player->getComponent<CInput>().right)
 	{
-		playerVelocity.x = 2;
+		playerVelocity.x += 0.2f;
 		m_player->getComponent<CTransform>().scale.x = std::abs(m_player->getComponent<CTransform>().scale.x);
 	}
 
+	// If player is moving left but the left key is not being pressed, gradually slow them down
+	if (!m_player->getComponent<CInput>().left && playerVelocity.x < 0) 
+	{
+		playerVelocity.x += 0.2f;
+
+		if (playerVelocity.x > 0)
+			playerVelocity.x = 0;
+	}
+
+	// If player is moving right but the right key is not being pressed, gradually slow them down
+	if (!m_player->getComponent<CInput>().right && playerVelocity.x > 0)
+	{
+		playerVelocity.x -= 0.2f;
+
+		if (playerVelocity.x < 0)
+			playerVelocity.x = 0;
+	}
+	
 	m_player->getComponent<CTransform>().velocity = playerVelocity;
+
+	// Clamp player velocity in either direction
+	if (m_player->getComponent<CTransform>().velocity.y > 3.0f)
+		m_player->getComponent<CTransform>().velocity.y = 3.0f;
+
+	if (m_player->getComponent<CTransform>().velocity.x > 4.0f)
+		m_player->getComponent<CTransform>().velocity.x = 4.0f;
+
+	if (m_player->getComponent<CTransform>().velocity.y < -6.0f)
+		m_player->getComponent<CTransform>().velocity.y = -6.0f;
+
+	if (m_player->getComponent<CTransform>().velocity.x < -4.0f)
+		m_player->getComponent<CTransform>().velocity.x = -4.0f;
+
 
 	for (auto entity : m_entityManager.getEntities()) 
 	{
@@ -207,7 +264,7 @@ void Scene_Play::sLifespan()
 
 void Scene_Play::sCollision()
 {
-	// REMEMBER: SFML's 90,0) position is on the TOP-LEFT corner
+	//	REMEMBER: SFML's (90,0) position is on the TOP-LEFT corner
 	//	This means jumping will have a negative y-component
 	//	and gravity will have a positive y-component
 	//	Also, something BELOW something else will have a y value GREATER than it
@@ -238,6 +295,8 @@ void Scene_Play::sCollision()
 				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
 
 				m_player->getComponent<CTransform>().velocity.y = 0;
+
+				m_player->getComponent<CInput>().canJump = true;
 			}
 			else if (prevCollision.x <= 0.f &&
 				std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x)
@@ -249,6 +308,8 @@ void Scene_Play::sCollision()
 		}
 		else {
 			m_player->getComponent<CState>().state = "AIR";
+
+			m_player->getComponent<CInput>().canJump = false;
 		}
 	}
 
