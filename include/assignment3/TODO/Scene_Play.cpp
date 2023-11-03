@@ -192,8 +192,8 @@ void Scene_Play::sMovement()
 
 	if (m_player->getComponent<CInput>().up)
 	{
-		playerVelocity.y += -0.6f;
-		//playerVelocity.y = m_player->getComponent<CInput>().canJump ? -20 : 0;
+		//playerVelocity.y += -0.6f;
+		playerVelocity.y += m_player->getComponent<CInput>().canJump ? -0.6f : 0;
 	}
 	if (m_player->getComponent<CInput>().down)
 	{
@@ -239,8 +239,10 @@ void Scene_Play::sMovement()
 	if (m_player->getComponent<CTransform>().velocity.x > 4.0f)
 		m_player->getComponent<CTransform>().velocity.x = 4.0f;
 
-	if (m_player->getComponent<CTransform>().velocity.y < -6.0f)
+	if (m_player->getComponent<CTransform>().velocity.y < -6.0f) {
 		m_player->getComponent<CTransform>().velocity.y = -6.0f;
+		m_player->getComponent<CInput>().canJump = false;
+	}
 
 	if (m_player->getComponent<CTransform>().velocity.x < -4.0f)
 		m_player->getComponent<CTransform>().velocity.x = -4.0f;
@@ -287,8 +289,21 @@ void Scene_Play::sCollision()
 
 			Vec2 prevCollision = physics.GetPreviousOverlap(entity, m_player);
 
+			// TODO: check for collisions with tiles above the player
+			// set canJump to false if a collision above player was detected
 			if (prevCollision.y <= 0.f &&
-				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y)
+				(m_player->getComponent<CTransform>().pos.y > entity->getComponent<CTransform>().pos.y))
+			{
+				m_player->getComponent<CTransform>().velocity.y = 0;
+
+				m_player->getComponent<CInput>().canJump = false;
+
+				std::cout << "collided with entity above player\n";
+			}
+
+			// TODO: check collision for below player
+			if (prevCollision.y <= 0.f &&
+				(m_player->getComponent<CTransform>().pos.y < entity->getComponent<CTransform>().pos.y))
 			{
 				m_player->getComponent<CState>().state = "GROUND";
 
@@ -297,6 +312,22 @@ void Scene_Play::sCollision()
 				m_player->getComponent<CTransform>().velocity.y = 0;
 
 				m_player->getComponent<CInput>().canJump = true;
+
+				std::cout << "collided with entity below player\n";
+			}
+
+			if (prevCollision.y <= 0.f &&
+				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y)
+			{
+				/*m_player->getComponent<CState>().state = "GROUND";
+
+				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+
+				m_player->getComponent<CTransform>().velocity.y = 0;
+
+				m_player->getComponent<CInput>().canJump = true;
+
+				std::cout << "collided with entity below player\n";*/
 			}
 			else if (prevCollision.x <= 0.f &&
 				std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x)
@@ -309,7 +340,7 @@ void Scene_Play::sCollision()
 		else {
 			m_player->getComponent<CState>().state = "AIR";
 
-			m_player->getComponent<CInput>().canJump = false;
+			//m_player->getComponent<CInput>().canJump = false;
 		}
 	}
 
