@@ -144,6 +144,14 @@ void Scene_Play::spawnPlayer()
 void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
 {
 	// TODO: this should spawn a bullet at the given entity, going in the direction the entity is facing
+	m_player->getComponent<CTransform>();
+	auto& m_bullet = m_entityManager.addEntity("bullet");
+	m_bullet->addComponent<CAnimation>(m_game->getAssets().getAnimation("Bullet"), true);
+	m_bullet->addComponent<CTransform>(m_player->getComponent<CTransform>());
+	m_bullet->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+
+	// TODO: Set lifespan for bullet
+	m_bullet->addComponent<CLifeSpan>();
 }
 
 void Scene_Play::update()
@@ -167,28 +175,6 @@ void Scene_Play::sMovement()
 	// NOTE: Setting an entity's scale.x to -1/1 will make it face to the left/right
 
 	Vec2 playerVelocity(m_player->getComponent<CTransform>().velocity.x, m_player->getComponent<CTransform>().velocity.y);
-
-	//if (m_player->getComponent<CInput>().up) 
-	//{
-	//	playerVelocity.y = -6.0f;
-	//	//playerVelocity.y = m_player->getComponent<CInput>().canJump ? -20 : 0;
-	//}
-	//if (m_player->getComponent<CInput>().down)
-	//{
-	//	playerVelocity.y = 3.0f;
-	//}
-	//if (m_player->getComponent<CInput>().left)
-	//{
-	//	playerVelocity.x = -2.0f;
-	//	m_player->getComponent<CTransform>().scale.x = -1 * std::abs(m_player->getComponent<CTransform>().scale.x);
-	//}
-	//if (m_player->getComponent<CInput>().right)
-	//{
-	//	playerVelocity.x = 2.0f;
-	//	m_player->getComponent<CTransform>().scale.x = std::abs(m_player->getComponent<CTransform>().scale.x);
-	//}
-
-	//m_player->getComponent<CTransform>().velocity = playerVelocity;
 
 	if (m_player->getComponent<CInput>().up)
 	{
@@ -302,7 +288,8 @@ void Scene_Play::sCollision()
 
 				m_player->getComponent<CInput>().canJump = false;
 
-				std::cout << "collided with entity above player\n";
+				// Debug collision
+				//std::cout << "collided with entity above player\n";
 			}
 
 			// TODO: check collision for below player
@@ -317,7 +304,8 @@ void Scene_Play::sCollision()
 
 				m_player->getComponent<CInput>().canJump = true;
 
-				std::cout << "collided with entity below player\n";
+				// Debug collision
+				//std::cout << "collided with entity below player\n";
 			}
 
 			if (prevCollision.y <= 0.f &&
