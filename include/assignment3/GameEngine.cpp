@@ -50,6 +50,7 @@ void GameEngine::init(const std::string& path)
 	//const auto& brickAnimation = Animation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
 	//m_assets.addAnimation("OryxBrick", brickAnimation);
 	//Animation brickAnimation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
+
 	const auto& blockRect = sf::IntRect(24, 24, 24, 24);
 	m_assets.addAnimation("OryxBrick", Animation("OryxBrick", m_assets.getTexture("OryxWorld"), blockRect));
 
@@ -59,6 +60,9 @@ void GameEngine::init(const std::string& path)
 
 	const auto& idleRect = sf::IntRect(4, 8, 24, 24);
 	m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleRect));
+
+	const auto& bulletRect = sf::IntRect(24 * 48, 24 * 1, 24, 24);
+	m_assets.addAnimation("Bullet", Animation("Bullet", m_assets.getTexture("OryxWorld"), bulletRect));
 
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
 	m_window.setFramerateLimit(144);

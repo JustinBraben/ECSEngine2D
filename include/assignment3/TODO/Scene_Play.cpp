@@ -33,6 +33,8 @@ void Scene_Play::init(const std::string& levelPath)
 	registerAction(sf::Keyboard::A, "MOVE_LEFT");
 	registerAction(sf::Keyboard::D, "MOVE_RIGHT");
 
+	registerAction(sf::Keyboard::Space, "SHOOT");
+
 	m_gridText.setCharacterSize(12);
 	//m_gridText.setFont(m_game->getAssets().getFont("Tech"));
 
@@ -146,11 +148,21 @@ void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
 	// TODO: this should spawn a bullet at the given entity, going in the direction the entity is facing
 	auto m_bullet = m_entityManager.addEntity("bullet");
 	m_bullet->addComponent<CAnimation>(m_game->getAssets().getAnimation("Bullet"), true);
-	m_bullet->addComponent<CTransform>(m_player->getComponent<CTransform>());
-	m_bullet->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+	m_bullet->addComponent<CTransform>();
+	m_bullet->addComponent<CBoundingBox>(Vec2(32.0f, 32.0f));
+
+	// TODO: Find what direction the player is facing.
+	// Spawn the bullet on the side the player is facing
+	m_bullet->getComponent<CTransform>().pos.x = entity->getComponent<CTransform>().pos.x;
+	m_bullet->getComponent<CTransform>().pos.y = entity->getComponent<CTransform>().pos.y;
+
+	if (entity->getComponent<CTransform>().scale.x > 0)
+		m_bullet->getComponent<CTransform>().velocity.x = 6.0f;
+	else
+		m_bullet->getComponent<CTransform>().velocity.x = -6.0f;
 
 	// TODO: Set lifespan for bullet
-	m_bullet->addComponent<CLifeSpan>();
+	m_bullet->addComponent<CLifeSpan>(90, 0);
 }
 
 void Scene_Play::update()
@@ -250,7 +262,24 @@ void Scene_Play::sMovement()
 
 void Scene_Play::sLifespan()
 {
-	// TODO: Check lifespan of entities that have them, and destroy them iff they go over
+	// TODO: Check lifespan of entities that have them, and destroy them if they go over
+	//
+	// for all entities
+	// if entity has no lifespan component, skip
+	// if entity has >0 remaining lifespan, subtract 1
+	// if it has lifespan and is alive
+	//	scale its alpha channel properly
+	// if it has lifespan and its time is up
+	//	destory the entity
+	for (auto& entity : m_entityManager.getEntities()) {
+		if (entity->hasComponent<CLifeSpan>()) {
+
+			entity->getComponent<CLifeSpan>().frameCreated++;
+
+			if (entity->getComponent<CLifeSpan>().lifespan < entity->getComponent<CLifeSpan>().frameCreated)
+				entity->destroy();
+		}
+	}
 }
 
 void Scene_Play::sCollision()
@@ -265,6 +294,22 @@ void Scene_Play::sCollision()
 
 	// TODO: Implement Physics::GetOverlap() function, use it inside this function
 
+	for (auto bullet : m_entityManager.getEntities("bullet")) {
+		for (auto entity : m_entityManager.getEntities()) {
+			if (entity->tag() == "player" || entity->tag() == "bullet")
+				continue;
+
+			Vec2 prevCollision = physics.GetPreviousOverlap(entity, bullet);
+
+
+			// Must be colliding in both x and y to destroy bullet
+			if (prevCollision.x > 0.f && prevCollision.y > 0.f)
+			{
+				std::cout << "bullet collided with " << entity->tag() << " , bullet will be destroyed\n";
+				bullet->destroy();
+			}
+		}
+	}
 
 
 	for (auto entity : m_entityManager.getEntities())
@@ -374,6 +419,11 @@ void Scene_Play::sDoAction(const Action& action)
 		{
 			m_player->getComponent<CInput>().down = true;
 		}
+
+		if (action.name() == "SHOOT")
+		{
+			spawnBullet(m_player);
+		}
 	}
 	else if (action.type() == "END") {
 
@@ -412,10 +462,14 @@ void Scene_Play::onEnd()
 {
 	// TODO: When the scene ends, change back to the MENU scene
 	// use m_game->changeScene(correct params);
+
+	// These actions are here to stop the player from continuously moving
+	// when holding a movement key down and exiting the play scene
 	sDoAction(Action("MOVE_LEFT", "END"));
 	sDoAction(Action("MOVE_RIGHT", "END"));
 	sDoAction(Action("MOVE_DOWN", "END"));
 	sDoAction(Action("MOVE_UP", "END"));
+
 	m_game->changeScene("MENU", std::make_shared<Scene_Menu>(m_game));
 }
 
