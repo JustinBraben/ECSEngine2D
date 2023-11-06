@@ -144,8 +144,7 @@ void Scene_Play::spawnPlayer()
 void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
 {
 	// TODO: this should spawn a bullet at the given entity, going in the direction the entity is facing
-	m_player->getComponent<CTransform>();
-	auto& m_bullet = m_entityManager.addEntity("bullet");
+	auto m_bullet = m_entityManager.addEntity("bullet");
 	m_bullet->addComponent<CAnimation>(m_game->getAssets().getAnimation("Bullet"), true);
 	m_bullet->addComponent<CTransform>(m_player->getComponent<CTransform>());
 	m_bullet->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
