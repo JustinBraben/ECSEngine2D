@@ -487,7 +487,17 @@ void Scene_Play::sAnimation()
 
 	if (m_player->getComponent<CState>().state == "GROUND")
 	{
-		m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
+		if (m_player->getComponent<CTransform>().velocity.x != 0 
+			&& m_player->getComponent<CAnimation>().animation.getName() != "PlayerRun")
+		{
+			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerRun"), true);
+		}
+
+		if (m_player->getComponent<CTransform>().velocity.x == 0
+			&& m_player->getComponent<CAnimation>().animation.getName() != "PlayerIdle")
+		{
+			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
+		}
 	}
 
 	// TODO: set the animation of the player based on its CState component
@@ -498,7 +508,15 @@ void Scene_Play::sAnimation()
 		if (!entity->hasComponent<CAnimation>())
 			continue;
 
+
 		entity->getComponent<CAnimation>().animation.update();
+
+		// If an animation that is set to repeat has ended, restart the animation
+		if (entity->getComponent<CAnimation>().animation.hasEnded() &&
+			entity->getComponent<CAnimation>().repeat)
+		{
+			entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(entity->getComponent<CAnimation>().animation.getName()), true);
+		}
 	}
 }
 

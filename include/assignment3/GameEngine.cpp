@@ -61,14 +61,23 @@ void GameEngine::init(const std::string& path)
 	const auto& questionRect = sf::IntRect(24 * 7, 24 * 27, 24, 24);
 	m_assets.addAnimation("OryxQuestion", Animation("OryxQuestion", m_assets.getTexture("OryxWorld"), questionRect));
 
+	size_t idleSpeed = 1;
+	size_t idleFrames = 11;
 	const auto& idleRect = sf::IntRect(4, 8, 24, 24);
-	m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleRect));
+	//m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleRect));
+	
+	m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleFrames, idleSpeed));
 
 	const auto& jumpRect = sf::IntRect(0, 0, 32, 32);
 	m_assets.addAnimation("PlayerJump", Animation("PlayerJump", m_assets.getTexture("PlayerJump"), jumpRect));
 	
 	const auto& fallRect = sf::IntRect(0, 0, 32, 32);
 	m_assets.addAnimation("PlayerFall", Animation("PlayerFall", m_assets.getTexture("PlayerFall"), fallRect));
+	
+	size_t runSpeed = 1;
+	size_t runFrames = 12;
+	const auto& runRect = sf::IntRect(0, 0, 32, 32);
+	m_assets.addAnimation("PlayerRun", Animation("PlayerRun", m_assets.getTexture("PlayerRun"), runFrames, runSpeed));
 
 	const auto& bulletRect = sf::IntRect(24 * 48, 24 * 1, 24, 24);
 	m_assets.addAnimation("Bullet", Animation("Bullet", m_assets.getTexture("OryxWorld"), bulletRect));
