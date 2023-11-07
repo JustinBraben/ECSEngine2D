@@ -189,7 +189,6 @@ void Scene_Play::sMovement()
 
 	if (m_player->getComponent<CInput>().up)
 	{
-		//playerVelocity.y += -0.6f;
 		playerVelocity.y += m_player->getComponent<CInput>().canJump ? -0.6f : 0;
 	}
 	if (m_player->getComponent<CInput>().down)
@@ -244,9 +243,16 @@ void Scene_Play::sMovement()
 	if (m_player->getComponent<CTransform>().velocity.x < -4.0f)
 		m_player->getComponent<CTransform>().velocity.x = -4.0f;
 
+	// If player is moving upwards they are in the air
+	if (m_player->getComponent<CTransform>().velocity.y < 0.0f)
+		m_player->getComponent<CState>().state = "AIR";
+
 	// If player is moving downwards they can no longer jump
-	if (m_player->getComponent<CTransform>().velocity.y > 0.0f)
+	if (m_player->getComponent<CTransform>().velocity.y > 0.0f) {
 		m_player->getComponent<CInput>().canJump = false;
+		m_player->getComponent<CState>().state = "AIR";
+	}
+
 
 
 	for (auto entity : m_entityManager.getEntities()) 
@@ -311,10 +317,16 @@ void Scene_Play::sCollision()
 		}
 	}
 
-
 	for (auto entity : m_entityManager.getEntities())
 	{
 		if (entity->tag() == "player")
+			continue;
+
+		// Skip collision detection on entities that are too far away to possibly collide with Player
+		if (std::abs(entity->getComponent<CTransform>().pos.x - m_player->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().size.x)
+			continue;
+
+		if (std::abs(entity->getComponent<CTransform>().pos.y - m_player->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().size.y)
 			continue;
 
 		Vec2 collision = physics.GetOverlap(entity, m_player);
@@ -373,11 +385,14 @@ void Scene_Play::sCollision()
 				m_player->getComponent<CTransform>().velocity.x = 0;
 			}
 		}
-		else {
+		/*else {
 			m_player->getComponent<CState>().state = "AIR";
+		}*/
 
-			//m_player->getComponent<CInput>().canJump = false;
-		}
+		if (m_player->getComponent<CInput>().canJump)
+			m_player->getComponent<CState>().state = "GROUND";
+		else
+			m_player->getComponent<CState>().state = "AIR";
 	}
 
 	// TODO: Implement bullet / tile collisions
@@ -453,9 +468,38 @@ void Scene_Play::sAnimation()
 {
 	// TODO: Complete the Animation class code first 
 
+	if (m_player->getComponent<CState>().state == "AIR")
+	{
+		// TODO: check if player is rising in the air
+		// set jumping animation if so
+		if (m_player->getComponent<CTransform>().velocity.y < 0)
+		{
+			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerJump"), true);
+		}
+
+		// TODO: set falling animation
+		if (m_player->getComponent<CTransform>().velocity.y > 0)
+		{
+			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerFall"), true);
+		}
+
+	}
+
+	if (m_player->getComponent<CState>().state == "GROUND")
+	{
+		m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
+	}
+
 	// TODO: set the animation of the player based on its CState component
 	// TODO: for each entity with an animation, call entity->getComponent<CAnimation>().animation.update()
 	//	if the animation is not repeated, and it has ended, destroy the entity
+	for (auto entity : m_entityManager.getEntities())
+	{
+		if (!entity->hasComponent<CAnimation>())
+			continue;
+
+		entity->getComponent<CAnimation>().animation.update();
+	}
 }
 
 void Scene_Play::onEnd()

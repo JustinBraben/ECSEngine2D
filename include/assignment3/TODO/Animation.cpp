@@ -26,20 +26,26 @@ Animation::Animation(const std::string& name, const sf::Texture& t, size_t frame
 	m_sprite.setTextureRect(sf::IntRect(std::floor(m_currentFrame) * m_size.x, 0, m_size.x, m_size.y));
 }
 
-// updates the animation to show the next frame, dependning on its speed
+// updates the animation to show the next frame, depending on its speed
 // animation loops when it reaches the end
 void Animation::update()
 {
 	// add the speed variable to the current frame
-	m_currentFrame++;
+	m_currentFrame += m_speed;
 
 	// TODO:	1) calculate the correct frame of animation to play based on currentFrame and speed
 	//			2) set the texture rectange properly (see constructor sample)
+	if (m_speed > 0)
+	{
+		m_sprite.setTextureRect(sf::IntRect(std::floor(m_currentFrame) * m_size.x, 0, m_size.x, m_size.y));
+	}
 }
 
 bool Animation::hasEnded() const
 {
 	// TODO: detect when animation has ended (last frame was played) and return true
+	if (m_currentFrame > m_frameCount)
+		return true;
 	return false;
 }
 

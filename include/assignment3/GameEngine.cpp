@@ -45,6 +45,9 @@ void GameEngine::init(const std::string& path)
 
 	// TODO: Load Textures
 	m_assets.addTexture("OryxWorld", "../../assets/textures/oryx_16bit_fantasy_world_trans.png");
+	//m_assets.addTexture("Jump", "../../assets/textures/Ninja_Frog/Jump_(32x32).png");
+	//m_assets.addTexture("Fall", "../../assets/textures/Ninja_Frog/Fall_(32x32).png");
+	//m_assets.addTexture("Run", "../../assets/textures/Ninja_Frog/Run_(32x32).png");
 
 	// TODO: Add animations
 	//const auto& brickAnimation = Animation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
@@ -60,6 +63,12 @@ void GameEngine::init(const std::string& path)
 
 	const auto& idleRect = sf::IntRect(4, 8, 24, 24);
 	m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleRect));
+
+	const auto& jumpRect = sf::IntRect(0, 0, 32, 32);
+	m_assets.addAnimation("PlayerJump", Animation("PlayerJump", m_assets.getTexture("PlayerJump"), jumpRect));
+	
+	const auto& fallRect = sf::IntRect(0, 0, 32, 32);
+	m_assets.addAnimation("PlayerFall", Animation("PlayerFall", m_assets.getTexture("PlayerFall"), fallRect));
 
 	const auto& bulletRect = sf::IntRect(24 * 48, 24 * 1, 24, 24);
 	m_assets.addAnimation("Bullet", Animation("Bullet", m_assets.getTexture("OryxWorld"), bulletRect));

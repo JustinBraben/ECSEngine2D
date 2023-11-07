@@ -1,8 +1,10 @@
 Texture		PlayerIdle			../../assets/textures/Ninja_Frog/Idle_(32x32).png
 Texture		PlayerRun			../../assets/textures/Ninja_Frog/Run_(32x32).png
+Texture		PlayerFall			../../assets/textures/Ninja_Frog/Fall_(32x32).png
+Texture		PlayerJump			../../assets/textures/Ninja_Frog/Jump_(32x32).png
 Animation	OryxBrick			../../assets/textures/oryx_16bit_fantasy_world_trans.png
 Animation	OryxQuestion		../../assets/textures/oryx_16bit_fantasy_world_trans.png
-Animation	Idle				../../assets/textures/Ninja_Frog/Idle_(32x32).png		11		0		4		8		24
+Animation	Idle				../../assets/textures/Ninja_Frog/Idle_(32x32).png		11		20		4		8		24
 Animation	Jump				../../assets/textures/Ninja_Frog/Jump_(32x32).png
 Animation	Fall				../../assets/textures/Ninja_Frog/Fall_(32x32).png
 Animation	Run					../../assets/textures/Ninja_Frog/Run_(32x32).png
