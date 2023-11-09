@@ -385,9 +385,6 @@ void Scene_Play::sCollision()
 				m_player->getComponent<CTransform>().velocity.x = 0;
 			}
 		}
-		/*else {
-			m_player->getComponent<CState>().state = "AIR";
-		}*/
 
 		if (m_player->getComponent<CInput>().canJump)
 			m_player->getComponent<CState>().state = "GROUND";

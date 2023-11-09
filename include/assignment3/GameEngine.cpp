@@ -79,6 +79,11 @@ void GameEngine::init(const std::string& path)
 	const auto& runRect = sf::IntRect(0, 0, 32, 32);
 	m_assets.addAnimation("PlayerRun", Animation("PlayerRun", m_assets.getTexture("PlayerRun"), runFrames, runSpeed));
 
+	size_t wallSlideSpeed = 1;
+	size_t wallSlideFrames = 5;
+	const auto& wallSlideRect = sf::IntRect(0, 0, 32, 32);
+	m_assets.addAnimation("PlayerWallSlide", Animation("PlayerWallSlide", m_assets.getTexture("PlayerWallSlide"), wallSlideFrames, wallSlideSpeed));
+
 	const auto& bulletRect = sf::IntRect(24 * 48, 24 * 1, 24, 24);
 	m_assets.addAnimation("Bullet", Animation("Bullet", m_assets.getTexture("OryxWorld"), bulletRect));
 
