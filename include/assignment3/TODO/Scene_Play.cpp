@@ -317,6 +317,9 @@ void Scene_Play::sCollision()
 		}
 	}
 
+	bool hasCollided = false;
+
+	// Loop for checking collisions for player
 	for (auto entity : m_entityManager.getEntities())
 	{
 		if (entity->tag() == "player")
@@ -364,25 +367,31 @@ void Scene_Play::sCollision()
 				//std::cout << "collided with entity below player\n";
 			}
 
-			if (prevCollision.y <= 0.f &&
-				std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y)
-			{
-				/*m_player->getComponent<CState>().state = "GROUND";
-
-				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
-
-				m_player->getComponent<CTransform>().velocity.y = 0;
-
-				m_player->getComponent<CInput>().canJump = true;
-
-				std::cout << "collided with entity below player\n";*/
-			}
-			else if (prevCollision.x <= 0.f &&
-				std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x)
+			// TODO: check collision for left/right of player
+			if (prevCollision.x <= 0.f &&
+				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x) &&
+				m_player->getComponent<CState>().state == "AIR")
 			{
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
 				m_player->getComponent<CTransform>().velocity.x = 0;
+
+				//m_player->getComponent<CInput>().canJump = false;
+
+				//m_player->getComponent<CState>().state = "WALLSLIDE";
+			}
+			
+			if (prevCollision.x <= 0.f &&
+				(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x) &&
+				m_player->getComponent<CState>().state == "AIR")
+			{
+				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
+
+				m_player->getComponent<CTransform>().velocity.x = 0;
+
+				//m_player->getComponent<CInput>().canJump = false;
+
+				//m_player->getComponent<CState>().state = "WALLSLIDE";
 			}
 		}
 
