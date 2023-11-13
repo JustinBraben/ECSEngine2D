@@ -347,6 +347,8 @@ void Scene_Play::sCollision()
 
 				m_player->getComponent<CInput>().canJump = false;
 
+				m_player->getComponent<CState>().state = "AIR";
+
 				// Debug collision
 				//std::cout << "collided with entity above player\n";
 			}
@@ -370,7 +372,7 @@ void Scene_Play::sCollision()
 			// TODO: check collision for left/right of player
 			if (prevCollision.x <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x) &&
-				m_player->getComponent<CState>().state == "AIR")
+				(m_player->getComponent<CState>().state == "AIR" || m_player->getComponent<CState>().state == "WALLSLIDE"))
 			{
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
@@ -378,12 +380,12 @@ void Scene_Play::sCollision()
 
 				//m_player->getComponent<CInput>().canJump = false;
 
-				//m_player->getComponent<CState>().state = "WALLSLIDE";
+				m_player->getComponent<CState>().state = "WALLSLIDE";
 			}
 			
 			if (prevCollision.x <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x) &&
-				m_player->getComponent<CState>().state == "AIR")
+				(m_player->getComponent<CState>().state == "AIR" || m_player->getComponent<CState>().state == "WALLSLIDE"))
 			{
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
@@ -391,14 +393,14 @@ void Scene_Play::sCollision()
 
 				//m_player->getComponent<CInput>().canJump = false;
 
-				//m_player->getComponent<CState>().state = "WALLSLIDE";
+				m_player->getComponent<CState>().state = "WALLSLIDE";
 			}
 		}
 
-		if (m_player->getComponent<CInput>().canJump)
+		/*if (m_player->getComponent<CInput>().canJump)
 			m_player->getComponent<CState>().state = "GROUND";
 		else
-			m_player->getComponent<CState>().state = "AIR";
+			m_player->getComponent<CState>().state = "AIR";*/
 	}
 
 	// TODO: Implement bullet / tile collisions
@@ -504,6 +506,11 @@ void Scene_Play::sAnimation()
 		{
 			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
 		}
+	}
+
+	if (m_player->getComponent<CState>().state == "WALLSLIDE")
+	{
+		m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerWallSlide"), true);
 	}
 
 	// TODO: set the animation of the player based on its CState component
