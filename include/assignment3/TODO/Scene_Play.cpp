@@ -338,11 +338,14 @@ void Scene_Play::sCollision()
 
 			Vec2 prevCollision = physics.GetPreviousOverlap(entity, m_player);
 
+
 			// TODO: check for collisions with tiles above the player
 			// set canJump to false if a collision above player was detected
 			if (prevCollision.y <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.y > entity->getComponent<CTransform>().pos.y))
 			{
+				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+
 				m_player->getComponent<CTransform>().velocity.y = 0;
 
 				m_player->getComponent<CInput>().canJump = false;
@@ -357,9 +360,9 @@ void Scene_Play::sCollision()
 			if (prevCollision.y <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.y < entity->getComponent<CTransform>().pos.y))
 			{
-				m_player->getComponent<CState>().state = "GROUND";
-
 				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+
+				m_player->getComponent<CState>().state = "GROUND";
 
 				m_player->getComponent<CTransform>().velocity.y = 0;
 
@@ -372,7 +375,7 @@ void Scene_Play::sCollision()
 			// TODO: check collision for left/right of player
 			if (prevCollision.x <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x) &&
-				(m_player->getComponent<CState>().state == "AIR" || m_player->getComponent<CState>().state == "WALLSLIDE"))
+				(m_player->getComponent<CTransform>().pos.y >= entity->getComponent<CTransform>().pos.y))
 			{
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
@@ -385,7 +388,33 @@ void Scene_Play::sCollision()
 			
 			if (prevCollision.x <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x) &&
-				(m_player->getComponent<CState>().state == "AIR" || m_player->getComponent<CState>().state == "WALLSLIDE"))
+				(m_player->getComponent<CTransform>().pos.y >= entity->getComponent<CTransform>().pos.y))
+			{
+				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
+
+				m_player->getComponent<CTransform>().velocity.x = 0;
+
+				//m_player->getComponent<CInput>().canJump = false;
+
+				m_player->getComponent<CState>().state = "WALLSLIDE";
+			}
+			
+			if (prevCollision.x <= 0.f &&
+				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x) &&
+				m_player->getComponent<CState>().state != "GROUND")
+			{
+				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
+
+				m_player->getComponent<CTransform>().velocity.x = 0;
+
+				//m_player->getComponent<CInput>().canJump = false;
+
+				m_player->getComponent<CState>().state = "WALLSLIDE";
+			}
+			
+			if (prevCollision.x <= 0.f &&
+				(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x) &&
+				m_player->getComponent<CState>().state != "GROUND")
 			{
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
@@ -396,11 +425,6 @@ void Scene_Play::sCollision()
 				m_player->getComponent<CState>().state = "WALLSLIDE";
 			}
 		}
-
-		/*if (m_player->getComponent<CInput>().canJump)
-			m_player->getComponent<CState>().state = "GROUND";
-		else
-			m_player->getComponent<CState>().state = "AIR";*/
 	}
 
 	// TODO: Implement bullet / tile collisions
