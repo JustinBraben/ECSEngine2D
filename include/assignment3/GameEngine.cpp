@@ -29,12 +29,11 @@ void GameEngine::init(const std::string& path)
 			m_assets.addTexture(textureName, texturePath);
 		}
 		else if (type == "Animation") {
-			/*std::string animationName, animationPath;
-			ss >> animationName >> animationPath;
-			sf::Texture texture;
-			texture.loadFromFile(animationPath);
-			auto animation = Animation(animationName, texture);
-			m_assets.addAnimation(animationName, std::move(animation));*/
+			std::string animationName, textureName;
+			int frameCount, animSpeed, textureRectLeft, textureRectTop, textureSize;
+			ss >> animationName >> textureName >> frameCount >> animSpeed >> textureRectLeft >> textureRectTop >> textureSize;
+			
+			//m_assets.addAnimation(animationName, Animation(animationName, m_assets.getTexture(textureName), frameCount, animSpeed));
 		}
 		else if (type == "Font") {
 			std::string fontName, fontPath;
@@ -44,7 +43,7 @@ void GameEngine::init(const std::string& path)
 	}
 
 	// TODO: Load Textures
-	m_assets.addTexture("OryxWorld", "../../assets/textures/oryx_16bit_fantasy_world_trans.png");
+	//m_assets.addTexture("OryxWorld", "../../assets/textures/oryx_16bit_fantasy_world_trans.png");
 	//m_assets.addTexture("Jump", "../../assets/textures/Ninja_Frog/Jump_(32x32).png");
 	//m_assets.addTexture("Fall", "../../assets/textures/Ninja_Frog/Fall_(32x32).png");
 	//m_assets.addTexture("Run", "../../assets/textures/Ninja_Frog/Run_(32x32).png");
@@ -64,7 +63,6 @@ void GameEngine::init(const std::string& path)
 	size_t idleSpeed = 1;
 	size_t idleFrames = 11;
 	const auto& idleRect = sf::IntRect(4, 8, 24, 24);
-	//m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleRect));
 	
 	m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleFrames, idleSpeed));
 
