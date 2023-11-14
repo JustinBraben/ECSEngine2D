@@ -360,13 +360,15 @@ void Scene_Play::sCollision()
 			if (prevCollision.y <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.y < entity->getComponent<CTransform>().pos.y))
 			{
-				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
 
-				m_player->getComponent<CState>().state = "GROUND";
+				if (std::abs(m_player->getComponent<CTransform>().prevPos.x - entity->getComponent<CTransform>().prevPos.x) <= m_player->getComponent<CBoundingBox>().halfSize.x) {
+					m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+					m_player->getComponent<CState>().state = "GROUND";
+					m_player->getComponent<CInput>().canJump = true;
+					m_player->getComponent<CTransform>().velocity.y = 0;
+				}
 
-				m_player->getComponent<CTransform>().velocity.y = 0;
 
-				m_player->getComponent<CInput>().canJump = true;
 
 				// Debug collision
 				//std::cout << "collided with entity below player\n";
@@ -383,7 +385,10 @@ void Scene_Play::sCollision()
 
 				//m_player->getComponent<CInput>().canJump = false;
 
-				m_player->getComponent<CState>().state = "WALLSLIDE";
+				if (m_player->getComponent<CState>().state != "GROUND")
+				{
+					m_player->getComponent<CState>().state = "WALLSLIDE";
+				}
 			}
 			
 			if (prevCollision.x <= 0.f &&
@@ -396,7 +401,10 @@ void Scene_Play::sCollision()
 
 				//m_player->getComponent<CInput>().canJump = false;
 
-				m_player->getComponent<CState>().state = "WALLSLIDE";
+				if (m_player->getComponent<CState>().state != "GROUND") 
+				{
+					m_player->getComponent<CState>().state = "WALLSLIDE";
+				}
 			}
 			
 			if (prevCollision.x <= 0.f &&
