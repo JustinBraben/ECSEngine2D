@@ -17,7 +17,9 @@ public:
 
 	Animation();
 	Animation(const std::string& name, const sf::Texture& t, const sf::IntRect& tRect);
+	Animation(const std::string& name, const sf::Texture& t, const sf::IntRect& tRect, size_t frameCount, size_t speed, Vec2 size);
 	Animation(const std::string& name, const sf::Texture& t);
+	Animation(const std::string& name, const sf::Texture& t, size_t frameCount, size_t speed, Vec2 size);
 	Animation(const std::string& name, const sf::Texture& t, size_t frameCount, size_t speed);
 
 	// TODO: add Move constuctor

@@ -20,7 +20,6 @@ Tile			OryxBrick			17	0
 Tile			OryxBrick			18	0
 Tile			OryxBrick			19	0
 Tile			FlameBottom			20	0
-Tile			FlameTop			20	1
 Tile			OryxBrick			5	3
 Tile			OryxQuestion		6	3
 Tile			OryxBrick			7	3

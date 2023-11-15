@@ -15,11 +15,26 @@ Animation::Animation(const std::string& name, const sf::Texture& t, const sf::In
 	m_sprite.setTextureRect(tRect);
 }
 
+Animation::Animation(const std::string& name, const sf::Texture& t, const sf::IntRect& tRect, size_t frameCount, size_t speed, Vec2 size)
+	: m_name(name), m_sprite(t), m_frameCount(frameCount), m_currentFrame(0), m_speed(speed), m_size(size)
+{
+	m_size = Vec2(static_cast<float>(tRect.width), static_cast<float>(tRect.height));
+	m_sprite.setOrigin(m_size.x / 2.0f, m_size.y / 2.0f);
+	m_sprite.setTexture(t);
+	m_sprite.setTextureRect(tRect);
+}
+
 Animation::Animation(const std::string& name, const sf::Texture& t)
 	: Animation(name, t, 1, 0) {}
 
+Animation::Animation(const std::string& name, const sf::Texture& t, size_t frameCount, size_t speed, Vec2 size)
+	: m_name(name), m_sprite(t), m_frameCount(frameCount), m_currentFrame(0), m_speed(speed), m_size(size)
+{
+	m_sprite.setOrigin(m_size.x / 2.0f, m_size.y / 2.0f);
+	m_sprite.setTextureRect(sf::IntRect(std::floor(m_currentFrame) * m_size.x, 0, m_size.x, m_size.y));
+}
+
 Animation::Animation(const std::string& name, const sf::Texture& t, size_t frameCount, size_t speed)
-	: m_name(name), m_sprite(t), m_frameCount(frameCount), m_currentFrame(0), m_speed(speed)
 {
 	m_size = Vec2(static_cast<float>(t.getSize().x) / frameCount, static_cast<float>(t.getSize().y));
 	m_sprite.setOrigin(m_size.x / 2.0f, m_size.y / 2.0f);
@@ -39,7 +54,7 @@ void Animation::update()
 	{
 		m_size = Vec2(static_cast<float>(m_sprite.getTexture()->getSize().x) / m_frameCount, static_cast<float>(m_sprite.getTexture()->getSize().y));
 		m_sprite.setOrigin(m_size.x / 2.0f, m_size.y / 2.0f);
-		m_sprite.setTextureRect(sf::IntRect(std::floor(m_currentFrame / 8) * m_size.x, 0, m_size.x, m_size.y));
+		m_sprite.setTextureRect(sf::IntRect(std::floor(m_currentFrame / 8) * m_size.x, m_sprite.getTextureRect().top, m_size.x, m_size.y));
 	}
 }
 

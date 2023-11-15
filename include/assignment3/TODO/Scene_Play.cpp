@@ -94,7 +94,12 @@ void Scene_Play::loadLevel(const std::string& filename)
 			brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
 			brick->addComponent<CAnimation>(animation, true);
 			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
-			brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+			if (tileType == "FlameBottom") {
+				brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+			}
+			else {
+				brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+			}
 		}
 	}
 

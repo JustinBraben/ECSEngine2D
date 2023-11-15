@@ -32,15 +32,17 @@ void GameEngine::init(const std::string& path)
 			std::string animationName, textureName;
 			int frameCount, animSpeed, textureRectLeft, textureRectTop, textureSize;
 			ss >> animationName >> textureName >> frameCount >> animSpeed >> textureRectLeft >> textureRectTop >> textureSize;
+
+			Vec2 textureSizeVec = { static_cast<float>(textureSize), static_cast<float>(textureSize) };
 			
-			//m_assets.addAnimation(animationName, Animation(animationName, m_assets.getTexture(textureName), frameCount, animSpeed));
 			if (animSpeed == 0) 
 			{
 				const auto& tileRect = sf::IntRect(textureRectLeft, textureRectTop, textureSize, textureSize);
 				m_assets.addAnimation(animationName, Animation(animationName, m_assets.getTexture(textureName), tileRect));
 			}
 			else {
-				m_assets.addAnimation(animationName, Animation(animationName, m_assets.getTexture(textureName), frameCount, animSpeed));
+				const auto& tileRect = sf::IntRect(textureRectLeft, textureRectTop, textureSize, textureSize);
+				m_assets.addAnimation(animationName, Animation(animationName, m_assets.getTexture(textureName), tileRect, frameCount, animSpeed, textureSizeVec));
 			}
 		}
 		else if (type == "Font") {
