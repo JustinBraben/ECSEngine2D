@@ -10,7 +10,7 @@
 #include <iostream>
 
 Scene_Menu::Scene_Menu(GameEngine* gameEngine)
-	: Scene(gameEngine), m_delayedMove(false), m_delayTime(sf::seconds(0.08f))
+	: Scene(gameEngine), m_delayedMove(false), m_delayTime(sf::seconds(0.12f))
 {
 	// Constructor implementation
 	// You may initialize any member variables or perform other necessary actions here
@@ -74,6 +74,12 @@ void Scene_Menu::onEnd()
 	m_game->quit();
 }
 
+void Scene_Menu::setDelayMove() {
+	// Start the delay timer after a move
+	m_delayedMove = true;
+	m_delayClock.restart();
+}
+
 void Scene_Menu::sDoAction(const Action& action)
 {
 	if (m_delayedMove)
@@ -94,12 +100,10 @@ void Scene_Menu::sDoAction(const Action& action)
 		m_game->changeScene("PLAY_" + m_levelPaths[m_selectedMenuIndex], newScenePlay);
 	}
 	else if (action.name() == "QUIT") {
-		onEnd();
+		//onEnd();
 	}
 
-	// Start the delay timer after a move
-	m_delayedMove = true;
-	m_delayClock.restart();
+	setDelayMove();
 }
 
 void Scene_Menu::sRender()

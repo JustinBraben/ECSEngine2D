@@ -29,6 +29,7 @@ public:
 
 	void update() override;
 	void onEnd() override;
+	void setDelayMove() override;
 	void sDoAction(const Action& action) override;
 	void sRender() override;
 

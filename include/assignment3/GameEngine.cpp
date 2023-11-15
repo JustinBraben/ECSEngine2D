@@ -201,5 +201,9 @@ void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene
 		// Add the new scene to the map
 		m_sceneMap[sceneName] = scene;
 		m_currentScene = sceneName;
+		if (m_currentScene == "MENU") {
+			// If its menu set delay to true 
+			m_sceneMap[sceneName]->setDelayMove();
+		}
 	}
 }

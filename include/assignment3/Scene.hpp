@@ -27,6 +27,7 @@ public:
 
 	virtual void onEnd() = 0;
 	virtual void update() = 0;
+	virtual void setDelayMove();
 	virtual void sDoAction(const Action& action) = 0;
 	virtual void sRender() = 0;
 

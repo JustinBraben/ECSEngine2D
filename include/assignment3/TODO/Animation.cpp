@@ -52,7 +52,7 @@ void Animation::update()
 	//			2) set the texture rectange properly (see constructor sample)
 	if (m_speed > 0)
 	{
-		m_size = Vec2(static_cast<float>(m_sprite.getTexture()->getSize().x) / m_frameCount, static_cast<float>(m_sprite.getTexture()->getSize().y));
+		//m_size = Vec2(static_cast<float>(m_sprite.getTexture()->getSize().x) / m_frameCount, static_cast<float>(m_sprite.getTexture()->getSize().y));
 		m_sprite.setOrigin(m_size.x / 2.0f, m_size.y / 2.0f);
 		m_sprite.setTextureRect(sf::IntRect(std::floor(m_currentFrame / 8) * m_size.x, m_sprite.getTextureRect().top, m_size.x, m_size.y));
 	}

@@ -6,6 +6,10 @@ void Scene::setPaused(bool paused)
     m_paused = paused;
 }
 
+void Scene::setDelayMove()
+{
+}
+
 Scene::Scene()
 {
 }
