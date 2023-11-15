@@ -361,7 +361,7 @@ void Scene_Play::sCollision()
 				(m_player->getComponent<CTransform>().pos.y < entity->getComponent<CTransform>().pos.y))
 			{
 
-				if (std::abs(m_player->getComponent<CTransform>().prevPos.x - entity->getComponent<CTransform>().prevPos.x) <= m_player->getComponent<CBoundingBox>().halfSize.x) {
+				if (std::abs(m_player->getComponent<CTransform>().prevPos.x - entity->getComponent<CTransform>().prevPos.x) < m_player->getComponent<CBoundingBox>().size.x) {
 					m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
 					m_player->getComponent<CState>().state = "GROUND";
 					m_player->getComponent<CInput>().canJump = true;

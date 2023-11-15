@@ -4,14 +4,14 @@ Texture		PlayerFall			../../assets/textures/Ninja_Frog/Fall_(32x32).png
 Texture		PlayerJump			../../assets/textures/Ninja_Frog/Jump_(32x32).png
 Texture		PlayerWallSlide		../../assets/textures/Ninja_Frog/Wall_Jump(32x32).png
 Texture		OryxWorld			../../assets/textures/oryx_16bit_fantasy_world_trans.png
-Animation	OryxBrick			OryxWorld			1		1		24		24		24
-Animation	OryxQuestion		OryxWorld			1		1		168		168		24
-Animation	PlayerIdle			PlayerIdle			11		1		0		0		32
+Animation	OryxBrick			OryxWorld			1		0		24		24		24
+Animation	OryxQuestion		OryxWorld			1		0		168		648		24
+Animation	PlayerIdle			PlayerIdle			11		1		4		8		24
 Animation	PlayerJump			PlayerJump			1		1		0		0		32
 Animation	PlayerFall			PlayerFall			1		1		0		0		32
 Animation	PlayerRun			PlayerRun			12		1		0		0		32
 Animation	PlayerWallSlide		PlayerWallSlide		5		1		0		0		32
-Animation	Bullet				OryxWorld			1		1		1152	24		24	
+Animation	Bullet				OryxWorld			1		0		1152	24		24	
 Font		Arial				../../assets/arial.ttf
 Font		AboveDemoRegular	../../include/assignment3/configs/fonts/AboveDemoRegular-lJMd.ttf
 Font		Neoteric			../../include/assignment3/configs/fonts/Neoteric-32A8.ttf
