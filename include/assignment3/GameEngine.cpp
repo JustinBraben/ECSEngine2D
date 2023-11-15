@@ -50,49 +50,6 @@ void GameEngine::init(const std::string& path)
 		}
 	}
 
-	// TODO: Load Textures
-	//m_assets.addTexture("OryxWorld", "../../assets/textures/oryx_16bit_fantasy_world_trans.png");
-	//m_assets.addTexture("Jump", "../../assets/textures/Ninja_Frog/Jump_(32x32).png");
-	//m_assets.addTexture("Fall", "../../assets/textures/Ninja_Frog/Fall_(32x32).png");
-	//m_assets.addTexture("Run", "../../assets/textures/Ninja_Frog/Run_(32x32).png");
-
-	// TODO: Add animations
-	//const auto& brickAnimation = Animation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
-	//m_assets.addAnimation("OryxBrick", brickAnimation);
-	//Animation brickAnimation("OryxBrick", m_assets.getTexture("OryxWorld"), tileRect);
-
-	//const auto& blockRect = sf::IntRect(24, 24, 24, 24);
-	//m_assets.addAnimation("OryxBrick", Animation("OryxBrick", m_assets.getTexture("OryxWorld"), blockRect));
-
-	//// TODO: Come up with a better way to get intRects from our large texture
-	//const auto& questionRect = sf::IntRect(24 * 7, 24 * 27, 24, 24);
-	//m_assets.addAnimation("OryxQuestion", Animation("OryxQuestion", m_assets.getTexture("OryxWorld"), questionRect));
-
-	/*size_t idleSpeed = 1;
-	size_t idleFrames = 11;
-	const auto& idleRect = sf::IntRect(4, 8, 24, 24);
-	
-	m_assets.addAnimation("PlayerIdle", Animation("PlayerIdle", m_assets.getTexture("PlayerIdle"), idleFrames, idleSpeed));
-
-	const auto& jumpRect = sf::IntRect(0, 0, 32, 32);
-	m_assets.addAnimation("PlayerJump", Animation("PlayerJump", m_assets.getTexture("PlayerJump"), jumpRect));*/
-	
-	/*const auto& fallRect = sf::IntRect(0, 0, 32, 32);
-	m_assets.addAnimation("PlayerFall", Animation("PlayerFall", m_assets.getTexture("PlayerFall"), fallRect));
-	
-	size_t runSpeed = 1;
-	size_t runFrames = 12;
-	const auto& runRect = sf::IntRect(0, 0, 32, 32);
-	m_assets.addAnimation("PlayerRun", Animation("PlayerRun", m_assets.getTexture("PlayerRun"), runFrames, runSpeed));
-
-	size_t wallSlideSpeed = 1;
-	size_t wallSlideFrames = 5;
-	const auto& wallSlideRect = sf::IntRect(0, 0, 32, 32);
-	m_assets.addAnimation("PlayerWallSlide", Animation("PlayerWallSlide", m_assets.getTexture("PlayerWallSlide"), wallSlideFrames, wallSlideSpeed));
-
-	const auto& bulletRect = sf::IntRect(24 * 48, 24 * 1, 24, 24);
-	m_assets.addAnimation("Bullet", Animation("Bullet", m_assets.getTexture("OryxWorld"), bulletRect));*/
-
 	m_window.create(sf::VideoMode(1280, 768), "Definitely Not Mario");
 	m_window.setFramerateLimit(144);
 

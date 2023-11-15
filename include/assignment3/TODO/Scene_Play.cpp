@@ -87,23 +87,14 @@ void Scene_Play::loadLevel(const std::string& filename)
 			float gridX, gridY;
 			ss >> tileType >> gridX >> gridY;
 
-			if (tileType == "Ground") {
 			auto brick = m_entityManager.addEntity("tile");
 			auto& assets = m_game->getAssets();
-			auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxBrick");
-			brick->addComponent<CAnimation>(animationOryxBrick, true);
+			auto& animation = m_game->getAssets().getAnimation(tileType);
+			brick->addComponent<CAnimation>(animation, true);
+			brick->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
+			brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
 			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
 			brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
-			}
-
-			if (tileType == "Question") {
-				auto question = m_entityManager.addEntity("tile");
-				auto& assets = m_game->getAssets();
-				auto& animationOryxBrick = m_game->getAssets().getAnimation("OryxQuestion");
-				question->addComponent<CAnimation>(animationOryxBrick, true);
-				question->addComponent<CTransform>(gridToMidPixel(gridX, gridY, question));
-				question->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
-			}
 		}
 	}
 
