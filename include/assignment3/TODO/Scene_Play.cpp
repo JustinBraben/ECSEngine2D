@@ -90,9 +90,9 @@ void Scene_Play::loadLevel(const std::string& filename)
 			auto brick = m_entityManager.addEntity("tile");
 			auto& assets = m_game->getAssets();
 			auto& animation = m_game->getAssets().getAnimation(tileType);
-			brick->addComponent<CAnimation>(animation, true);
 			brick->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
 			brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
+			brick->addComponent<CAnimation>(animation, true);
 			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
 			brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 		}

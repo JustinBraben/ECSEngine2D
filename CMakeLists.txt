@@ -16,7 +16,7 @@ endif()
 # Define the project and set the C++ standard to 17.
 # ${PROJECT_NAME} will now be myproject
 project(myproject CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 
 # Set the binary directory to /build within the source directory.
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
