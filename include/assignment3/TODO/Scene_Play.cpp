@@ -87,14 +87,17 @@ void Scene_Play::loadLevel(const std::string& filename)
 			float gridX, gridY;
 			ss >> tileType >> gridX >> gridY;
 
-			auto brick = m_entityManager.addEntity("tile");
+			if (tileType == "FlameBottom") {
+				std::cout << "Flamethrower help debug\n";
+			}
+
+			auto brick = m_entityManager.addEntity(type);
 			auto& assets = m_game->getAssets();
 			auto& animation = m_game->getAssets().getAnimation(tileType);
 			brick->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
 			brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
 			brick->addComponent<CAnimation>(animation, true);
 			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
-			//brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 			brick->addComponent<CBoundingBox>(Vec2(animation.getSize().x * brick->getComponent<CTransform>().scale.x, 
 				animation.getSize().y * brick->getComponent<CTransform>().scale.y));
 		}
@@ -104,7 +107,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 			float gridX, gridY;
 			ss >> tileType >> gridX >> gridY;
 
-			auto dec = m_entityManager.addEntity("dec");
+			auto dec = m_entityManager.addEntity(type);
 			auto& assets = m_game->getAssets();
 			auto& animation = m_game->getAssets().getAnimation(tileType);
 			dec->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
@@ -119,15 +122,23 @@ void Scene_Play::loadLevel(const std::string& filename)
 			float gridX, gridY;
 			ss >> tileType >> gridX >> gridY;
 
-			auto hazard = m_entityManager.addEntity("hazard");
+			auto hazard = m_entityManager.addEntity(type);
 			auto& assets = m_game->getAssets();
 			auto& animation = m_game->getAssets().getAnimation(tileType);
 			hazard->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
 			hazard->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
 			hazard->addComponent<CAnimation>(animation, true);
 			hazard->addComponent<CTransform>(gridToMidPixel(gridX, gridY, hazard));
+
 			hazard->addComponent<CBoundingBox>(Vec2(animation.getSize().x * hazard->getComponent<CTransform>().scale.x,
 				animation.getSize().y * hazard->getComponent<CTransform>().scale.y));
+
+			if (tileType == "SpikeTrap") 
+			{
+				hazard->getComponent<CBoundingBox>().size.y /= 2;
+				hazard->getComponent<CBoundingBox>().halfSize.y = hazard->getComponent<CBoundingBox>().size.y / 2;
+				hazard->getComponent<CTransform>().pos.y += hazard->getComponent<CBoundingBox>().halfSize.y;
+			}
 		}
 	}
 
@@ -350,7 +361,7 @@ void Scene_Play::sCollision()
 		if (entity->tag() == "player")
 			continue;
 		
-		if (entity->tag() == "dec")
+		if (entity->tag() == "Dec")
 			continue;
 
 		// Skip collision detection on entities that are too far away to possibly collide with Player
@@ -358,6 +369,9 @@ void Scene_Play::sCollision()
 			continue;
 
 		if (std::abs(entity->getComponent<CTransform>().pos.y - m_player->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().size.y)
+			continue;
+
+		if (!m_player->isActive())
 			continue;
 
 		Vec2 collision = physics.GetOverlap(entity, m_player);
@@ -368,61 +382,73 @@ void Scene_Play::sCollision()
 
 			// check collision above player
 
-			if (prevCollision.y <= 0.f &&
-				(m_player->getComponent<CTransform>().pos.y > entity->getComponent<CTransform>().pos.y))
+			if (m_player->isActive())
 			{
-				m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
-
-				m_player->getComponent<CTransform>().velocity.y = 0;
-
-				m_player->getComponent<CState>().state = "AIR";
-			}
-
-			// check collision below player
-
-			if (prevCollision.y <= 0.f &&
-				(m_player->getComponent<CTransform>().pos.y < entity->getComponent<CTransform>().pos.y))
-			{
-				if (std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) <= m_player->getComponent<CBoundingBox>().size.x - 1.0f)
+				if (entity->tag() == "Tile")
 				{
-					m_player->getComponent<CState>().state = "GROUND";
+					if (prevCollision.y <= 0.f &&
+						(m_player->getComponent<CTransform>().pos.y > entity->getComponent<CTransform>().pos.y))
+					{
+						m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
 
-					m_player->getComponent<CTransform>().velocity.y = 0;
+						m_player->getComponent<CTransform>().velocity.y = 0;
 
-					m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+						m_player->getComponent<CState>().state = "AIR";
+					}
 
-					m_player->getComponent<CInput>().canJump = true;
+					// check collision below player
+
+					if (prevCollision.y <= 0.f &&
+						(m_player->getComponent<CTransform>().pos.y < entity->getComponent<CTransform>().pos.y))
+					{
+						if (std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) <= m_player->getComponent<CBoundingBox>().size.x - 1.0f)
+						{
+							m_player->getComponent<CState>().state = "GROUND";
+
+							m_player->getComponent<CTransform>().velocity.y = 0;
+
+							m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+
+							m_player->getComponent<CInput>().canJump = true;
+						}
+					}
+
+					// check collision to the right of player
+					if (prevCollision.x <= 0.f &&
+						(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x))
+					{
+						m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
+
+						m_player->getComponent<CTransform>().velocity.x = 0;
+
+						if (m_player->getComponent<CState>().state != "GROUND")
+						{
+							m_player->getComponent<CState>().state = "WALLSLIDE";
+						}
+					}
+
+					// check collision to the left of player
+					if (prevCollision.x <= 0.f &&
+						(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x))
+					{
+						if (std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) <= m_player->getComponent<CBoundingBox>().size.y - 1.0f)
+						{
+							m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
+
+							m_player->getComponent<CTransform>().velocity.x = 0;
+						}
+
+						if (m_player->getComponent<CState>().state != "GROUND")
+						{
+							m_player->getComponent<CState>().state = "WALLSLIDE";
+						}
+					}
 				}
-			}
 
-			// check collision to the right of player
-			if (prevCollision.x <= 0.f &&
-				(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x))
-			{
-				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
-
-				m_player->getComponent<CTransform>().velocity.x = 0;
-
-				if (m_player->getComponent<CState>().state != "GROUND")
+				if (entity->tag() == "Hazard")
 				{
-					m_player->getComponent<CState>().state = "WALLSLIDE";
-				}
-			}
-
-			// check collision to the left of player
-			if (prevCollision.x <= 0.f &&
-				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x))
-			{
-				if (std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) <= m_player->getComponent<CBoundingBox>().size.y - 1.0f)
-				{
-					m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
-
-					m_player->getComponent<CTransform>().velocity.x = 0;
-				}
-
-				if (m_player->getComponent<CState>().state != "GROUND")
-				{
-					m_player->getComponent<CState>().state = "WALLSLIDE";
+					m_player->destroy();
+					spawnPlayer();
 				}
 			}
 		}
@@ -634,8 +660,8 @@ void Scene_Play::sRender()
 			if (entity->hasComponent<CAnimation>()) {
 				auto& animation = entity->getComponent<CAnimation>().animation;
 				animation.getSprite().setRotation(transform.angle);
-				animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
 				animation.getSprite().setScale(transform.scale.x, transform.scale.y);
+				animation.getSprite().setPosition(transform.pos.x, transform.pos.y);
 				m_game->window().draw(animation.getSprite());
 			}
 		}
