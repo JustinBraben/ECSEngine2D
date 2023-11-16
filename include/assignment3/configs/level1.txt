@@ -1,7 +1,6 @@
 Tile			OryxBrick			0	0
 Tile			OryxBrick			1	0
 Tile			OryxBrick			2	0
-Dec				BushBig				0	1
 Tile			OryxBrick			3	0
 Tile			OryxBrick			4	0
 Tile			OryxBrick			5	0
@@ -29,7 +28,7 @@ Tile			OryxBrick			18	0
 Tile			OryxBrick			18	1
 Tile			OryxBrick			19	0
 Tile			FlameBottom			20	0
-Tile			FlameTop			20	1
+Dec				FlameTop			20	1
 Tile			OryxBrick			5	3
 Tile			OryxQuestion		6	3
 Tile			OryxBrick			7	3

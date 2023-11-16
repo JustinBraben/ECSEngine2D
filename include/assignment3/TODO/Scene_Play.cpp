@@ -96,6 +96,20 @@ void Scene_Play::loadLevel(const std::string& filename)
 			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
 			brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 		}
+		if (type == "Dec")
+		{
+			std::string tileType;
+			float gridX, gridY;
+			ss >> tileType >> gridX >> gridY;
+
+			auto dec = m_entityManager.addEntity("dec");
+			auto& assets = m_game->getAssets();
+			auto& animation = m_game->getAssets().getAnimation(tileType);
+			dec->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
+			dec->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
+			dec->addComponent<CAnimation>(animation, true);
+			dec->addComponent<CTransform>(gridToMidPixel(gridX, gridY, dec));
+		}
 	}
 
 	// NOTE: all of the code below is sample code which shows you hot to
@@ -313,7 +327,11 @@ void Scene_Play::sCollision()
 	// Loop for checking collisions for player
 	for (auto entity : m_entityManager.getEntities())
 	{
+		// Skip entities the player should not collide with
 		if (entity->tag() == "player")
+			continue;
+		
+		if (entity->tag() == "dec")
 			continue;
 
 		// Skip collision detection on entities that are too far away to possibly collide with Player
