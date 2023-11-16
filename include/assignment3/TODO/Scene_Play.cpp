@@ -329,9 +329,8 @@ void Scene_Play::sCollision()
 
 			Vec2 prevCollision = physics.GetPreviousOverlap(entity, m_player);
 
+			// check collision above player
 
-			// TODO: check for collisions with tiles above the player
-			// set canJump to false if a collision above player was detected
 			if (prevCollision.y <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.y > entity->getComponent<CTransform>().pos.y))
 			{
@@ -339,89 +338,55 @@ void Scene_Play::sCollision()
 
 				m_player->getComponent<CTransform>().velocity.y = 0;
 
-				m_player->getComponent<CInput>().canJump = false;
-
 				m_player->getComponent<CState>().state = "AIR";
-
-				// Debug collision
-				//std::cout << "collided with entity above player\n";
 			}
 
-			// TODO: check collision for below player
+			// check collision below player
+
 			if (prevCollision.y <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.y < entity->getComponent<CTransform>().pos.y))
 			{
-
-				if (std::abs(m_player->getComponent<CTransform>().prevPos.x - entity->getComponent<CTransform>().prevPos.x) < m_player->getComponent<CBoundingBox>().size.x) {
-					m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+				if (std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) <= m_player->getComponent<CBoundingBox>().size.x - 1.0f)
+				{
 					m_player->getComponent<CState>().state = "GROUND";
-					m_player->getComponent<CInput>().canJump = true;
+
 					m_player->getComponent<CTransform>().velocity.y = 0;
+
+					m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+
+					m_player->getComponent<CInput>().canJump = true;
 				}
-
-
-
-				// Debug collision
-				//std::cout << "collided with entity below player\n";
 			}
 
-			// TODO: check collision for left/right of player
+			// check collision to the right of player
 			if (prevCollision.x <= 0.f &&
-				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x) &&
-				(m_player->getComponent<CTransform>().pos.y >= entity->getComponent<CTransform>().pos.y))
+				(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x))
 			{
 				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
 				m_player->getComponent<CTransform>().velocity.x = 0;
-
-				//m_player->getComponent<CInput>().canJump = false;
 
 				if (m_player->getComponent<CState>().state != "GROUND")
 				{
 					m_player->getComponent<CState>().state = "WALLSLIDE";
 				}
 			}
-			
+
+			// check collision to the left of player
 			if (prevCollision.x <= 0.f &&
-				(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x) &&
-				(m_player->getComponent<CTransform>().pos.y >= entity->getComponent<CTransform>().pos.y))
+				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x))
 			{
-				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
+				if (std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) <= m_player->getComponent<CBoundingBox>().size.y)
+				{
+					m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
-				m_player->getComponent<CTransform>().velocity.x = 0;
+					m_player->getComponent<CTransform>().velocity.x = 0;
+				}
 
-				//m_player->getComponent<CInput>().canJump = false;
-
-				if (m_player->getComponent<CState>().state != "GROUND") 
+				if (m_player->getComponent<CState>().state != "GROUND")
 				{
 					m_player->getComponent<CState>().state = "WALLSLIDE";
 				}
-			}
-			
-			if (prevCollision.x <= 0.f &&
-				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x) &&
-				m_player->getComponent<CState>().state != "GROUND")
-			{
-				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
-
-				m_player->getComponent<CTransform>().velocity.x = 0;
-
-				//m_player->getComponent<CInput>().canJump = false;
-
-				m_player->getComponent<CState>().state = "WALLSLIDE";
-			}
-			
-			if (prevCollision.x <= 0.f &&
-				(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x) &&
-				m_player->getComponent<CState>().state != "GROUND")
-			{
-				m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
-
-				m_player->getComponent<CTransform>().velocity.x = 0;
-
-				//m_player->getComponent<CInput>().canJump = false;
-
-				m_player->getComponent<CState>().state = "WALLSLIDE";
 			}
 		}
 	}
