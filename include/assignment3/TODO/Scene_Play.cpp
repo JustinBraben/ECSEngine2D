@@ -135,9 +135,9 @@ void Scene_Play::loadLevel(const std::string& filename)
 
 			if (tileType == "SpikeTrap") 
 			{
-				hazard->getComponent<CBoundingBox>().size.y /= 2;
-				hazard->getComponent<CBoundingBox>().halfSize.y = hazard->getComponent<CBoundingBox>().size.y / 2;
-				hazard->getComponent<CTransform>().pos.y += hazard->getComponent<CBoundingBox>().halfSize.y;
+				//hazard->getComponent<CBoundingBox>().size.y /= 2;
+				//hazard->getComponent<CBoundingBox>().halfSize.y = hazard->getComponent<CBoundingBox>().size.y / 2;
+				hazard->getComponent<CTransform>().pos.y += hazard->getComponent<CBoundingBox>().halfSize.y * 1.5f;
 			}
 		}
 	}
