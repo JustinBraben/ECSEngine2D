@@ -6,8 +6,10 @@ Tile			OryxBrick			4	0
 Tile			OryxBrick			5	0
 Tile			OryxBrick			6	0
 Tile			OryxBrick			7	0
+Hazard			SpikeTrap			7	7
 Tile			OryxBrick			8	0
 Tile			OryxBrick			9	0
+Hazard			SpikeTrap			9	4
 Tile			OryxBrick			10	0
 Tile			OryxBrick			11	0
 Tile			OryxBrick			12	0

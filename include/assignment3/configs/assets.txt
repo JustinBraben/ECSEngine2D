@@ -5,6 +5,7 @@ Texture		PlayerJump			../../assets/textures/Ninja_Frog/Jump_(32x32).png
 Texture		PlayerWallSlide		../../assets/textures/Ninja_Frog/Wall_Jump(32x32).png
 Texture		OryxWorld			../../assets/textures/oryx_16bit_fantasy_world_trans.png
 Texture		FireTrap			../../assets/textures/Traps/Fire/On_(16x32).png
+Texture		SpikeTrap			../../assets/textures/Traps/Spikes/Idle.png
 Animation	FlameTop			FireTrap			3		1		0		0		16
 Animation	FlameBottom			FireTrap			3		0		0		16		16
 Animation	OryxBrick			OryxWorld			1		0		24		24		24
@@ -14,7 +15,8 @@ Animation	PlayerJump			PlayerJump			1		1		0		0		32
 Animation	PlayerFall			PlayerFall			1		1		0		0		32
 Animation	PlayerRun			PlayerRun			12		1		0		0		32
 Animation	PlayerWallSlide		PlayerWallSlide		5		1		0		0		32
-Animation	Bullet				OryxWorld			1		0		1152	24		24	
+Animation	Bullet				OryxWorld			1		0		1152	24		24
+Animation	SpikeTrap			SpikeTrap			1		0		0		0		16
 Font		Arial				../../assets/arial.ttf
 Font		AboveDemoRegular	../../include/assignment3/configs/fonts/AboveDemoRegular-lJMd.ttf
 Font		Neoteric			../../include/assignment3/configs/fonts/Neoteric-32A8.ttf

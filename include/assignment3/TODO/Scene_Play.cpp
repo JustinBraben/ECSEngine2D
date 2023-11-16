@@ -94,7 +94,9 @@ void Scene_Play::loadLevel(const std::string& filename)
 			brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
 			brick->addComponent<CAnimation>(animation, true);
 			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
-			brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+			//brick->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+			brick->addComponent<CBoundingBox>(Vec2(animation.getSize().x * brick->getComponent<CTransform>().scale.x, 
+				animation.getSize().y * brick->getComponent<CTransform>().scale.y));
 		}
 		if (type == "Dec")
 		{
@@ -109,6 +111,23 @@ void Scene_Play::loadLevel(const std::string& filename)
 			dec->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
 			dec->addComponent<CAnimation>(animation, true);
 			dec->addComponent<CTransform>(gridToMidPixel(gridX, gridY, dec));
+		}
+
+		if (type == "Hazard")
+		{
+			std::string tileType;
+			float gridX, gridY;
+			ss >> tileType >> gridX >> gridY;
+
+			auto hazard = m_entityManager.addEntity("hazard");
+			auto& assets = m_game->getAssets();
+			auto& animation = m_game->getAssets().getAnimation(tileType);
+			hazard->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
+			hazard->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
+			hazard->addComponent<CAnimation>(animation, true);
+			hazard->addComponent<CTransform>(gridToMidPixel(gridX, gridY, hazard));
+			hazard->addComponent<CBoundingBox>(Vec2(animation.getSize().x * hazard->getComponent<CTransform>().scale.x,
+				animation.getSize().y * hazard->getComponent<CTransform>().scale.y));
 		}
 	}
 
@@ -394,7 +413,7 @@ void Scene_Play::sCollision()
 			if (prevCollision.x <= 0.f &&
 				(m_player->getComponent<CTransform>().pos.x > entity->getComponent<CTransform>().pos.x))
 			{
-				if (std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) <= m_player->getComponent<CBoundingBox>().size.y)
+				if (std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) <= m_player->getComponent<CBoundingBox>().size.y - 1.0f)
 				{
 					m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
