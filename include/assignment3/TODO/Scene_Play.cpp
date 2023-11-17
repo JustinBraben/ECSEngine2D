@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <ranges>
 
 Scene_Play::Scene_Play(GameEngine* gameEngine, const std::string& levelPath)
 	: Scene(gameEngine), m_levelPath(levelPath)
@@ -620,6 +621,12 @@ void Scene_Play::sRender()
 	auto& cameraCenterX = view.getCenter().x;
 	auto& cameraCenterY = view.getCenter().y;
 
+	auto cameraLeftX = view.getCenter().x - (static_cast<float>(width()) / 2.f);
+	auto cameraTopY = view.getCenter().y + (static_cast<float>(height()) / 2.f);
+
+	auto cameraRightX = cameraLeftX + width();
+	auto cameraBottomY = cameraTopY - height();
+
 	// Player on right side of the screen
 	if (pPos.x > view.getCenter().x) 
 	{
@@ -660,8 +667,13 @@ void Scene_Play::sRender()
 
 	// draw all Entity textures / animations
 	if (m_drawTextures) {
-		for (auto entity : m_entityManager.getEntities()) {
+		auto filterByBounds = m_entityManager.getEntities() | std::views::filter([cameraLeftX, cameraRightX, cameraTopY, cameraBottomY](const auto& entity) {
+			return entity->getComponent<CTransform>().pos.x >= cameraLeftX && entity->getComponent<CTransform>().pos.x <= cameraRightX 
+				&& entity->getComponent<CTransform>().pos.y >= cameraBottomY && entity->getComponent<CTransform>().pos.y <= cameraTopY;
+		});
 
+		for (auto entity : filterByBounds) {
+			
 			auto& transform = entity->getComponent<CTransform>();
 
 			if (entity->hasComponent<CAnimation>()) {
@@ -694,17 +706,8 @@ void Scene_Play::sRender()
 
 	// draw the grid so you can easily debug
 	if (m_drawGrid) {
-		auto cameraCenterX = view.getCenter().x;
-		auto cameraCenterY = view.getCenter().y;
-
-		auto cameraLeftX = view.getCenter().x - (static_cast<float>(width()) / 2.f);
-		auto cameraTopY = view.getCenter().y + (static_cast<float>(height()) / 2.f);
-
-		auto cameraRightX = cameraLeftX + width();
-		auto cameraBottomY = cameraTopY - height();
 
 		auto startGridPos = pixelToGrid(cameraLeftX, cameraBottomY);
-
 
 		// Now looping from start of the left-most viewable grid, to the furthest right viewable grid
 		for (float x = startGridPos.x * m_gridSize.x; x < cameraRightX; x += m_gridSize.x) {
