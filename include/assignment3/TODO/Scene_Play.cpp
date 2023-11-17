@@ -67,28 +67,8 @@ Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity
 	return Vec2(midX, midY);
 }
 
-Vec2 Scene_Play::leftTopPixelToGrid(float pixelX, float pixelY)
+Vec2 Scene_Play::pixelToGrid(float pixelX, float pixelY)
 {
-	sf::View view = m_game->window().getView();
-	auto cameraCenterX = view.getCenter().x;
-	auto cameraCenterY = view.getCenter().y;
-
-	auto cameraLeftX = view.getCenter().x - (static_cast<float>(width()) / 2.f);
-	auto cameraTopY = view.getCenter().y + (static_cast<float>(height()) / 2.f);
-
-	auto cameraRightX = view.getCenter().x + (static_cast<float>(width()) / 2.f);
-	auto cameraBottomY = static_cast<float>(height()) - (view.getCenter().y + (static_cast<float>(height()) / 2.f));
-
-	/*std::cout << "Camera center x :" << cameraCenterX << " and y : " << cameraCenterY << "\n";
-	std::cout << "Camera Left/Top x :" << cameraLeftX << " and y : " << cameraTopY << "\n";
-	std::cout << "Camera Right/Bottom x :" << cameraRightX << " and y : " << cameraBottomY << "\n";
-	std::cout << "furthest left tile should be (" << std::floor(cameraLeftX / (m_gridSize.x)) << ","
-		<< std::floor(cameraTopY / (m_gridSize.y)) << ")\n";
-	std::cout << "furthest right tile should be (" << std::floor(cameraRightX / (m_gridSize.x)) << ","
-		<< std::floor(cameraBottomY / (m_gridSize.y)) << ")\n";*/
-
-	/*auto tilePositionX = std::floor((pixelX - (static_cast<float>(width()) / 2.f)) / m_gridSize.x);
-	auto tilePositionY = std::floor((pixelY + (static_cast<float>(height()) / 2.f)) / m_gridSize.y);*/
 	auto tilePositionX = std::floor(pixelX / m_gridSize.x);
 	auto tilePositionY = std::floor(pixelY / m_gridSize.y);
 	return Vec2(tilePositionX, tilePositionY);
@@ -714,28 +694,36 @@ void Scene_Play::sRender()
 
 	// draw the grid so you can easily debug
 	if (m_drawGrid) {
-		float leftX = view.getCenter().x - width() / 2;
-		float rightX = leftX + width() + m_gridSize.x;
-		float nextGridX = leftX - static_cast<float>((static_cast<int>(leftX) % static_cast<int>(m_gridSize.x)));
+		auto cameraCenterX = view.getCenter().x;
+		auto cameraCenterY = view.getCenter().y;
 
-		for (float x = nextGridX; x < rightX; x += m_gridSize.x) {
-			drawLine(Vec2(x, 0), Vec2(x, height()));
+		auto cameraLeftX = view.getCenter().x - (static_cast<float>(width()) / 2.f);
+		auto cameraTopY = view.getCenter().y + (static_cast<float>(height()) / 2.f);
+
+		auto cameraRightX = cameraLeftX + width();
+		auto cameraBottomY = cameraTopY - height();
+
+		auto startGridPos = pixelToGrid(cameraLeftX, cameraBottomY);
+
+
+		// Now looping from start of the left-most viewable grid, to the furthest right viewable grid
+		for (float x = startGridPos.x * m_gridSize.x; x < cameraRightX; x += m_gridSize.x) {
+			drawLine(Vec2(x, cameraBottomY), Vec2(x, cameraTopY));
 		}
 
-		for (float y = m_gridSize.y * -2.f; y < height(); y += m_gridSize.y) {
-			drawLine(Vec2(leftX, height() - y), Vec2(rightX, height() - y));
+		// Now looping from start of the lowest viewable grid, to the highest up viewable grid
+		for (float y = startGridPos.y * m_gridSize.y; y < cameraTopY; y += m_gridSize.y) {
+			drawLine(Vec2(cameraLeftX, y), Vec2(cameraRightX, y));
 
-			for (float x = nextGridX; x < rightX; x += m_gridSize.x) {
+			for (float x = startGridPos.x * m_gridSize.x; x < cameraRightX; x += m_gridSize.x) {
 				std::string xCell = std::to_string(static_cast<int>(x) / static_cast<int>(m_gridSize.x));
-				std::string yCell = std::to_string(static_cast<int>(y) / static_cast<int>(m_gridSize.y));
+				std::string yCell = std::to_string((static_cast<int>(y - height()) / static_cast<int>(m_gridSize.y)) * -1);
 				m_gridText.setString("(" + xCell + "," + yCell + ")");
-				m_gridText.setPosition(x + 3, height() - y - m_gridSize.y + 2);
+				m_gridText.setPosition(x + 3, y - m_gridSize.y + 2);
 				m_gridText.setFillColor(sf::Color::White);
 				m_game->window().draw(m_gridText);
 			}
 		}
-
-		leftTopPixelToGrid(1.f, 1.f);
 	}
 
 	m_game->window().display();
