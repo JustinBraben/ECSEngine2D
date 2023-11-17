@@ -34,6 +34,8 @@ public:
 
 	Vec2 gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity> entity);
 
+	Vec2 leftTopPixelToGrid(float pixelX, float pixelY);
+
 	void spawnPlayer();
 	void spawnBullet(std::shared_ptr<Entity> entity);
 
