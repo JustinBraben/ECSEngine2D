@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-12 ]
+        os: [ macOS-latest ]
         cmake_preset: [ debug, release ]
 
     env:
