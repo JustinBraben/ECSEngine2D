@@ -17,7 +17,6 @@ endif()
 # ${PROJECT_NAME} will now be myproject
 project(myproject CXX)
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set the binary directory to /build within the source directory.
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
