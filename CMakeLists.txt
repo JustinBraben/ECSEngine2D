@@ -35,7 +35,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 # Enforce treating warnings as errors for GNU and Clang compilers.
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  add_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -O3 -g -fPIC -fsanitize=address -fsanitize=undefined --coverage -std=c++23)
+  add_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -O3 -g -fPIC -fsanitize=address -fsanitize=undefined --coverage -std=c++23 -std=gnu++2b)
 endif()
 
 # Enforce treating warnings as errors for MSVC compiler.
