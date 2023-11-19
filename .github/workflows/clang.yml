@@ -62,9 +62,10 @@ jobs:
         ls -l /usr/local
       if: runner.os == 'macOS'
 
-    - name: Install Xcode 17.0.0
-      run: sudo xcode-select --install
+    - name: Install Clang via Homebrew
+      run: brew install llvm
       if: runner.os == 'macOS'
+
 
     - name: List available Clang versions
       run: |
