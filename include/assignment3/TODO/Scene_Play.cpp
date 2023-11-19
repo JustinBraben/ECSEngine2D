@@ -667,12 +667,12 @@ void Scene_Play::sRender()
 
 	// draw all Entity textures / animations
 	if (m_drawTextures) {
-		auto filterByBounds = m_entityManager.getEntities() | std::views::filter([cameraLeftX, cameraRightX, cameraTopY, cameraBottomY](const auto& entity) {
+		auto filterByBounds = (m_entityManager.getEntities()) | std::views::filter([cameraLeftX, cameraRightX, cameraTopY, cameraBottomY](std::shared_ptr<Entity> entity) {
 			return entity->getComponent<CTransform>().pos.x >= cameraLeftX && entity->getComponent<CTransform>().pos.x <= cameraRightX 
 				&& entity->getComponent<CTransform>().pos.y >= cameraBottomY && entity->getComponent<CTransform>().pos.y <= cameraTopY;
 		});
 
-		for (auto entity : filterByBounds) {
+		for (const auto& entity : filterByBounds) {
 			
 			auto& transform = entity->getComponent<CTransform>();
 
