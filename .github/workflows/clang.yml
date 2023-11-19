@@ -62,6 +62,13 @@ jobs:
         ls -l /usr/local
       if: runner.os == 'macOS'
 
+    - name: List available Clang versions
+      run: |
+        echo "Available Clang versions:"
+        ls -1 /usr/bin/clang*
+        ls -1 /usr/bin/clang++*
+      if: runner.os == 'macOS'
+
     - name: Configure and run CMake
       uses: lukka/run-cmake@v10
       env:
