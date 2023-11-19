@@ -70,18 +70,17 @@ jobs:
     - name: List available Clang versions
       run: |
         echo "Available Clang versions:"
-        ls -1 /Applications/Xcode_14.2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang*
-        ls -1 /Applications/Xcode_14.2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++*
-        ls -1 /Applications/Xcode*
-        ls -1 /Applications
+        ls -1 /usr/local/opt/llvm/bin/clang*
+        ls -1 /usr/local/opt/llvm/bin/clang++*
+        ls -1 /usr/local/opt/llvm
       if: runner.os == 'macOS'
 
     - name: Configure and run CMake
       uses: lukka/run-cmake@v10
       env:
         VCPKG_ROOT: ${{ fromJSON('[ "/usr/local/share/vcpkg", "C:\\vcpkg" ]')[runner.os == 'Windows'] }}
-        CC: ${{ fromJSON('{"Linux":"gcc-10", "macOS":"clang", "Windows":"" }')[runner.os] }}
-        CXX: ${{ fromJSON('{"Linux":"g++-10", "macOS":"clang++", "Windows":"" }')[runner.os] }}
+        CC: ${{ fromJSON('{"Linux":"gcc-10", "macOS":"/usr/local/opt/llvm/bin/clang", "Windows":"" }')[runner.os] }}
+        CXX: ${{ fromJSON('{"Linux":"g++-10", "macOS":"/usr/local/opt/llvm/bin/clang++", "Windows":"" }')[runner.os] }}
       with:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         configurePreset: ${{ matrix.cmake_preset }}
