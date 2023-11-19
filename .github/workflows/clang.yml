@@ -65,8 +65,8 @@ jobs:
     - name: List available Clang versions
       run: |
         echo "Available Clang versions:"
-        ls -1 /usr/bin/clang*
-        ls -1 /usr/bin/clang++*
+        ls -1 /Applications/Xcode_14.2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang*
+        ls -1 /Applications/Xcode_14.2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++*
       if: runner.os == 'macOS'
 
     - name: Configure and run CMake
