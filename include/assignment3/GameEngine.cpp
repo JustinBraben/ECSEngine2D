@@ -159,6 +159,24 @@ void GameEngine::sUserInput()
 			// look up the action and send the action to the scene
 			currentScene()->sDoAction(Action(currentScene()->getActionMap().at(evnt.key.code), actionType));
 		}
+		
+		if (evnt.type == sf::Event::MouseButtonPressed || evnt.type == sf::Event::MouseButtonReleased) {
+
+			auto scene = currentScene();
+
+			// if the current scene does not have an action associated with this key, skip the event
+			if (currentScene()->getActionMap().find(evnt.mouseButton.button) == currentScene()->getActionMap().end())
+				continue;
+
+			if (evnt.mouseButton.button == sf::Mouse::Left)
+				continue;
+
+			// determine start or end action by whether it was key press or release
+			const std::string actionType = (evnt.type == sf::Event::MouseButtonPressed) ? "START" : "END";
+
+			// look up the action and send the action to the scene
+			currentScene()->sDoAction(Action(currentScene()->getActionMap().at(evnt.mouseButton.button), actionType));
+		}
 	}
 	
 	// Check if the window is closed after processing events

@@ -25,6 +25,7 @@ void Scene_Play::init(const std::string& levelPath)
 	registerAction(sf::Keyboard::T, "TOGGLE_TEXTURE");		// Toggle drawing (T)extures
 	registerAction(sf::Keyboard::C, "TOGGLE_COLLISION");	// Toggle drawing (C)ollision Boxes
 	registerAction(sf::Keyboard::G, "TOGGLE_GRID");			// Toggle drawing (G)rid
+	registerAction(sf::Mouse::Right, "SET_TILE");			// Set tiles to add to current scene and associated level txt
 
 	//registerAction(sf::Keyboard::W, "JUMP");
 
@@ -307,6 +308,12 @@ void Scene_Play::sMovement()
 		entity->getComponent<CTransform>().prevPos = entity->getComponent<CTransform>().pos;
 		entity->getComponent<CTransform>().pos += entity->getComponent<CTransform>().velocity;
 	}
+
+	if (m_player->getComponent<CTransform>().pos.y > height() + m_gridSize.y * 2.f)
+	{
+		m_player->destroy();
+		spawnPlayer();
+	}
 }
 
 void Scene_Play::sLifespan()
@@ -506,6 +513,26 @@ void Scene_Play::sDoAction(const Action& action)
 		{
 			spawnBullet(m_player);
 		}
+
+		if (action.name() == "SET_TILE")
+		{
+			const auto mousePos = sf::Mouse::getPosition(m_game->window());
+			const auto mouseWorldPos = m_game->window().mapPixelToCoords(mousePos);
+
+			//auto adjustedMousePos = 
+			const auto gridPos = pixelToGrid(mouseWorldPos.x, mouseWorldPos.y);
+
+			//std::cout << "Current view center (" << cameraCenterX << "," << cameraCenterY << ")\n";
+			//std::cout << "Mouse in window position (" << mousePos.x << "," << mousePos.y << ")\n";
+
+			/*std::string xCell = std::to_string(static_cast<int>(x) / static_cast<int>(m_gridSize.x));
+			std::string yCell = std::to_string((static_cast<int>(y - height()) / static_cast<int>(m_gridSize.y)) * -1);*/
+
+			std::cout << "Mouse in world position (" << mouseWorldPos.x << "," << mouseWorldPos.y << ")\n";
+			std::cout << "Mouse in tile position (" << gridPos.x << "," << gridPos.y << ")\n";
+		}
+
+
 	}
 	else if (action.type() == "END") {
 
