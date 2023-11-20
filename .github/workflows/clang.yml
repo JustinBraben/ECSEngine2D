@@ -66,6 +66,13 @@ jobs:
       run: brew install llvm
       if: runner.os == 'macOS'
 
+    - name: Set Clang environment variables
+      run: |
+        echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> $HOME/.bash_profile
+        echo 'export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib/c++"' >> $HOME/.bash_profile
+        echo 'export CPPFLAGS="-I/usr/local/opt/llvm/include"' >> $HOME/.bash_profile
+      if: runner.os == 'macOS'
+
     - name: List available Clang versions
       run: |
         echo "Available Clang versions:"
