@@ -51,6 +51,7 @@ public:
 	size_t height() const;
 
 	// Systems
+	void sTileEdit();
 	void sAnimation();
 	void sMovement();
 	void sEnemySpawner();

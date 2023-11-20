@@ -26,6 +26,7 @@ void Scene_Play::init(const std::string& levelPath)
 	registerAction(sf::Keyboard::C, "TOGGLE_COLLISION");	// Toggle drawing (C)ollision Boxes
 	registerAction(sf::Keyboard::G, "TOGGLE_GRID");			// Toggle drawing (G)rid
 	registerAction(sf::Mouse::Right, "SET_TILE");			// Set tiles to add to current scene and associated level txt
+	registerAction(sf::Mouse::Button::XButton2, "REMOVE_TILE");		// Remove tiles from current scene and associated level txt
 
 	//registerAction(sf::Keyboard::W, "JUMP");
 
@@ -216,6 +217,11 @@ void Scene_Play::update()
 	sCollision();
 	sAnimation();
 	sRender();
+}
+
+void Scene_Play::sTileEdit()
+{
+
 }
 
 void Scene_Play::sMovement()
@@ -530,44 +536,109 @@ void Scene_Play::sDoAction(const Action& action)
 			std::vector<std::string> lines;
 			std::string line;
 
-			while (std::getline(inputFile, line)) {
+			while (std::getline(inputFile, line)) 
+			{
 				lines.push_back(line);
 			}
 
 			// Check if the file has at least two lines
-			if (lines.size() >= 2) {
+			if (lines.size() >= 2) 
+			{
 				// Insert a line with a tile at the second last position
 				std::string newTile = "Tile\t\t\tOryxBrick\t\t\t" + std::to_string(static_cast<int>(gridPos.x)) + "\t" + std::to_string(static_cast<int>(gridPos.y));
-				lines.insert(lines.end() - 1, newTile);
 
-				// Write the modified content back to the file
-				std::ofstream outputFile(filePath);
+				// Check if the line already exists in the file
+				if (std::find(lines.begin(), lines.end(), newTile) == lines.end()) 
+				{
+					// Line does not exist, insert it
+					lines.insert(lines.end() - 1, newTile);
 
-				for (size_t i = 0; i < lines.size() - 1; ++i) {
-					outputFile << lines[i] << "\n";
+					// Write the modified content back to the file
+					std::ofstream outputFile(filePath);
+
+					for (size_t i = 0; i < lines.size() - 1; ++i) 
+					{
+						outputFile << lines[i] << "\n";
+					}
+
+					// Write the last line without adding an extra newline
+					outputFile << lines.back();
+
+					std::cout << newTile << "\n";
+					std::cout << "New tile inserted at the second last position.\n";
+
+					auto brick = m_entityManager.addEntity("Tile");
+					auto& assets = m_game->getAssets();
+					auto& animation = m_game->getAssets().getAnimation("OryxBrick");
+					brick->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
+					brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
+					brick->addComponent<CAnimation>(animation, true);
+					brick->addComponent<CTransform>(gridToMidPixel(gridPos.x, gridPos.y, brick));
+					brick->addComponent<CBoundingBox>(Vec2(animation.getSize().x * brick->getComponent<CTransform>().scale.x,
+						animation.getSize().y * brick->getComponent<CTransform>().scale.y));
 				}
-
-				// Write the last line without adding an extra newline
-				outputFile << lines.back();
-				std::cout << newTile << "\n";
-				std::cout << "New tile inserted at the second last position.\n";
-
-				auto brick = m_entityManager.addEntity("Tile");
-				auto& assets = m_game->getAssets();
-				auto& animation = m_game->getAssets().getAnimation("OryxBrick");
-				brick->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
-				brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
-				brick->addComponent<CAnimation>(animation, true);
-				brick->addComponent<CTransform>(gridToMidPixel(gridPos.x, gridPos.y, brick));
-				brick->addComponent<CBoundingBox>(Vec2(animation.getSize().x * brick->getComponent<CTransform>().scale.x,
-					animation.getSize().y * brick->getComponent<CTransform>().scale.y));
+				else
+				{
+					std::cout << "Duplicate line found. Not inserting a new tile.\n";
+				}
 			}
-			else {
+			else
+			{
 				std::cerr << "The file does not have enough lines.\n";
 			}
 		}
+		if (action.name() == "REMOVE_TILE")
+		{
+			const auto mousePos = sf::Mouse::getPosition(m_game->window());
+			const auto mouseWorldPos = m_game->window().mapPixelToCoords(mousePos);
 
+			const auto gridPos = pixelToGrid(mouseWorldPos.x, mouseWorldPos.y);
 
+			//std::cout << "Mouse in world position (" << mouseWorldPos.x << "," << mouseWorldPos.y << ")\n";
+			//std::cout << "Mouse in tile position (" << gridPos.x << "," << gridPos.y << ")\n";
+
+			//std::cout << "Level path is : " << m_levelPath << "\n;";
+
+			// Specify the file path
+			std::string filePath = m_levelPath;
+
+			// Specify the content to be removed
+			std::string tileLineToRemove = "Tile\t\t\tOryxBrick\t\t\t" + std::to_string(static_cast<int>(gridPos.x)) + "\t" + std::to_string(static_cast<int>(gridPos.y));
+
+			// Read the contents of the file into a vector of strings
+			std::ifstream inputFile(filePath);
+			std::vector<std::string> lines;
+			std::string line;
+
+			while (std::getline(inputFile, line)) 
+			{
+				// Check if the line contains the content to be removed
+				if (line.find(tileLineToRemove) == std::string::npos) 
+				{
+					// If not, add the line to the vector
+					lines.push_back(line);
+				}
+			}
+
+			// Write the modified content back to the file
+			std::ofstream outputFile(filePath);
+
+			for (const auto& line : lines) {
+				outputFile << line << "\n";
+			}
+
+			std::cout << "Lines containing \"" << tileLineToRemove << "\" removed.\n";
+
+			for (auto entity : m_entityManager.getEntities())
+			{
+				if (entity->tag() == "Tile")
+				{
+					auto entityGridPos = pixelToGrid(entity->getComponent<CTransform>().pos.x, entity->getComponent<CTransform>().pos.y);
+					if (entityGridPos.x == gridPos.x && entityGridPos.y == gridPos.y)
+						entity->destroy();
+				}
+			}
+		}
 	}
 	else if (action.type() == "END") {
 
