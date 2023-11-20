@@ -667,12 +667,19 @@ void Scene_Play::sRender()
 
 	// draw all Entity textures / animations
 	if (m_drawTextures) {
-		auto filterByBounds = (m_entityManager.getEntities()) | std::views::filter([cameraLeftX, cameraRightX, cameraTopY, cameraBottomY](const auto& entity) {
+
+		// TODO: Set the proper clang compiler to build for C++20 allowing this
+
+		/*auto filterByBounds = (m_entityManager.getEntities()) | std::views::filter([cameraLeftX, cameraRightX, cameraTopY, cameraBottomY](const auto& entity) {
 			return entity->template getComponent<CTransform>().pos.x >= cameraLeftX && entity->template getComponent<CTransform>().pos.x <= cameraRightX 
 				&& entity->template getComponent<CTransform>().pos.y >= cameraBottomY && entity->template getComponent<CTransform>().pos.y <= cameraTopY;
-		});
+		});*/
 
-		for (const auto& entity : filterByBounds) {
+		for (const auto& entity : m_entityManager.getEntities()) {
+
+			if (!(entity->template getComponent<CTransform>().pos.x >= cameraLeftX && entity->template getComponent<CTransform>().pos.x <= cameraRightX
+				&& entity->template getComponent<CTransform>().pos.y >= cameraBottomY && entity->template getComponent<CTransform>().pos.y <= cameraTopY))
+				continue;
 			
 			auto& transform = entity->getComponent<CTransform>();
 
