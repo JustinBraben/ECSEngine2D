@@ -64,8 +64,8 @@ jobs:
       uses: lukka/run-cmake@v10
       env:
         VCPKG_ROOT: ${{ fromJSON('[ "/usr/local/share/vcpkg", "C:\\vcpkg" ]')[runner.os == 'Windows'] }}
-        CC: ${{ fromJSON('{"Linux":"gcc-10", "macOS":"clang", "Windows":"" }')[runner.os] }}
-        CXX: ${{ fromJSON('{"Linux":"g++-10", "macOS":"clang++", "Windows":"" }')[runner.os] }}
+        CC: ${{ fromJSON('{"Linux":"gcc-10", "macOS":"gcc-13", "Windows":"" }')[runner.os] }}
+        CXX: ${{ fromJSON('{"Linux":"g++-10", "macOS":"g++-13", "Windows":"" }')[runner.os] }}
       with:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         configurePreset: ${{ matrix.cmake_preset }}
