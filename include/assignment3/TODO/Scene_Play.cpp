@@ -71,8 +71,8 @@ Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity
 
 Vec2 Scene_Play::pixelToGrid(float pixelX, float pixelY)
 {
-	auto tilePositionX = std::floor(pixelX / m_gridSize.x);
-	auto tilePositionY = std::floor(pixelY / m_gridSize.y);
+	auto tilePositionX = std::trunc(pixelX / m_gridSize.x);
+	auto tilePositionY = std::trunc((pixelY - height()) / m_gridSize.y) * -1;
 	return Vec2(tilePositionX, tilePositionY);
 }
 
@@ -749,12 +749,13 @@ void Scene_Play::sRender()
 		}
 
 		// Now looping from start of the lowest viewable grid, to the highest up viewable grid
-		for (float y = startGridPos.y * m_gridSize.y; y < cameraTopY; y += m_gridSize.y) {
+		for (float y = ((startGridPos.y * m_gridSize.y) * -1.f) + static_cast<float>(height()); y < cameraTopY; y += m_gridSize.y) {
 			drawLine(Vec2(cameraLeftX, y), Vec2(cameraRightX, y));
 
 			for (float x = startGridPos.x * m_gridSize.x; x < cameraRightX; x += m_gridSize.x) {
-				std::string xCell = std::to_string(static_cast<int>(x) / static_cast<int>(m_gridSize.x));
-				std::string yCell = std::to_string((static_cast<int>(y - height()) / static_cast<int>(m_gridSize.y)) * -1);
+				const auto& gridPos = pixelToGrid(x, y);
+				std::string xCell = std::to_string(static_cast<int>(gridPos.x));
+				std::string yCell = std::to_string(static_cast<int>(gridPos.y));
 				m_gridText.setString("(" + xCell + "," + yCell + ")");
 				m_gridText.setPosition(x + 3, y - m_gridSize.y + 2);
 				m_gridText.setFillColor(sf::Color::White);
