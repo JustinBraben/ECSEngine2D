@@ -16,7 +16,7 @@ endif()
 # Define the project and set the C++ standard to 17.
 # ${PROJECT_NAME} will now be myproject
 project(myproject CXX)
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 
 # Set the binary directory to /build within the source directory.
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
@@ -35,7 +35,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 # Enforce treating warnings as errors for GNU and Clang compilers.
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  add_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -O3 -g -fPIC -fsanitize=address -fsanitize=undefined --coverage -std=c++23 -std=gnu++2b)
+  add_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic -O3 -g -fPIC -fsanitize=address -fsanitize=undefined --coverage -std=c++20)
 endif()
 
 # Enforce treating warnings as errors for MSVC compiler.

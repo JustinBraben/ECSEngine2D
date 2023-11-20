@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macOS-latest ]
+        os: [ macos-12 ]
         cmake_preset: [ debug, release ]
 
     env:
@@ -40,7 +40,6 @@ jobs:
         -name "${{ env.NUGET_SOURCE_NAME }}"
         -username "${{ github.actor }}"
         -password "${{ secrets.GITHUB_TOKEN }}"
-
     - name: Restore vcpkg
       uses: actions/cache@v3
       with:
@@ -53,7 +52,6 @@ jobs:
       run: |
         echo "Setting VCPKG_ROOT to /usr/local/share/vcpkg"
         echo "VCPKG_ROOT=/usr/local/share/vcpkg" >> $GITHUB_ENV
-
     - name: List vcpkg directories (macOS)
       run: |
         ls -l /usr/local/share/vcpkg
@@ -62,31 +60,12 @@ jobs:
         ls -l /usr/local
       if: runner.os == 'macOS'
 
-    - name: Install Clang via Homebrew
-      run: brew install llvm
-      if: runner.os == 'macOS'
-
-    - name: Set Clang environment variables
-      run: |
-        echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> $HOME/.bash_profile
-        echo 'export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib/c++"' >> $HOME/.bash_profile
-        echo 'export CPPFLAGS="-I/usr/local/opt/llvm/include"' >> $HOME/.bash_profile
-      if: runner.os == 'macOS'
-
-    - name: List available Clang versions
-      run: |
-        echo "Available Clang versions:"
-        ls -1 /usr/local/opt/llvm/bin/clang*
-        ls -1 /usr/local/opt/llvm/bin/clang++*
-        ls -1 /usr/local/opt/llvm
-      if: runner.os == 'macOS'
-
     - name: Configure and run CMake
       uses: lukka/run-cmake@v10
       env:
         VCPKG_ROOT: ${{ fromJSON('[ "/usr/local/share/vcpkg", "C:\\vcpkg" ]')[runner.os == 'Windows'] }}
-        CC: ${{ fromJSON('{"Linux":"gcc-10", "macOS":"/usr/local/opt/llvm/bin/clang", "Windows":"" }')[runner.os] }}
-        CXX: ${{ fromJSON('{"Linux":"g++-10", "macOS":"/usr/local/opt/llvm/bin/clang++", "Windows":"" }')[runner.os] }}
+        CC: ${{ fromJSON('{"Linux":"gcc-10", "macOS":"clang", "Windows":"" }')[runner.os] }}
+        CXX: ${{ fromJSON('{"Linux":"g++-10", "macOS":"clang++", "Windows":"" }')[runner.os] }}
       with:
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
         configurePreset: ${{ matrix.cmake_preset }}
