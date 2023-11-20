@@ -71,7 +71,7 @@ Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity
 
 Vec2 Scene_Play::pixelToGrid(float pixelX, float pixelY)
 {
-	auto tilePositionX = std::trunc(pixelX / m_gridSize.x);
+	auto tilePositionX = std::floor(pixelX / m_gridSize.x);
 	auto tilePositionY = std::trunc((pixelY - height()) / m_gridSize.y) * -1;
 	return Vec2(tilePositionX, tilePositionY);
 }
@@ -95,10 +95,6 @@ void Scene_Play::loadLevel(const std::string& filename)
 			std::string tileType;
 			float gridX, gridY;
 			ss >> tileType >> gridX >> gridY;
-
-			if (tileType == "FlameBottom") {
-				std::cout << "Flamethrower help debug\n";
-			}
 
 			auto brick = m_entityManager.addEntity(type);
 			auto& assets = m_game->getAssets();
@@ -519,17 +515,56 @@ void Scene_Play::sDoAction(const Action& action)
 			const auto mousePos = sf::Mouse::getPosition(m_game->window());
 			const auto mouseWorldPos = m_game->window().mapPixelToCoords(mousePos);
 
-			//auto adjustedMousePos = 
 			const auto gridPos = pixelToGrid(mouseWorldPos.x, mouseWorldPos.y);
 
-			//std::cout << "Current view center (" << cameraCenterX << "," << cameraCenterY << ")\n";
-			//std::cout << "Mouse in window position (" << mousePos.x << "," << mousePos.y << ")\n";
+			//std::cout << "Mouse in world position (" << mouseWorldPos.x << "," << mouseWorldPos.y << ")\n";
+			//std::cout << "Mouse in tile position (" << gridPos.x << "," << gridPos.y << ")\n";
 
-			/*std::string xCell = std::to_string(static_cast<int>(x) / static_cast<int>(m_gridSize.x));
-			std::string yCell = std::to_string((static_cast<int>(y - height()) / static_cast<int>(m_gridSize.y)) * -1);*/
+			//std::cout << "Level path is : " << m_levelPath << "\n;";
 
-			std::cout << "Mouse in world position (" << mouseWorldPos.x << "," << mouseWorldPos.y << ")\n";
-			std::cout << "Mouse in tile position (" << gridPos.x << "," << gridPos.y << ")\n";
+			// Specify the file path
+			std::string filePath = m_levelPath;
+
+			// Read the contents of the file into a vector of strings
+			std::ifstream inputFile(filePath);
+			std::vector<std::string> lines;
+			std::string line;
+
+			while (std::getline(inputFile, line)) {
+				lines.push_back(line);
+			}
+
+			// Check if the file has at least two lines
+			if (lines.size() >= 2) {
+				// Insert a line with a tile at the second last position
+				std::string newTile = "Tile\t\t\tOryxBrick\t\t\t" + std::to_string(static_cast<int>(gridPos.x)) + "\t" + std::to_string(static_cast<int>(gridPos.y));
+				lines.insert(lines.end() - 1, newTile);
+
+				// Write the modified content back to the file
+				std::ofstream outputFile(filePath);
+
+				for (size_t i = 0; i < lines.size() - 1; ++i) {
+					outputFile << lines[i] << "\n";
+				}
+
+				// Write the last line without adding an extra newline
+				outputFile << lines.back();
+				std::cout << newTile << "\n";
+				std::cout << "New tile inserted at the second last position.\n";
+
+				auto brick = m_entityManager.addEntity("Tile");
+				auto& assets = m_game->getAssets();
+				auto& animation = m_game->getAssets().getAnimation("OryxBrick");
+				brick->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
+				brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
+				brick->addComponent<CAnimation>(animation, true);
+				brick->addComponent<CTransform>(gridToMidPixel(gridPos.x, gridPos.y, brick));
+				brick->addComponent<CBoundingBox>(Vec2(animation.getSize().x * brick->getComponent<CTransform>().scale.x,
+					animation.getSize().y * brick->getComponent<CTransform>().scale.y));
+			}
+			else {
+				std::cerr << "The file does not have enough lines.\n";
+			}
 		}
 
 
