@@ -3,6 +3,11 @@ Texture		PlayerRun			../../assets/textures/Ninja_Frog/Run_(32x32).png
 Texture		PlayerFall			../../assets/textures/Ninja_Frog/Fall_(32x32).png
 Texture		PlayerJump			../../assets/textures/Ninja_Frog/Jump_(32x32).png
 Texture		PlayerWallSlide		../../assets/textures/Ninja_Frog/Wall_Jump(32x32).png
+Texture		EnemyIdle			../../assets/textures/Mask_Dude/Idle_(32x32).png
+Texture		EnemyRun			../../assets/textures/Mask_Dude/Run_(32x32).png
+Texture		EnemyFall			../../assets/textures/Mask_Dude/Fall_(32x32).png
+Texture		EnemyJump			../../assets/textures/Mask_Dude/Jump_(32x32).png
+Texture		EnemyWallSlide		../../assets/textures/Mask_Dude/Wall_Jump_(32x32).png
 Texture		OryxWorld			../../assets/textures/oryx_16bit_fantasy_world_trans.png
 Texture		FireTrap			../../assets/textures/Traps/Fire/On_(16x32).png
 Texture		SpikeTrap			../../assets/textures/Traps/Spikes/Idle.png
@@ -15,6 +20,11 @@ Animation	PlayerJump			PlayerJump			1		1		0		0		32
 Animation	PlayerFall			PlayerFall			1		1		0		0		32
 Animation	PlayerRun			PlayerRun			12		1		0		0		32
 Animation	PlayerWallSlide		PlayerWallSlide		5		1		0		0		32
+Animation	EnemyIdle			EnemyIdle			11		1		0		0		32
+Animation	EnemyJump			EnemyJump			1		1		0		0		32
+Animation	EnemyFall			EnemyFall			1		1		0		0		32
+Animation	EnemyRun			EnemyRun			12		1		0		0		32
+Animation	EnemyWallSlide		EnemyWallSlide		5		1		0		0		32
 Animation	Bullet				OryxWorld			1		0		1152	24		24
 Animation	SpikeTrap			SpikeTrap			1		0		0		0		16
 Font		Arial				../../assets/arial.ttf

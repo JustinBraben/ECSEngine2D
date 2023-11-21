@@ -1,5 +1,4 @@
 #include "Scene.hpp"
-#include "Scene.hpp"
 
 void Scene::setPaused(bool paused)
 {

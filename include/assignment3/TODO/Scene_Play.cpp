@@ -763,7 +763,7 @@ void Scene_Play::sRender()
 	// Player on right side of the screen
 	if (pPos.x > view.getCenter().x) 
 	{
-		while (pPos.x - cameraCenterX > m_game->window().getSize().x / 4.0f) 
+		while (pPos.x - cameraCenterX > m_game->window().getSize().x / 8.0f) 
 		{
 			view.setCenter(cameraCenterX + 1.0f, cameraCenterY);
 			m_game->window().setView(view);
@@ -772,7 +772,7 @@ void Scene_Play::sRender()
 	// Player on the left side of the screen
 	else 
 	{
-		while (cameraCenterX - pPos.x > m_game->window().getSize().x / 4.0f)
+		while (cameraCenterX - pPos.x > m_game->window().getSize().x / 8.0f)
 		{
 			view.setCenter(cameraCenterX - 1.0f, cameraCenterY);
 			m_game->window().setView(view);
@@ -782,7 +782,7 @@ void Scene_Play::sRender()
 	// Player is below screen
 	if (pPos.y > view.getCenter().y)
 	{
-		while (pPos.y - cameraCenterY > m_game->window().getSize().y / 4.0f)
+		while (pPos.y - cameraCenterY > m_game->window().getSize().y / 3.0f)
 		{
 			view.setCenter(cameraCenterX, cameraCenterY + 1.0f);
 			m_game->window().setView(view);
@@ -791,7 +791,7 @@ void Scene_Play::sRender()
 	// Player is above screen
 	else
 	{
-		while (cameraCenterY - pPos.y > m_game->window().getSize().y / 4.0f)
+		while (cameraCenterY - pPos.y > m_game->window().getSize().y / 3.0f)
 		{
 			view.setCenter(cameraCenterX, cameraCenterY - 1.0f);
 			m_game->window().setView(view);
