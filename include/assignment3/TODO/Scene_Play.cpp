@@ -153,7 +153,6 @@ void Scene_Play::loadLevel(const std::string& filename)
 
 	spawnPlayer();
 	spawnEnemy(41.f, 4.f);
-	spawnEnemy(10.f, 9.f);
 
 	// some sample entities
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
@@ -176,11 +175,11 @@ void Scene_Play::loadLevel(const std::string& filename)
 void Scene_Play::spawnPlayer()
 {
 	// here is a sample player entity which you can use to construct other entities
-	m_player = m_entityManager.addEntity("player");
+	m_player = m_entityManager.addEntity("Player");
 	m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
 	m_player->getComponent<CTransform>().scale.x = 64.0f / m_player->getComponent<CAnimation>().animation.getSize().x;
 	m_player->getComponent<CTransform>().scale.y = 64.0f / m_player->getComponent<CAnimation>().animation.getSize().x;
-	m_player->addComponent<CTransform>(Vec2(224, 352));
+	m_player->addComponent<CTransform>(gridToMidPixel(3.f, 5.f, m_player));
 	m_player->addComponent<CGravity>(0.1f);
 	m_player->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 	m_player->addComponent<CState>("AIR");
@@ -190,11 +189,12 @@ void Scene_Play::spawnPlayer()
 
 void Scene_Play::spawnEnemy(float posX, float posY)
 {
-	auto enemy = m_entityManager.addEntity("enemy");
+	auto enemy = m_entityManager.addEntity("Enemy");
 	enemy->addComponent<CAnimation>(m_game->getAssets().getAnimation("EnemyIdle"), true);
 	enemy->getComponent<CTransform>().scale.x = 64.0f / enemy->getComponent<CAnimation>().animation.getSize().x;
 	enemy->getComponent<CTransform>().scale.y = 64.0f / enemy->getComponent<CAnimation>().animation.getSize().x;
 	enemy->addComponent<CTransform>(gridToMidPixel(posX, posY, enemy));
+	enemy->getComponent<CTransform>().velocity.x = 2.f;
 	enemy->addComponent<CGravity>(0.1f);
 	enemy->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 	enemy->addComponent<CState>("AIR");
@@ -319,6 +319,9 @@ void Scene_Play::sMovement()
 
 	for (auto entity : m_entityManager.getEntities()) 
 	{
+		/*if (entity->tag() != "player" && entity->tag() != "enemy")
+			continue;*/
+
 		if (entity->hasComponent<CGravity>()) 
 		{
 			entity->getComponent<CTransform>().velocity.y += entity->getComponent<CGravity>().gravity;
@@ -370,7 +373,7 @@ void Scene_Play::sCollision()
 
 	for (auto bullet : m_entityManager.getEntities("bullet")) {
 		for (auto entity : m_entityManager.getEntities()) {
-			if (entity->tag() == "player" || entity->tag() == "bullet")
+			if (entity->tag() == "Player" || entity->tag() == "bullet")
 				continue;
 
 			Vec2 prevCollision = physics.GetPreviousOverlap(entity, bullet);
@@ -391,7 +394,7 @@ void Scene_Play::sCollision()
 	for (auto entity : m_entityManager.getEntities())
 	{
 		// Skip entities the player should not collide with
-		if (entity->tag() == "player")
+		if (entity->tag() == "Player")
 			continue;
 		
 		if (entity->tag() == "Dec")
@@ -425,8 +428,6 @@ void Scene_Play::sCollision()
 						m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
 
 						m_player->getComponent<CTransform>().velocity.y = 0;
-
-						//m_player->getComponent<CState>().state = "AIR";
 					}
 
 					// check collision below player
@@ -493,15 +494,16 @@ void Scene_Play::sCollision()
 		// Loop through enemies to do collision on
 	}
 
+	// Loop for checking collisions of enemies
 	for (auto entity : m_entityManager.getEntities())
 	{
 		// Skip entities the player should not collide with
-		if (entity->tag() != "enemy")
+		if (entity->tag() != "Enemy")
 			continue;
 
 		for (auto otherEntity : m_entityManager.getEntities())
 		{
-			if (otherEntity->tag() == "enemy")
+			if (otherEntity->tag() == "Enemy")
 				continue;
 
 			Vec2 collision = physics.GetOverlap(entity, otherEntity);
@@ -522,7 +524,7 @@ void Scene_Play::sCollision()
 						//m_player->getComponent<CState>().state = "AIR";
 					}
 
-					// check collision below player
+					// check collision below enemy
 
 					if (prevCollision.y <= 0.f &&
 						(entity->getComponent<CTransform>().pos.y < otherEntity->getComponent<CTransform>().pos.y))
@@ -539,13 +541,15 @@ void Scene_Play::sCollision()
 						}
 					}
 
-					// check collision to the right of player
+					// check collision below enemy
 					if (prevCollision.x <= 0.f &&
 						(entity->getComponent<CTransform>().pos.x < otherEntity->getComponent<CTransform>().pos.x))
 					{
 						entity->getComponent<CTransform>().pos.x = entity->getComponent<CTransform>().prevPos.x;
 
-						entity->getComponent<CTransform>().velocity.x = 0;
+						entity->getComponent<CTransform>().velocity.x = -1.f * entity->getComponent<CTransform>().velocity.x;
+
+						entity->getComponent<CTransform>().scale.x = -1.f * entity->getComponent<CTransform>().scale.x;
 
 						if (entity->getComponent<CState>().state != "GROUND")
 						{
@@ -553,7 +557,7 @@ void Scene_Play::sCollision()
 						}
 					}
 
-					// check collision to the left of player
+					// check collision below enemy
 					if (prevCollision.x <= 0.f &&
 						(entity->getComponent<CTransform>().pos.x > otherEntity->getComponent<CTransform>().pos.x))
 					{
@@ -561,7 +565,9 @@ void Scene_Play::sCollision()
 						{
 							entity->getComponent<CTransform>().pos.x = entity->getComponent<CTransform>().prevPos.x;
 
-							entity->getComponent<CTransform>().velocity.x = 0;
+							entity->getComponent<CTransform>().velocity.x = -1.f * entity->getComponent<CTransform>().velocity.x;
+
+							entity->getComponent<CTransform>().scale.x = -1.f * entity->getComponent<CTransform>().scale.x;
 						}
 
 						if (entity->getComponent<CState>().state != "GROUND")
@@ -771,41 +777,46 @@ void Scene_Play::sAnimation()
 {
 	// TODO: Complete the Animation class code first 
 
-	if (m_player->getComponent<CState>().state == "AIR")
+	for (auto entity : m_entityManager.getEntities())
 	{
-		// TODO: check if player is rising in the air
-		// set jumping animation if so
-		if (m_player->getComponent<CTransform>().velocity.y < 0)
+		if (entity->tag() != "Enemy" && entity->tag() != "Player")
+			continue;
+
+		if (entity->getComponent<CState>().state == "AIR")
 		{
-			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerJump"), true);
+			if (entity->getComponent<CTransform>().velocity.y < 0)
+			{
+				entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(entity->tag() + "Jump"), true);
+			}
+
+			if (entity->getComponent<CTransform>().velocity.y > 0)
+			{
+				entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(entity->tag() + "Fall"), true);
+			}
 		}
 
-		// TODO: set falling animation
-		if (m_player->getComponent<CTransform>().velocity.y > 0)
+		if (entity->getComponent<CState>().state == "GROUND")
 		{
-			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerFall"), true);
+			if (entity->getComponent<CTransform>().velocity.x != 0
+				&& entity->getComponent<CAnimation>().animation.getName() != entity->tag() + "Run")
+			{
+				entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(entity->tag() + "Run"), true);
+			}
+
+			if (entity->getComponent<CTransform>().velocity.x == 0
+				&& entity->getComponent<CAnimation>().animation.getName() != entity->tag() + "Idle")
+			{
+				entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(entity->tag() + "Idle"), true);
+			}
 		}
 
-	}
-
-	if (m_player->getComponent<CState>().state == "GROUND")
-	{
-		if (m_player->getComponent<CTransform>().velocity.x != 0 
-			&& m_player->getComponent<CAnimation>().animation.getName() != "PlayerRun")
+		if (entity->getComponent<CState>().state == "WALLSLIDE")
 		{
-			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerRun"), true);
+			entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(entity->tag() + "WallSlide"), true);
 		}
 
-		if (m_player->getComponent<CTransform>().velocity.x == 0
-			&& m_player->getComponent<CAnimation>().animation.getName() != "PlayerIdle")
-		{
-			m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
-		}
-	}
-
-	if (m_player->getComponent<CState>().state == "WALLSLIDE")
-	{
-		m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerWallSlide"), true);
+		/*entity->getComponent<CTransform>().scale.x = entity->getComponent<CTransform>().velocity.x >= 0 ?
+			std::abs(entity->getComponent<CTransform>().scale.x) : -1.f * std::abs(entity->getComponent<CTransform>().scale.x);*/
 	}
 
 	// TODO: set the animation of the player based on its CState component
