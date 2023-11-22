@@ -152,6 +152,8 @@ void Scene_Play::loadLevel(const std::string& filename)
 	//	set up and use entities with the new syntax, it should be removed
 
 	spawnPlayer();
+	spawnEnemy(41.f, 4.f);
+	spawnEnemy(10.f, 9.f);
 
 	// some sample entities
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
@@ -176,12 +178,26 @@ void Scene_Play::spawnPlayer()
 	// here is a sample player entity which you can use to construct other entities
 	m_player = m_entityManager.addEntity("player");
 	m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
+	m_player->getComponent<CTransform>().scale.x = 64.0f / m_player->getComponent<CAnimation>().animation.getSize().x;
+	m_player->getComponent<CTransform>().scale.y = 64.0f / m_player->getComponent<CAnimation>().animation.getSize().x;
 	m_player->addComponent<CTransform>(Vec2(224, 352));
 	m_player->addComponent<CGravity>(0.1f);
 	m_player->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 	m_player->addComponent<CState>("AIR");
 
 	// TODO: be sure to add the remaining components to the player
+}
+
+void Scene_Play::spawnEnemy(float posX, float posY)
+{
+	auto enemy = m_entityManager.addEntity("enemy");
+	enemy->addComponent<CAnimation>(m_game->getAssets().getAnimation("EnemyIdle"), true);
+	enemy->getComponent<CTransform>().scale.x = 64.0f / enemy->getComponent<CAnimation>().animation.getSize().x;
+	enemy->getComponent<CTransform>().scale.y = 64.0f / enemy->getComponent<CAnimation>().animation.getSize().x;
+	enemy->addComponent<CTransform>(gridToMidPixel(posX, posY, enemy));
+	enemy->addComponent<CGravity>(0.1f);
+	enemy->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
+	enemy->addComponent<CState>("AIR");
 }
 
 void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
@@ -380,12 +396,11 @@ void Scene_Play::sCollision()
 		
 		if (entity->tag() == "Dec")
 			continue;
-
-		// Skip collision detection on entities that are too far away to possibly collide with Player
-		if (std::abs(entity->getComponent<CTransform>().pos.x - m_player->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().size.x)
+		
+		if (std::abs(entity->getComponent<CTransform>().pos.x - m_player->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x + entity->getComponent<CBoundingBox>().halfSize.x)
 			continue;
 
-		if (std::abs(entity->getComponent<CTransform>().pos.y - m_player->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().size.y)
+		if (std::abs(entity->getComponent<CTransform>().pos.y - m_player->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y + entity->getComponent<CBoundingBox>().halfSize.y)
 			continue;
 
 		if (!m_player->isActive())
@@ -393,14 +408,15 @@ void Scene_Play::sCollision()
 
 		Vec2 collision = physics.GetOverlap(entity, m_player);
 
-		if (collision.x > 0.f && collision.y > 0.f) {
+		if (collision.x > 0.f && collision.y > 0.f) 
+		{
 
 			Vec2 prevCollision = physics.GetPreviousOverlap(entity, m_player);
 
-			// check collision above player
-
 			if (m_player->isActive())
 			{
+				// check collision above player
+
 				if (entity->tag() == "Tile")
 				{
 					if (prevCollision.y <= 0.f &&
@@ -410,7 +426,7 @@ void Scene_Play::sCollision()
 
 						m_player->getComponent<CTransform>().velocity.y = 0;
 
-						m_player->getComponent<CState>().state = "AIR";
+						//m_player->getComponent<CState>().state = "AIR";
 					}
 
 					// check collision below player
@@ -466,6 +482,93 @@ void Scene_Play::sCollision()
 				{
 					m_player->destroy();
 					spawnPlayer();
+				}
+			}
+		}
+		else
+		{
+			m_player->getComponent<CState>().state = "AIR";
+		}
+
+		// Loop through enemies to do collision on
+	}
+
+	for (auto entity : m_entityManager.getEntities())
+	{
+		// Skip entities the player should not collide with
+		if (entity->tag() != "enemy")
+			continue;
+
+		for (auto otherEntity : m_entityManager.getEntities())
+		{
+			if (otherEntity->tag() == "enemy")
+				continue;
+
+			Vec2 collision = physics.GetOverlap(entity, otherEntity);
+
+			if (collision.x > 0.f && collision.y > 0.f && entity->isActive() && otherEntity->isActive())
+			{
+				Vec2 prevCollision = physics.GetPreviousOverlap(entity, otherEntity);
+
+				if (otherEntity->tag() == "Tile")
+				{
+					if (prevCollision.y <= 0.f &&
+						(entity->getComponent<CTransform>().pos.y > otherEntity->getComponent<CTransform>().pos.y))
+					{
+						entity->getComponent<CTransform>().pos.y = entity->getComponent<CTransform>().prevPos.y;
+
+						entity->getComponent<CTransform>().velocity.y = 0;
+
+						//m_player->getComponent<CState>().state = "AIR";
+					}
+
+					// check collision below player
+
+					if (prevCollision.y <= 0.f &&
+						(entity->getComponent<CTransform>().pos.y < otherEntity->getComponent<CTransform>().pos.y))
+					{
+						if (std::abs(entity->getComponent<CTransform>().pos.x - otherEntity->getComponent<CTransform>().pos.x) <= entity->getComponent<CBoundingBox>().size.x - 1.0f)
+						{
+							entity->getComponent<CState>().state = "GROUND";
+
+							entity->getComponent<CTransform>().velocity.y = 0;
+
+							entity->getComponent<CTransform>().pos.y = entity->getComponent<CTransform>().prevPos.y;
+
+							entity->getComponent<CInput>().canJump = true;
+						}
+					}
+
+					// check collision to the right of player
+					if (prevCollision.x <= 0.f &&
+						(entity->getComponent<CTransform>().pos.x < otherEntity->getComponent<CTransform>().pos.x))
+					{
+						entity->getComponent<CTransform>().pos.x = entity->getComponent<CTransform>().prevPos.x;
+
+						entity->getComponent<CTransform>().velocity.x = 0;
+
+						if (entity->getComponent<CState>().state != "GROUND")
+						{
+							entity->getComponent<CState>().state = "WALLSLIDE";
+						}
+					}
+
+					// check collision to the left of player
+					if (prevCollision.x <= 0.f &&
+						(entity->getComponent<CTransform>().pos.x > otherEntity->getComponent<CTransform>().pos.x))
+					{
+						if (std::abs(entity->getComponent<CTransform>().pos.y - otherEntity->getComponent<CTransform>().pos.y) <= entity->getComponent<CBoundingBox>().size.y - 1.0f)
+						{
+							entity->getComponent<CTransform>().pos.x = entity->getComponent<CTransform>().prevPos.x;
+
+							entity->getComponent<CTransform>().velocity.x = 0;
+						}
+
+						if (entity->getComponent<CState>().state != "GROUND")
+						{
+							entity->getComponent<CState>().state = "WALLSLIDE";
+						}
+					}
 				}
 			}
 		}

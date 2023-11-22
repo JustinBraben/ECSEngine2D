@@ -37,6 +37,7 @@ public:
 	Vec2 pixelToGrid(float pixelX, float pixelY);
 
 	void spawnPlayer();
+	void spawnEnemy(float posX, float posY);
 	void spawnBullet(std::shared_ptr<Entity> entity);
 
 	void update() override;
