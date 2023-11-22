@@ -663,8 +663,8 @@ void Scene_Play::sCollision()
 
 	// TODO: Implement Physics::GetOverlap() function, use it inside this function
 
-	for (auto bullet : m_entityManager.getEntities("Bullet")) {
-		for (auto entity : m_entityManager.getEntities()) {
+	for (const auto& bullet : m_entityManager.getEntities("Bullet")) {
+		for (const auto& entity : m_entityManager.getEntities()) {
 
 			if (entity->tag() == "Player" || entity->tag() == "Bullet")
 				continue;
@@ -692,7 +692,7 @@ void Scene_Play::sCollision()
 	bool hasCollided = false;
 
 	// Loop through tiles checking collisions for player
-	for (auto entity : m_entityManager.getEntities("Tile"))
+	for (const auto& entity : m_entityManager.getEntities("Tile"))
 	{		
 		if (!m_player->isActive())
 			continue;
@@ -795,9 +795,9 @@ void Scene_Play::sCollision()
 	}
 
 	// Loop for checking collisions of enemies
-	for (auto enemy : m_entityManager.getEntities("Enemy"))
+	for (const auto& enemy : m_entityManager.getEntities("Enemy"))
 	{
-		for (auto otherEntity : m_entityManager.getEntities())
+		for (const auto& otherEntity : m_entityManager.getEntities())
 		{
 			if (otherEntity->tag() == "Enemy")
 				continue;
@@ -1145,7 +1145,12 @@ void Scene_Play::sRender()
 
 	// draw all Entity collision bounding boxes with a rectangleshape
 	if (m_drawCollision) {
-		for (auto entity : m_entityManager.getEntities()) {
+		for (const auto& entity : m_entityManager.getEntities()) {
+
+			if (!(entity->template getComponent<CTransform>().pos.x >= cameraLeftX && entity->template getComponent<CTransform>().pos.x <= cameraRightX
+				&& entity->template getComponent<CTransform>().pos.y >= cameraBottomY && entity->template getComponent<CTransform>().pos.y <= cameraTopY))
+				continue;
+
 			if (entity->hasComponent<CBoundingBox>()) {
 				auto& box = entity->getComponent<CBoundingBox>();
 				auto& transform = entity->getComponent<CTransform>();
