@@ -3,6 +3,7 @@
 #include "Scene.hpp"
 #include <map>
 #include <memory>
+#include <random>
 
 #include "EntityManager.hpp"
 
@@ -28,6 +29,11 @@ protected:
 
 	void loadLevel(const std::string& filename);
 
+private:
+	sf::Time m_scenePlayTime;   // Delay time between moves
+	sf::Clock m_scenePlayClock; // Clock to track the delay time
+	std::random_device m_randomDevice;
+	std::mt19937 m_randomGenerator;
 public:
 
 	Scene_Play(GameEngine* gameEngine, const std::string& levelPath);
@@ -37,7 +43,7 @@ public:
 	Vec2 pixelToGrid(float pixelX, float pixelY);
 
 	void spawnPlayer(float posX, float posY);
-	void spawnEnemy(float posX, float posY, std::string& aiType);
+	std::shared_ptr<Entity> spawnEnemy(float posX, float posY, std::string& aiType);
 	void spawnBullet(std::shared_ptr<Entity> entity);
 	bool canCollide(std::shared_ptr<Entity> entity1, std::shared_ptr<Entity> entity2);
 	void setTile();

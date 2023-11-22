@@ -22,9 +22,6 @@ Tile			OryxBrick			16	3
 Tile			OryxBrick			17	0
 Tile			OryxBrick			17	1
 Tile			OryxBrick			17	2
-Tile			OryxBrick			18	0
-Tile			OryxBrick			18	1
-Tile			OryxBrick			19	0
 Tile			OryxBrick			5	3
 Tile			OryxQuestion		6	3
 Tile			OryxBrick			7	3
@@ -36,9 +33,6 @@ Tile			OryxQuestion		7	6
 Tile			OryxBrick			8	6
 Tile			OryxQuestion		9	6
 Tile			OryxQuestion		8	9
-Tile			OryxBrick			21	0
-Tile			OryxBrick			22	0
-Tile			OryxBrick			23	0
 Tile			OryxBrick			26	3
 Tile			OryxBrick			27	3
 Tile			OryxBrick			28	3
@@ -242,4 +236,11 @@ Enemy			MaskDude			41	4
 Player 2 6	48 48 5	-20	20 0.75 Buster
 Tile			OryxBrick			14	1
 Tile			OryxBrick			15	1
+Tile			OryxBrick			22	0
+Tile			OryxBrick			23	0
+Tile			OryxBrick			21	0
 Tile			OryxBrick			20	0
+Tile			OryxBrick			19	0
+Tile			OryxBrick			18	0
+Tile			OryxBrick			18	1
+Tile			OryxBrick			24	0

@@ -47,6 +47,8 @@ void Scene_Play::init(const std::string& levelPath)
 	m_gridText.setCharacterSize(12);
 
 	loadLevel(levelPath);
+
+	m_randomGenerator = std::mt19937(m_randomDevice());
 }
 
 Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity> entity)
@@ -191,7 +193,7 @@ void Scene_Play::spawnPlayer(float posX, float posY)
 	// TODO: be sure to add the remaining components to the player
 }
 
-void Scene_Play::spawnEnemy(float posX, float posY, std::string& aiType)
+std::shared_ptr<Entity> Scene_Play::spawnEnemy(float posX, float posY, std::string& aiType)
 {
 	auto enemy = m_entityManager.addEntity("Enemy");
 	enemy->addComponent<CAnimation>(m_game->getAssets().getAnimation("EnemyIdle"), true);
@@ -211,6 +213,67 @@ void Scene_Play::spawnEnemy(float posX, float posY, std::string& aiType)
 	{
 		enemy->addComponent<CInput>();
 		enemy->getComponent<CInput>().right = true;
+	}
+	return enemy;
+}
+
+void Scene_Play::sEnemySpawner()
+{
+	m_scenePlayTime = m_scenePlayClock.getElapsedTime();
+	sf::Time t1 = sf::seconds(5);
+
+	if (m_scenePlayTime > t1)
+	{
+		std::uniform_int_distribution<> distributionX(2, 51);
+		std::uniform_int_distribution<> distributionY(3, 8);
+
+		std::string jumping = "Jumping";
+
+		bool successfulCreate = false;
+
+		while (!successfulCreate)
+		{
+			int randomX = distributionX(m_randomGenerator);
+			int randomY = distributionY(m_randomGenerator);
+
+			auto enemy = spawnEnemy(randomX, randomY, jumping);
+
+			// Check for collisions with existing entities
+			bool collision = false;
+
+			// Loop through entities and make sure there isnt any collisions with existing entities
+			for (auto entity : m_entityManager.getEntities())
+			{
+				if (entity->tag() == "Enemy")
+				{
+					continue;
+				}
+
+				if (!canCollide(enemy, entity))
+				{
+					continue;
+				}
+
+				Physics physics;
+
+				Vec2 overlap = physics.GetOverlap(entity, enemy);
+
+				if (overlap.x > 0 && overlap.y)
+				{
+					collision = true;
+					enemy->destroy();
+					break;
+				}
+			}
+
+			if (!collision)
+			{
+				successfulCreate = true;
+				std::cout << "5 seconds have passed, an enemy will spawn at (" << randomX << ", " << randomY << ")\n";
+			}
+		}
+
+		m_scenePlayClock.restart();
 	}
 }
 
@@ -253,6 +316,7 @@ void Scene_Play::update()
 
 	// TODO: implement pause functionality
 
+	sEnemySpawner();
 	sMovement();
 	sLifespan();
 	sCollision();
@@ -552,12 +616,16 @@ void Scene_Play::sMovement()
 		}
 		entity->getComponent<CTransform>().prevPos = entity->getComponent<CTransform>().pos;
 		entity->getComponent<CTransform>().pos += entity->getComponent<CTransform>().velocity;
-	}
 
-	if (m_player->getComponent<CTransform>().pos.y > height() + m_gridSize.y * 2.f)
-	{
-		m_player->destroy();
-		spawnPlayer(3.f, 3.f);
+		if (entity->getComponent<CTransform>().pos.y > height() + m_gridSize.y * 2.f)
+		{
+			entity->destroy();
+			
+			if (entity->tag() == "Player")
+			{
+				spawnPlayer(3.f, 3.f);
+			}
+		}
 	}
 }
 
@@ -645,6 +713,12 @@ void Scene_Play::sCollision()
 
 				if (entity->tag() == "Tile")
 				{
+					Vec2 entityTilePos = pixelToGrid(entity->getComponent<CTransform>().pos.x, entity->getComponent<CTransform>().pos.y);
+					Vec2 playerTilePos = pixelToGrid(m_player->getComponent<CTransform>().pos.x, m_player->getComponent<CTransform>().pos.y);
+
+					/*std::cout << "Player is in tile (" << playerTilePos.x << ", " << playerTilePos.y << ")\n";
+					std::cout << "Player collided with tile at (" << entityTilePos.x << ", " << entityTilePos.y << ")\n";*/
+
 					if (prevCollision.y <= 0.f &&
 						(m_player->getComponent<CTransform>().pos.y > entity->getComponent<CTransform>().pos.y))
 					{
@@ -659,24 +733,27 @@ void Scene_Play::sCollision()
 						(m_player->getComponent<CTransform>().pos.y < entity->getComponent<CTransform>().pos.y))
 					{
 						if (std::abs(m_player->getComponent<CTransform>().pos.x - entity->getComponent<CTransform>().pos.x) <= m_player->getComponent<CBoundingBox>().size.x - 1.0f)
-						{
-							m_player->getComponent<CState>().state = "GROUND";
+							{
+								m_player->getComponent<CState>().state = "GROUND";
 
-							m_player->getComponent<CTransform>().velocity.y = 0;
+								m_player->getComponent<CTransform>().velocity.y = 0;
 
-							m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
+								m_player->getComponent<CTransform>().pos.y = m_player->getComponent<CTransform>().prevPos.y;
 
-							m_player->getComponent<CInput>().canJump = true;
-						}
+								m_player->getComponent<CInput>().canJump = true;
+							}
 					}
 
 					// check collision to the right of player
 					if (prevCollision.x <= 0.f &&
 						(m_player->getComponent<CTransform>().pos.x < entity->getComponent<CTransform>().pos.x))
 					{
-						m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
+						if (std::abs(m_player->getComponent<CTransform>().pos.y - entity->getComponent<CTransform>().pos.y) <= m_player->getComponent<CBoundingBox>().size.y - 1.0f)
+						{
+							m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CTransform>().prevPos.x;
 
-						m_player->getComponent<CTransform>().velocity.x = 0;
+							m_player->getComponent<CTransform>().velocity.x = 0;
+						}
 
 						if (m_player->getComponent<CState>().state != "GROUND")
 						{
