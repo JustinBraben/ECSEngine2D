@@ -150,9 +150,13 @@ void Scene_Play::loadLevel(const std::string& filename)
 
 	// NOTE: all of the code below is sample code which shows you hot to
 	//	set up and use entities with the new syntax, it should be removed
+	std::string aiBackandForth = "BackAndForth";
+	std::string aiJumping = "Jumping";
 
-	spawnPlayer(3.f, 3.f);
-	spawnEnemy(41.f, 4.f);
+	spawnPlayer(16, 5);
+	spawnEnemy(3, 2, aiBackandForth);
+	spawnEnemy(11, 7, aiJumping);
+	spawnEnemy(43, 3, aiBackandForth);
 
 	// some sample entities
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
@@ -187,17 +191,27 @@ void Scene_Play::spawnPlayer(float posX, float posY)
 	// TODO: be sure to add the remaining components to the player
 }
 
-void Scene_Play::spawnEnemy(float posX, float posY)
+void Scene_Play::spawnEnemy(float posX, float posY, std::string& aiType)
 {
 	auto enemy = m_entityManager.addEntity("Enemy");
 	enemy->addComponent<CAnimation>(m_game->getAssets().getAnimation("EnemyIdle"), true);
 	enemy->getComponent<CTransform>().scale.x = 64.0f / enemy->getComponent<CAnimation>().animation.getSize().x;
 	enemy->getComponent<CTransform>().scale.y = 64.0f / enemy->getComponent<CAnimation>().animation.getSize().x;
 	enemy->addComponent<CTransform>(gridToMidPixel(posX, posY, enemy));
-	enemy->getComponent<CTransform>().velocity.x = 2.f;
 	enemy->addComponent<CGravity>(0.1f);
 	enemy->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 	enemy->addComponent<CState>("AIR");
+	enemy->addComponent<CAi>(aiType);
+	if (enemy->getComponent<CAi>().behaviour == "Jumping")
+	{
+		enemy->addComponent<CInput>();
+		enemy->getComponent<CInput>().up = true;
+	}
+	if (enemy->getComponent<CAi>().behaviour == "BackAndForth")
+	{
+		enemy->addComponent<CInput>();
+		enemy->getComponent<CInput>().right = true;
+	}
 }
 
 void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
@@ -371,7 +385,7 @@ void Scene_Play::removeTile()
 	}
 }
 
-void Scene_Play::sMovement()
+void Scene_Play::playerMovement()
 {
 	// TODO: Implement player movement / jumping based on its CInput component
 	// TODO: Implement gravity's effect on the player
@@ -402,7 +416,7 @@ void Scene_Play::sMovement()
 	}
 
 	// If player is moving left but the left key is not being pressed, gradually slow them down
-	if (!m_player->getComponent<CInput>().left && playerVelocity.x < 0) 
+	if (!m_player->getComponent<CInput>().left && playerVelocity.x < 0)
 	{
 		playerVelocity.x += 0.2f;
 
@@ -418,7 +432,7 @@ void Scene_Play::sMovement()
 		if (playerVelocity.x < 0)
 			playerVelocity.x = 0;
 	}
-	
+
 	m_player->getComponent<CTransform>().velocity = playerVelocity;
 
 	// Clamp player velocity in either direction
@@ -445,8 +459,87 @@ void Scene_Play::sMovement()
 		m_player->getComponent<CInput>().canJump = false;
 		m_player->getComponent<CState>().state = "AIR";
 	}
+}
 
+void Scene_Play::enemyMovement() 
+{
+	for (auto enemy : m_entityManager.getEntities("Enemy"))
+	{
+		if (enemy->getComponent<CAi>().behaviour == "Jumping")
+		{
+			// TODO set up movement for a jumping ai
+			Vec2 enemyVelocity(enemy->getComponent<CTransform>().velocity.x, enemy->getComponent<CTransform>().velocity.y);
 
+			if (enemy->getComponent<CInput>().up)
+			{
+				enemyVelocity.y += enemy->getComponent<CInput>().canJump ? -0.6f : 0;
+			}
+
+			enemy->getComponent<CTransform>().velocity = enemyVelocity;
+		}
+
+		if (enemy->getComponent<CAi>().behaviour == "BackAndForth")
+		{
+			// TODO set up movement for a jumping ai
+			Vec2 enemyVelocity(enemy->getComponent<CTransform>().velocity.x, enemy->getComponent<CTransform>().velocity.y);
+
+			if (enemy->getComponent<CInput>().left)
+			{
+				enemyVelocity.x += -0.2f;
+				enemy->getComponent<CTransform>().scale.x = -1 * std::abs(enemy->getComponent<CTransform>().scale.x);
+			}
+
+			if (enemy->getComponent<CInput>().right)
+			{
+				enemyVelocity.x += 0.2f;
+				enemy->getComponent<CTransform>().scale.x = std::abs(enemy->getComponent<CTransform>().scale.x);
+			}
+
+			enemy->getComponent<CTransform>().velocity = enemyVelocity;
+		}
+
+		// Clamp player velocity in either direction
+		if (enemy->getComponent<CTransform>().velocity.y > 6.0f)
+		{
+			enemy->getComponent<CTransform>().velocity.y = 6.0f;
+		}
+
+		if (enemy->getComponent<CTransform>().velocity.x > 4.0f)
+		{
+			enemy->getComponent<CTransform>().velocity.x = 4.0f;
+		}
+
+		if (enemy->getComponent<CTransform>().velocity.y < -6.0f)
+		{
+			enemy->getComponent<CTransform>().velocity.y = -6.0f;
+			enemy->getComponent<CInput>().canJump = false;
+		}
+
+		if (enemy->getComponent<CTransform>().velocity.x < -4.0f)
+		{
+			enemy->getComponent<CTransform>().velocity.x = -4.0f;
+		}
+
+		// If player is moving upwards they are in the air
+		if (enemy->getComponent<CTransform>().velocity.y < 0.0f)
+		{
+			enemy->getComponent<CState>().state = "AIR";
+		}
+
+		// If player is moving downwards they can no longer jump
+		if (enemy->getComponent<CTransform>().velocity.y > 0.0f)
+		{
+			enemy->getComponent<CInput>().canJump = false;
+			enemy->getComponent<CState>().state = "AIR";
+		}
+	}
+}
+
+void Scene_Play::sMovement()
+{
+	playerMovement();
+
+	enemyMovement();
 
 	for (auto entity : m_entityManager.getEntities()) 
 	{
@@ -670,13 +763,18 @@ void Scene_Play::sCollision()
 						}
 					}
 
-					// check collision below enemy
+					// check collision to the right of enemy
 					if (prevCollision.x <= 0.f &&
 						(enemy->getComponent<CTransform>().pos.x < otherEntity->getComponent<CTransform>().pos.x))
 					{
 						enemy->getComponent<CTransform>().pos.x = enemy->getComponent<CTransform>().prevPos.x;
 
-						enemy->getComponent<CTransform>().velocity.x = -1.f * enemy->getComponent<CTransform>().velocity.x;
+
+						if (enemy->getComponent<CAi>().behaviour == "BackAndForth")
+						{
+							enemy->getComponent<CInput>().right = false;
+							enemy->getComponent<CInput>().left = true;
+						}
 
 						enemy->getComponent<CTransform>().scale.x = -1.f * enemy->getComponent<CTransform>().scale.x;
 
@@ -686,7 +784,7 @@ void Scene_Play::sCollision()
 						}
 					}
 
-					// check collision below enemy
+					// check collision to the left of enemy
 					if (prevCollision.x <= 0.f &&
 						(enemy->getComponent<CTransform>().pos.x > otherEntity->getComponent<CTransform>().pos.x))
 					{
@@ -694,9 +792,11 @@ void Scene_Play::sCollision()
 						{
 							enemy->getComponent<CTransform>().pos.x = enemy->getComponent<CTransform>().prevPos.x;
 
-							enemy->getComponent<CTransform>().velocity.x = -1.f * enemy->getComponent<CTransform>().velocity.x;
-
-							enemy->getComponent<CTransform>().scale.x = -1.f * enemy->getComponent<CTransform>().scale.x;
+							if (enemy->getComponent<CAi>().behaviour == "BackAndForth")
+							{
+								enemy->getComponent<CInput>().left = false;
+								enemy->getComponent<CInput>().right = true;
+							}
 						}
 
 						if (enemy->getComponent<CState>().state != "GROUND")

@@ -37,11 +37,13 @@ public:
 	Vec2 pixelToGrid(float pixelX, float pixelY);
 
 	void spawnPlayer(float posX, float posY);
-	void spawnEnemy(float posX, float posY);
+	void spawnEnemy(float posX, float posY, std::string& aiType);
 	void spawnBullet(std::shared_ptr<Entity> entity);
 	bool canCollide(std::shared_ptr<Entity> entity1, std::shared_ptr<Entity> entity2);
 	void setTile();
 	void removeTile();
+	void playerMovement();
+	void enemyMovement();
 
 	void update() override;
 	void onEnd() override;

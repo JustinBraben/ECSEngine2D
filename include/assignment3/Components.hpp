@@ -117,3 +117,11 @@ public:
 	CState(const std::string& s)
 		: state(s) {}
 };
+
+class CAi : public Component {
+public:
+	std::string behaviour = "BackAndForth";
+	CAi() {}
+	CAi(std::string aiType)
+		: behaviour(aiType) {}
+};
