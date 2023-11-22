@@ -100,7 +100,7 @@ void Scene_Menu::sDoAction(const Action& action)
 		m_game->changeScene("PLAY_" + m_levelPaths[m_selectedMenuIndex], newScenePlay);
 	}
 	else if (action.name() == "QUIT") {
-		//onEnd();
+		onEnd();
 	}
 
 	setDelayMove();

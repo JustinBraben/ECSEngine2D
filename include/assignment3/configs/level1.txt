@@ -13,9 +13,7 @@ Tile			OryxBrick			11	0
 Tile			OryxBrick			12	0
 Tile			OryxBrick			13	0
 Tile			OryxBrick			14	0
-Tile			OryxBrick			14	1
 Tile			OryxBrick			15	0
-Tile			OryxBrick			15	1
 Tile			OryxBrick			15	2
 Tile			OryxBrick			16	0
 Tile			OryxBrick			16	1
@@ -27,8 +25,6 @@ Tile			OryxBrick			17	2
 Tile			OryxBrick			18	0
 Tile			OryxBrick			18	1
 Tile			OryxBrick			19	0
-Tile			FlameBottom			20	0
-Dec				FlameTop			20	1
 Tile			OryxBrick			5	3
 Tile			OryxQuestion		6	3
 Tile			OryxBrick			7	3
@@ -79,7 +75,6 @@ Tile			OryxBrick			0	0
 Tile			OryxBrick			46	1
 Tile			OryxBrick			46	2
 Tile			OryxBrick			46	3
-Player 2 6	48 48 5	-20	20 0.75 Buster
 Tile			OryxBrick			-1	0
 Tile			OryxBrick			-2	0
 Tile			OryxBrick			-3	0
@@ -242,4 +237,9 @@ Tile			OryxBrick			1	12
 Tile			OryxBrick			1	13
 Tile			OryxBrick			1	15
 Tile			OryxBrick			1	14
+Tile			OryxBrick			-23	7
 Enemy			MaskDude			41	4
+Player 2 6	48 48 5	-20	20 0.75 Buster
+Tile			OryxBrick			14	1
+Tile			OryxBrick			15	1
+Tile			OryxBrick			20	0

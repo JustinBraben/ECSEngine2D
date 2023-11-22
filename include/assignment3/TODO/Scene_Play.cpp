@@ -151,7 +151,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 	// NOTE: all of the code below is sample code which shows you hot to
 	//	set up and use entities with the new syntax, it should be removed
 
-	spawnPlayer();
+	spawnPlayer(3.f, 3.f);
 	spawnEnemy(41.f, 4.f);
 
 	// some sample entities
@@ -172,14 +172,14 @@ void Scene_Play::loadLevel(const std::string& filename)
 	//	auto& transform2 = entity->get<CTransform>();
 }
 
-void Scene_Play::spawnPlayer()
+void Scene_Play::spawnPlayer(float posX, float posY)
 {
 	// here is a sample player entity which you can use to construct other entities
 	m_player = m_entityManager.addEntity("Player");
 	m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("PlayerIdle"), true);
 	m_player->getComponent<CTransform>().scale.x = 64.0f / m_player->getComponent<CAnimation>().animation.getSize().x;
 	m_player->getComponent<CTransform>().scale.y = 64.0f / m_player->getComponent<CAnimation>().animation.getSize().x;
-	m_player->addComponent<CTransform>(gridToMidPixel(3.f, 5.f, m_player));
+	m_player->addComponent<CTransform>(gridToMidPixel(posX, posY, m_player));
 	m_player->addComponent<CGravity>(0.1f);
 	m_player->addComponent<CBoundingBox>(Vec2(64.0f, 64.0f));
 	m_player->addComponent<CState>("AIR");
@@ -203,7 +203,7 @@ void Scene_Play::spawnEnemy(float posX, float posY)
 void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
 {
 	// TODO: this should spawn a bullet at the given entity, going in the direction the entity is facing
-	auto m_bullet = m_entityManager.addEntity("bullet");
+	auto m_bullet = m_entityManager.addEntity("Bullet");
 	m_bullet->addComponent<CAnimation>(m_game->getAssets().getAnimation("Bullet"), true);
 	m_bullet->addComponent<CTransform>();
 	m_bullet->addComponent<CBoundingBox>(Vec2(32.0f, 32.0f));
@@ -222,6 +222,17 @@ void Scene_Play::spawnBullet(std::shared_ptr<Entity> entity)
 	m_bullet->addComponent<CLifeSpan>(90, 0);
 }
 
+bool Scene_Play::canCollide(std::shared_ptr<Entity> entity1, std::shared_ptr<Entity> entity2)
+{
+	bool canCollideX = std::abs(entity1->getComponent<CTransform>().pos.x - entity2->getComponent<CTransform>().pos.x) <
+		entity1->getComponent<CBoundingBox>().halfSize.x + entity2->getComponent<CBoundingBox>().halfSize.x;
+
+	bool canCollideY = std::abs(entity1->getComponent<CTransform>().pos.y - entity2->getComponent<CTransform>().pos.y) <
+		entity1->getComponent<CBoundingBox>().halfSize.y + entity2->getComponent<CBoundingBox>().halfSize.y;
+
+	return canCollideX && canCollideY;
+}
+
 void Scene_Play::update()
 {
 	m_entityManager.update();
@@ -235,9 +246,129 @@ void Scene_Play::update()
 	sRender();
 }
 
-void Scene_Play::sTileEdit()
+void Scene_Play::setTile()
 {
+	const auto mousePos = sf::Mouse::getPosition(m_game->window());
+	const auto mouseWorldPos = m_game->window().mapPixelToCoords(mousePos);
 
+	const auto gridPos = pixelToGrid(mouseWorldPos.x, mouseWorldPos.y);
+
+	//std::cout << "Mouse in world position (" << mouseWorldPos.x << "," << mouseWorldPos.y << ")\n";
+	//std::cout << "Mouse in tile position (" << gridPos.x << "," << gridPos.y << ")\n";
+
+	//std::cout << "Level path is : " << m_levelPath << "\n;";
+
+	// Specify the file path
+	std::string filePath = m_levelPath;
+
+	// Read the contents of the file into a vector of strings
+	std::ifstream inputFile(filePath);
+	std::vector<std::string> lines;
+	std::string line;
+
+	while (std::getline(inputFile, line))
+	{
+		lines.push_back(line);
+	}
+
+	// Check if the file has at least two lines
+	if (lines.size() >= 2)
+	{
+		// Insert a line with a tile at the second last position
+		std::string newTile = "Tile\t\t\tOryxBrick\t\t\t" + std::to_string(static_cast<int>(gridPos.x)) + "\t" + std::to_string(static_cast<int>(gridPos.y));
+
+		// Check if the line already exists in the file
+		if (std::find(lines.begin(), lines.end(), newTile) == lines.end())
+		{
+			// Line does not exist, insert it
+			lines.insert(lines.end() - 1, newTile);
+
+			// Write the modified content back to the file
+			std::ofstream outputFile(filePath);
+
+			for (size_t i = 0; i < lines.size() - 1; ++i)
+			{
+				outputFile << lines[i] << "\n";
+			}
+
+			// Write the last line without adding an extra newline
+			outputFile << lines.back();
+
+			std::cout << newTile << "\n";
+			std::cout << "New tile inserted at the second last position.\n";
+
+			auto brick = m_entityManager.addEntity("Tile");
+			auto& assets = m_game->getAssets();
+			auto& animation = m_game->getAssets().getAnimation("OryxBrick");
+			brick->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
+			brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
+			brick->addComponent<CAnimation>(animation, true);
+			brick->addComponent<CTransform>(gridToMidPixel(gridPos.x, gridPos.y, brick));
+			brick->addComponent<CBoundingBox>(Vec2(animation.getSize().x * brick->getComponent<CTransform>().scale.x,
+				animation.getSize().y * brick->getComponent<CTransform>().scale.y));
+		}
+		else
+		{
+			std::cout << "Duplicate line found. Not inserting a new tile.\n";
+		}
+	}
+	else
+	{
+		std::cerr << "The file does not have enough lines.\n";
+	}
+}
+
+void Scene_Play::removeTile()
+{
+	const auto mousePos = sf::Mouse::getPosition(m_game->window());
+	const auto mouseWorldPos = m_game->window().mapPixelToCoords(mousePos);
+
+	const auto gridPos = pixelToGrid(mouseWorldPos.x, mouseWorldPos.y);
+
+	//std::cout << "Mouse in world position (" << mouseWorldPos.x << "," << mouseWorldPos.y << ")\n";
+	//std::cout << "Mouse in tile position (" << gridPos.x << "," << gridPos.y << ")\n";
+
+	//std::cout << "Level path is : " << m_levelPath << "\n;";
+
+	// Specify the file path
+	std::string filePath = m_levelPath;
+
+	// Specify the content to be removed
+	std::string tileLineToRemove = "Tile\t\t\tOryxBrick\t\t\t" + std::to_string(static_cast<int>(gridPos.x)) + "\t" + std::to_string(static_cast<int>(gridPos.y));
+
+	// Read the contents of the file into a vector of strings
+	std::ifstream inputFile(filePath);
+	std::vector<std::string> lines;
+	std::string line;
+
+	while (std::getline(inputFile, line))
+	{
+		// Check if the line contains the content to be removed
+		if (line.find(tileLineToRemove) == std::string::npos)
+		{
+			// If not, add the line to the vector
+			lines.push_back(line);
+		}
+	}
+
+	// Write the modified content back to the file
+	std::ofstream outputFile(filePath);
+
+	for (const auto& line : lines) {
+		outputFile << line << "\n";
+	}
+
+	std::cout << "Lines containing \"" << tileLineToRemove << "\" removed.\n";
+
+	for (auto entity : m_entityManager.getEntities())
+	{
+		if (entity->tag() == "Tile")
+		{
+			auto entityGridPos = pixelToGrid(entity->getComponent<CTransform>().pos.x, entity->getComponent<CTransform>().pos.y);
+			if (entityGridPos.x == gridPos.x && entityGridPos.y == gridPos.y)
+				entity->destroy();
+		}
+	}
 }
 
 void Scene_Play::sMovement()
@@ -333,7 +464,7 @@ void Scene_Play::sMovement()
 	if (m_player->getComponent<CTransform>().pos.y > height() + m_gridSize.y * 2.f)
 	{
 		m_player->destroy();
-		spawnPlayer();
+		spawnPlayer(3.f, 3.f);
 	}
 }
 
@@ -371,9 +502,13 @@ void Scene_Play::sCollision()
 
 	// TODO: Implement Physics::GetOverlap() function, use it inside this function
 
-	for (auto bullet : m_entityManager.getEntities("bullet")) {
+	for (auto bullet : m_entityManager.getEntities("Bullet")) {
 		for (auto entity : m_entityManager.getEntities()) {
-			if (entity->tag() == "Player" || entity->tag() == "bullet")
+
+			if (entity->tag() == "Player" || entity->tag() == "Bullet")
+				continue;
+
+			if (!canCollide(bullet, entity))
 				continue;
 
 			Vec2 prevCollision = physics.GetPreviousOverlap(entity, bullet);
@@ -384,29 +519,24 @@ void Scene_Play::sCollision()
 			{
 				std::cout << "bullet collided with " << entity->tag() << " , bullet will be destroyed\n";
 				bullet->destroy();
+
+				if (entity->tag() == "Enemy")
+				{
+					entity->destroy();
+				}
 			}
 		}
 	}
 
 	bool hasCollided = false;
 
-	// Loop for checking collisions for player
-	for (auto entity : m_entityManager.getEntities())
-	{
-		// Skip entities the player should not collide with
-		if (entity->tag() == "Player")
-			continue;
-		
-		if (entity->tag() == "Dec")
-			continue;
-		
-		if (std::abs(entity->getComponent<CTransform>().pos.x - m_player->getComponent<CTransform>().pos.x) > m_player->getComponent<CBoundingBox>().halfSize.x + entity->getComponent<CBoundingBox>().halfSize.x)
-			continue;
-
-		if (std::abs(entity->getComponent<CTransform>().pos.y - m_player->getComponent<CTransform>().pos.y) > m_player->getComponent<CBoundingBox>().halfSize.y + entity->getComponent<CBoundingBox>().halfSize.y)
-			continue;
-
+	// Loop through tiles checking collisions for player
+	for (auto entity : m_entityManager.getEntities("Tile"))
+	{		
 		if (!m_player->isActive())
+			continue;
+
+		if (!canCollide(entity, m_player))
 			continue;
 
 		Vec2 collision = physics.GetOverlap(entity, m_player);
@@ -482,44 +612,43 @@ void Scene_Play::sCollision()
 				if (entity->tag() == "Hazard")
 				{
 					m_player->destroy();
-					spawnPlayer();
+					spawnPlayer(3.f, 3.f);
 				}
 			}
 		}
-		else
+		/*else
 		{
 			m_player->getComponent<CState>().state = "AIR";
-		}
+		}*/
 
 		// Loop through enemies to do collision on
 	}
 
 	// Loop for checking collisions of enemies
-	for (auto entity : m_entityManager.getEntities())
+	for (auto enemy : m_entityManager.getEntities("Enemy"))
 	{
-		// Skip entities the player should not collide with
-		if (entity->tag() != "Enemy")
-			continue;
-
 		for (auto otherEntity : m_entityManager.getEntities())
 		{
 			if (otherEntity->tag() == "Enemy")
 				continue;
 
-			Vec2 collision = physics.GetOverlap(entity, otherEntity);
+			if (!canCollide(enemy, otherEntity))
+				continue;
 
-			if (collision.x > 0.f && collision.y > 0.f && entity->isActive() && otherEntity->isActive())
+			Vec2 collision = physics.GetOverlap(enemy, otherEntity);
+
+			if (collision.x > 0.f && collision.y > 0.f && enemy->isActive() && otherEntity->isActive())
 			{
-				Vec2 prevCollision = physics.GetPreviousOverlap(entity, otherEntity);
+				Vec2 prevCollision = physics.GetPreviousOverlap(enemy, otherEntity);
 
 				if (otherEntity->tag() == "Tile")
 				{
 					if (prevCollision.y <= 0.f &&
-						(entity->getComponent<CTransform>().pos.y > otherEntity->getComponent<CTransform>().pos.y))
+						(enemy->getComponent<CTransform>().pos.y > otherEntity->getComponent<CTransform>().pos.y))
 					{
-						entity->getComponent<CTransform>().pos.y = entity->getComponent<CTransform>().prevPos.y;
+						enemy->getComponent<CTransform>().pos.y = enemy->getComponent<CTransform>().prevPos.y;
 
-						entity->getComponent<CTransform>().velocity.y = 0;
+						enemy->getComponent<CTransform>().velocity.y = 0;
 
 						//m_player->getComponent<CState>().state = "AIR";
 					}
@@ -527,54 +656,60 @@ void Scene_Play::sCollision()
 					// check collision below enemy
 
 					if (prevCollision.y <= 0.f &&
-						(entity->getComponent<CTransform>().pos.y < otherEntity->getComponent<CTransform>().pos.y))
+						(enemy->getComponent<CTransform>().pos.y < otherEntity->getComponent<CTransform>().pos.y))
 					{
-						if (std::abs(entity->getComponent<CTransform>().pos.x - otherEntity->getComponent<CTransform>().pos.x) <= entity->getComponent<CBoundingBox>().size.x - 1.0f)
+						if (std::abs(enemy->getComponent<CTransform>().pos.x - otherEntity->getComponent<CTransform>().pos.x) <= enemy->getComponent<CBoundingBox>().size.x - 1.0f)
 						{
-							entity->getComponent<CState>().state = "GROUND";
+							enemy->getComponent<CState>().state = "GROUND";
 
-							entity->getComponent<CTransform>().velocity.y = 0;
+							enemy->getComponent<CTransform>().velocity.y = 0;
 
-							entity->getComponent<CTransform>().pos.y = entity->getComponent<CTransform>().prevPos.y;
+							enemy->getComponent<CTransform>().pos.y = enemy->getComponent<CTransform>().prevPos.y;
 
-							entity->getComponent<CInput>().canJump = true;
+							enemy->getComponent<CInput>().canJump = true;
 						}
 					}
 
 					// check collision below enemy
 					if (prevCollision.x <= 0.f &&
-						(entity->getComponent<CTransform>().pos.x < otherEntity->getComponent<CTransform>().pos.x))
+						(enemy->getComponent<CTransform>().pos.x < otherEntity->getComponent<CTransform>().pos.x))
 					{
-						entity->getComponent<CTransform>().pos.x = entity->getComponent<CTransform>().prevPos.x;
+						enemy->getComponent<CTransform>().pos.x = enemy->getComponent<CTransform>().prevPos.x;
 
-						entity->getComponent<CTransform>().velocity.x = -1.f * entity->getComponent<CTransform>().velocity.x;
+						enemy->getComponent<CTransform>().velocity.x = -1.f * enemy->getComponent<CTransform>().velocity.x;
 
-						entity->getComponent<CTransform>().scale.x = -1.f * entity->getComponent<CTransform>().scale.x;
+						enemy->getComponent<CTransform>().scale.x = -1.f * enemy->getComponent<CTransform>().scale.x;
 
-						if (entity->getComponent<CState>().state != "GROUND")
+						if (enemy->getComponent<CState>().state != "GROUND")
 						{
-							entity->getComponent<CState>().state = "WALLSLIDE";
+							enemy->getComponent<CState>().state = "WALLSLIDE";
 						}
 					}
 
 					// check collision below enemy
 					if (prevCollision.x <= 0.f &&
-						(entity->getComponent<CTransform>().pos.x > otherEntity->getComponent<CTransform>().pos.x))
+						(enemy->getComponent<CTransform>().pos.x > otherEntity->getComponent<CTransform>().pos.x))
 					{
-						if (std::abs(entity->getComponent<CTransform>().pos.y - otherEntity->getComponent<CTransform>().pos.y) <= entity->getComponent<CBoundingBox>().size.y - 1.0f)
+						if (std::abs(enemy->getComponent<CTransform>().pos.y - otherEntity->getComponent<CTransform>().pos.y) <= enemy->getComponent<CBoundingBox>().size.y - 1.0f)
 						{
-							entity->getComponent<CTransform>().pos.x = entity->getComponent<CTransform>().prevPos.x;
+							enemy->getComponent<CTransform>().pos.x = enemy->getComponent<CTransform>().prevPos.x;
 
-							entity->getComponent<CTransform>().velocity.x = -1.f * entity->getComponent<CTransform>().velocity.x;
+							enemy->getComponent<CTransform>().velocity.x = -1.f * enemy->getComponent<CTransform>().velocity.x;
 
-							entity->getComponent<CTransform>().scale.x = -1.f * entity->getComponent<CTransform>().scale.x;
+							enemy->getComponent<CTransform>().scale.x = -1.f * enemy->getComponent<CTransform>().scale.x;
 						}
 
-						if (entity->getComponent<CState>().state != "GROUND")
+						if (enemy->getComponent<CState>().state != "GROUND")
 						{
-							entity->getComponent<CState>().state = "WALLSLIDE";
+							enemy->getComponent<CState>().state = "WALLSLIDE";
 						}
 					}
+				}
+
+				if (otherEntity->tag() == "Player")
+				{
+					otherEntity->destroy();
+					spawnPlayer(3, 3);
 				}
 			}
 		}
@@ -598,7 +733,7 @@ void Scene_Play::sDoAction(const Action& action)
 		else if (action.name() == "TOGGLE_COLLISION") { m_drawCollision = !m_drawCollision;  }
 		else if (action.name() == "TOGGLE_GRID") { m_drawGrid = !m_drawGrid;  }
 		else if (action.name() == "PAUSE") { setPaused(!m_paused);  }
-		else if (action.name() == "QUIT") { onEnd();  }
+		/*else if (action.name() == "QUIT") { onEnd();  }*/
 
 		if (action.name() == "MOVE_LEFT") 
 		{ 
@@ -627,126 +762,11 @@ void Scene_Play::sDoAction(const Action& action)
 
 		if (action.name() == "SET_TILE")
 		{
-			const auto mousePos = sf::Mouse::getPosition(m_game->window());
-			const auto mouseWorldPos = m_game->window().mapPixelToCoords(mousePos);
-
-			const auto gridPos = pixelToGrid(mouseWorldPos.x, mouseWorldPos.y);
-
-			//std::cout << "Mouse in world position (" << mouseWorldPos.x << "," << mouseWorldPos.y << ")\n";
-			//std::cout << "Mouse in tile position (" << gridPos.x << "," << gridPos.y << ")\n";
-
-			//std::cout << "Level path is : " << m_levelPath << "\n;";
-
-			// Specify the file path
-			std::string filePath = m_levelPath;
-
-			// Read the contents of the file into a vector of strings
-			std::ifstream inputFile(filePath);
-			std::vector<std::string> lines;
-			std::string line;
-
-			while (std::getline(inputFile, line)) 
-			{
-				lines.push_back(line);
-			}
-
-			// Check if the file has at least two lines
-			if (lines.size() >= 2) 
-			{
-				// Insert a line with a tile at the second last position
-				std::string newTile = "Tile\t\t\tOryxBrick\t\t\t" + std::to_string(static_cast<int>(gridPos.x)) + "\t" + std::to_string(static_cast<int>(gridPos.y));
-
-				// Check if the line already exists in the file
-				if (std::find(lines.begin(), lines.end(), newTile) == lines.end()) 
-				{
-					// Line does not exist, insert it
-					lines.insert(lines.end() - 1, newTile);
-
-					// Write the modified content back to the file
-					std::ofstream outputFile(filePath);
-
-					for (size_t i = 0; i < lines.size() - 1; ++i) 
-					{
-						outputFile << lines[i] << "\n";
-					}
-
-					// Write the last line without adding an extra newline
-					outputFile << lines.back();
-
-					std::cout << newTile << "\n";
-					std::cout << "New tile inserted at the second last position.\n";
-
-					auto brick = m_entityManager.addEntity("Tile");
-					auto& assets = m_game->getAssets();
-					auto& animation = m_game->getAssets().getAnimation("OryxBrick");
-					brick->getComponent<CTransform>().scale.x = 64.0f / animation.getSize().x;
-					brick->getComponent<CTransform>().scale.y = 64.0f / animation.getSize().y;
-					brick->addComponent<CAnimation>(animation, true);
-					brick->addComponent<CTransform>(gridToMidPixel(gridPos.x, gridPos.y, brick));
-					brick->addComponent<CBoundingBox>(Vec2(animation.getSize().x * brick->getComponent<CTransform>().scale.x,
-						animation.getSize().y * brick->getComponent<CTransform>().scale.y));
-				}
-				else
-				{
-					std::cout << "Duplicate line found. Not inserting a new tile.\n";
-				}
-			}
-			else
-			{
-				std::cerr << "The file does not have enough lines.\n";
-			}
+			setTile();
 		}
 		if (action.name() == "REMOVE_TILE")
 		{
-			const auto mousePos = sf::Mouse::getPosition(m_game->window());
-			const auto mouseWorldPos = m_game->window().mapPixelToCoords(mousePos);
-
-			const auto gridPos = pixelToGrid(mouseWorldPos.x, mouseWorldPos.y);
-
-			//std::cout << "Mouse in world position (" << mouseWorldPos.x << "," << mouseWorldPos.y << ")\n";
-			//std::cout << "Mouse in tile position (" << gridPos.x << "," << gridPos.y << ")\n";
-
-			//std::cout << "Level path is : " << m_levelPath << "\n;";
-
-			// Specify the file path
-			std::string filePath = m_levelPath;
-
-			// Specify the content to be removed
-			std::string tileLineToRemove = "Tile\t\t\tOryxBrick\t\t\t" + std::to_string(static_cast<int>(gridPos.x)) + "\t" + std::to_string(static_cast<int>(gridPos.y));
-
-			// Read the contents of the file into a vector of strings
-			std::ifstream inputFile(filePath);
-			std::vector<std::string> lines;
-			std::string line;
-
-			while (std::getline(inputFile, line)) 
-			{
-				// Check if the line contains the content to be removed
-				if (line.find(tileLineToRemove) == std::string::npos) 
-				{
-					// If not, add the line to the vector
-					lines.push_back(line);
-				}
-			}
-
-			// Write the modified content back to the file
-			std::ofstream outputFile(filePath);
-
-			for (const auto& line : lines) {
-				outputFile << line << "\n";
-			}
-
-			std::cout << "Lines containing \"" << tileLineToRemove << "\" removed.\n";
-
-			for (auto entity : m_entityManager.getEntities())
-			{
-				if (entity->tag() == "Tile")
-				{
-					auto entityGridPos = pixelToGrid(entity->getComponent<CTransform>().pos.x, entity->getComponent<CTransform>().pos.y);
-					if (entityGridPos.x == gridPos.x && entityGridPos.y == gridPos.y)
-						entity->destroy();
-				}
-			}
+			removeTile();
 		}
 	}
 	else if (action.type() == "END") {
@@ -764,11 +784,17 @@ void Scene_Play::sDoAction(const Action& action)
 		if (action.name() == "MOVE_UP")
 		{
 			m_player->getComponent<CInput>().up = false;
+			m_player->getComponent<CInput>().canJump = false;
 		}
 
 		if (action.name() == "MOVE_DOWN")
 		{
 			m_player->getComponent<CInput>().down = false;
+		}
+
+		if (action.name() == "QUIT")
+		{
+			onEnd();
 		}
 	}
 }
