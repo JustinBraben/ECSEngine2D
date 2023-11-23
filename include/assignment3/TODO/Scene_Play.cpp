@@ -159,6 +159,7 @@ void Scene_Play::loadLevel(const std::string& filename)
 	spawnEnemy(3, 2, aiBackandForth);
 	spawnEnemy(11, 7, aiJumping);
 	spawnEnemy(43, 3, aiBackandForth);
+	spawnEnemy(80, 2, aiBackandForth);
 
 	// some sample entities
 	// IMPORTANT: always add the CAnimation component first so that gridToMidPixel can compute correctly
@@ -820,7 +821,6 @@ void Scene_Play::sCollision()
 
 						enemy->getComponent<CTransform>().velocity.y = 0;
 
-						//m_player->getComponent<CState>().state = "AIR";
 					}
 
 					// check collision below enemy
@@ -844,16 +844,18 @@ void Scene_Play::sCollision()
 					if (prevCollision.x <= 0.f &&
 						(enemy->getComponent<CTransform>().pos.x < otherEntity->getComponent<CTransform>().pos.x))
 					{
-						enemy->getComponent<CTransform>().pos.x = enemy->getComponent<CTransform>().prevPos.x;
-
-
-						if (enemy->getComponent<CAi>().behaviour == "BackAndForth")
+						if (std::abs(enemy->getComponent<CTransform>().pos.y - otherEntity->getComponent<CTransform>().pos.y) <= enemy->getComponent<CBoundingBox>().size.y - 1.0f)
 						{
-							enemy->getComponent<CInput>().right = false;
-							enemy->getComponent<CInput>().left = true;
+							enemy->getComponent<CTransform>().pos.x = enemy->getComponent<CTransform>().prevPos.x;
+
+							if (enemy->getComponent<CAi>().behaviour == "BackAndForth")
+							{
+								enemy->getComponent<CInput>().right = false;
+								enemy->getComponent<CInput>().left = true;
+							}
 						}
 
-						enemy->getComponent<CTransform>().scale.x = -1.f * enemy->getComponent<CTransform>().scale.x;
+						//enemy->getComponent<CTransform>().scale.x = -1.f * enemy->getComponent<CTransform>().scale.x;
 
 						if (enemy->getComponent<CState>().state != "GROUND")
 						{
@@ -1097,23 +1099,23 @@ void Scene_Play::sRender()
 	}
 
 	// Player is below screen
-	if (pPos.y > view.getCenter().y)
-	{
-		while (pPos.y - cameraCenterY > m_game->window().getSize().y / 3.0f)
-		{
-			view.setCenter(cameraCenterX, cameraCenterY + 1.0f);
-			m_game->window().setView(view);
-		}
-	}
-	// Player is above screen
-	else
-	{
-		while (cameraCenterY - pPos.y > m_game->window().getSize().y / 3.0f)
-		{
-			view.setCenter(cameraCenterX, cameraCenterY - 1.0f);
-			m_game->window().setView(view);
-		}
-	}
+	//if (pPos.y > view.getCenter().y)
+	//{
+	//	while (pPos.y - cameraCenterY > m_game->window().getSize().y / 3.0f)
+	//	{
+	//		view.setCenter(cameraCenterX, cameraCenterY + 1.0f);
+	//		m_game->window().setView(view);
+	//	}
+	//}
+	//// Player is above screen
+	//else
+	//{
+	//	while (cameraCenterY - pPos.y > m_game->window().getSize().y / 3.0f)
+	//	{
+	//		view.setCenter(cameraCenterX, cameraCenterY - 1.0f);
+	//		m_game->window().setView(view);
+	//	}
+	//}
 
 	// draw all Entity textures / animations
 	if (m_drawTextures) {
