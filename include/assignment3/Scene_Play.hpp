@@ -24,6 +24,7 @@ protected:
 	bool m_drawGrid = false;
 	const Vec2 m_gridSize = { 64, 64 };
 	sf::Text m_gridText;
+	std::vector<std::string> m_aiBehaviours;
 
 	void init(const std::string& levelPath);
 

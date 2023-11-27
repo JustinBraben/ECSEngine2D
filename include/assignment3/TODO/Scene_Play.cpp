@@ -49,6 +49,8 @@ void Scene_Play::init(const std::string& levelPath)
 	loadLevel(levelPath);
 
 	m_randomGenerator = std::mt19937(m_randomDevice());
+
+	m_aiBehaviours = { "Jumping", "BackAndForth" };
 }
 
 Vec2 Scene_Play::gridToMidPixel(float gridX, float gridY, std::shared_ptr<Entity> entity)
@@ -225,10 +227,9 @@ void Scene_Play::sEnemySpawner()
 
 	if (m_scenePlayTime > t1)
 	{
-		std::uniform_int_distribution<> distributionX(2, 51);
-		std::uniform_int_distribution<> distributionY(3, 8);
-
-		std::string jumping = "Jumping";
+		std::uniform_int_distribution<> distributionX(17, 150);
+		std::uniform_int_distribution<> distributionY(5, 10);
+		std::uniform_int_distribution<> distributionAI(0, m_aiBehaviours.size() - 1);
 
 		bool successfulCreate = false;
 
@@ -236,13 +237,14 @@ void Scene_Play::sEnemySpawner()
 		{
 			int randomX = distributionX(m_randomGenerator);
 			int randomY = distributionY(m_randomGenerator);
+			int randomAI = distributionAI(m_randomGenerator);
 
-			auto enemy = spawnEnemy(randomX, randomY, jumping);
+			auto enemy = spawnEnemy(randomX, randomY, m_aiBehaviours[randomAI]);
 
 			// Check for collisions with existing entities
 			bool collision = false;
 
-			// Loop through entities and make sure there isnt any collisions with existing entities
+			// Loop through entities and make sure there are no collisions with existing entities
 			for (auto entity : m_entityManager.getEntities())
 			{
 				if (entity->tag() == "Enemy")
@@ -259,7 +261,7 @@ void Scene_Play::sEnemySpawner()
 
 				Vec2 overlap = physics.GetOverlap(entity, enemy);
 
-				if (overlap.x > 0 && overlap.y)
+				if (overlap.x > 0 && overlap.y > 0)
 				{
 					collision = true;
 					enemy->destroy();
